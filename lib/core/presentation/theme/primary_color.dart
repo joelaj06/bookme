@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class PrimaryColor{
+  PrimaryColor._();
   static const MaterialColor color = MaterialColor(_primaryPrimaryValue, <int, Color>{
     50: Color(0xFFFEF0E3),
     100: Color(0xFFFCD9B9),
@@ -15,7 +16,7 @@ class PrimaryColor{
   });
   static const int _primaryPrimaryValue = 0xFFF68014;
 
-  static const int backgroundColor = 0xFEFEFE;
+  static const Color backgroundColor = Color(0xFFFEFEFE);
 
   static const MaterialColor primaryAccent = MaterialColor(_primaryAccentValue, <int, Color>{
     100: Color(0xFFFFFFFF),
