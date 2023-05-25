@@ -19,6 +19,10 @@ class HomeController extends GetxController{
   ];
 
 
+  void navigateToServiceDetailsScreen(int index) async{
+    await Get.toNamed<dynamic>(AppRoutes.serviceDetails,
+        arguments: index);
+  }
 
   void navigateToPromotionsPage() async{
     await Get.toNamed<dynamic>(AppRoutes.promotions);

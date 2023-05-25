@@ -1,22 +1,24 @@
 import 'package:flutter/material.dart';
 
 import '../utitls/app_spacing.dart';
-class LocationIcon extends StatelessWidget {
-   LocationIcon({required this.text,
+class IconText extends StatelessWidget {
+  const IconText({required this.text,
      this.textColor,
      this.iconColor,
+     this.icon,
      Key? key}) : super(key: key);
 
-  String text;
-  Color? iconColor;
-  Color? textColor;
+  final String text;
+  final Color? iconColor;
+  final Color? textColor;
+  final IconData? icon;
 
   @override
   Widget build(BuildContext context) {
     return   Row(
       children:  <Widget>[
          Icon(
-          Icons.place_outlined,
+          icon ?? Icons.place_outlined,
           size: 16,
           color: iconColor,
         ),

@@ -4,6 +4,7 @@ import 'package:bookme/features/bookme/presentation/bookings/getx/bookings_bindi
 import 'package:bookme/features/bookme/presentation/bookings/screens/bookings_screen.dart';
 import 'package:bookme/features/bookme/presentation/home/getx/home_bindings.dart';
 import 'package:bookme/features/bookme/presentation/more/screens/more_screen.dart';
+import 'package:bookme/features/bookme/presentation/promotions/getx/promotions_bindings.dart';
 import 'package:bookme/features/bookme/presentation/promotions/screens/promotions_screen.dart';
 import 'package:bookme/features/bookme/presentation/services/getx/services_bindings.dart';
 import 'package:bookme/features/bookme/presentation/services/screens/service_details_screen.dart';
@@ -19,6 +20,7 @@ class Pages {
       page: () => const BaseScreen(),
       bindings: <Bindings>[
         ServicesBindings(),
+        BookingBindings(),
       ]
     ),
     GetPage<AppRoutes>(
@@ -40,6 +42,7 @@ class Pages {
     GetPage<AppRoutes>(
       name: AppRoutes.promotions,
       page: () => const PromotionsScreen(),
+      binding: PromotionBindings(),
     ),
     GetPage<AppRoutes>(
       name: AppRoutes.serviceDetails,

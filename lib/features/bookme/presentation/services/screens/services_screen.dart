@@ -110,7 +110,7 @@ class ServicesScreen extends GetView<ServicesController> {
                           style: context.textTheme.bodyMedium?.copyWith(
                               fontSize: 15, fontWeight: FontWeight.w500),
                         ),
-                       LocationIcon(text: 'Kasoa, Ofankor'),
+                       IconText(text: 'Kasoa, Ofankor'),
                         SizedBox(
                           child: Text(
                             controller.description,

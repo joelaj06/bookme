@@ -118,7 +118,26 @@ class ServiceDetailsScreen extends GetView<ServicesController> {
                       const AppRating(value: '4.7'),
                     ],
                   ),
-                  LocationIcon(
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Row(
+                        children:  <Widget>[
+                          const Icon(Ionicons.person_circle_outline),
+                          const AppSpacing(h: 10,),
+                          Text('John Doe',
+                          style: context.textTheme.bodyLarge?.copyWith(
+                            fontSize: 20,
+                          ),),
+                        ],
+                      ),
+                      TextButton(
+                        onPressed: () {},
+                        child: const Text('View Profile'),
+                      ),
+                    ],
+                  ),
+                  IconText(
                     text: 'Kasoa, Ofankor',
                     textColor: PrimaryColor.color,
                     iconColor: PrimaryColor.color,
@@ -141,7 +160,7 @@ class ServiceDetailsScreen extends GetView<ServicesController> {
   Widget _buildBottomNavigationItems() {
     return SizedBox(
       height: 80,
-     // color: Colors.red,
+      // color: Colors.red,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,

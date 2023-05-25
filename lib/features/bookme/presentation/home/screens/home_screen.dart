@@ -117,7 +117,15 @@ class HomeScreen extends GetView<HomeController> {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemBuilder: (BuildContext context, int index) {
-        return Padding(
+        return _buildPromotionServiceCard(context,index);
+      },
+    );
+  }
+
+  GestureDetector _buildPromotionServiceCard(BuildContext context,int index) {
+    return GestureDetector(
+      onTap: () => controller.navigateToServiceDetailsScreen(index),
+      child: Padding(
           padding: AppPaddings.mA,
           child: Container(
             decoration: BoxDecoration(
@@ -193,8 +201,7 @@ class HomeScreen extends GetView<HomeController> {
               ),
             ),
           ),
-        );
-      },
+        ),
     );
   }
 
@@ -209,90 +216,99 @@ class HomeScreen extends GetView<HomeController> {
           shrinkWrap: false,
           itemCount: 6,
           itemBuilder: (BuildContext context, int index) {
-            return _buildPopularServiceCard(context);
+            return _buildPopularServiceCard(context, index);
           }),
     );
   }
 
-  Widget _buildPopularServiceCard(BuildContext context) {
-    return Padding(
-      padding: AppPaddings.mA,
-      child: Container(
-        width: 200,
-        decoration: BoxDecoration(
-            color: PrimaryColor.backgroundColor,
-            borderRadius: BorderRadius.circular(15),
-            //  border: Border.all(color: Colors.red),
-            boxShadow: const <BoxShadow>[
-              BoxShadow(
-                offset: Offset(3, 3),
-                spreadRadius: -8,
-                blurRadius: 10,
-                color: Color.fromRGBO(137, 137, 137, 1),
-              )
-            ]),
-        child: Padding(
-          padding: AppPaddings.mA,
-          child: Column(
-            children: <Widget>[
-              Stack(
-                children: <Widget>[
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(15),
-                    child: Image.asset(
-                      'assets/images/photographer.png',
-                    ),
-                  ),
-                  Positioned(
-                    right: 4,
-                    top: 4,
-                    child: CircleAvatar(
-                      radius: 17,
-                      backgroundColor:
-                          HintColor.color.shade300.withOpacity(0.5),
-                      child: IconButton(
-                        onPressed: () {},
-                        icon: const Icon(
-                          Ionicons.heart,
-                          // Ionicons.heart_outline,
-                          color: SecondaryColor.secondaryAccent,
-                          // Colors.white,
-                          size: 17,
+  Widget _buildPopularServiceCard(BuildContext context,int index) {
+    return GestureDetector(
+      onTap: () => controller.navigateToServiceDetailsScreen(index),
+      child: Padding(
+        padding: AppPaddings.mA,
+        child: Container(
+          width: 200,
+          decoration: BoxDecoration(
+              color: PrimaryColor.backgroundColor,
+              borderRadius: BorderRadius.circular(15),
+              //  border: Border.all(color: Colors.red),
+              boxShadow: const <BoxShadow>[
+                BoxShadow(
+                  offset: Offset(3, 3),
+                  spreadRadius: -8,
+                  blurRadius: 10,
+                  color: Color.fromRGBO(137, 137, 137, 1),
+                )
+              ]),
+          child: Padding(
+            padding: AppPaddings.mA,
+            child: Column(
+              children: <Widget>[
+                Stack(
+                  children: <Widget>[
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(15),
+                      child: Hero(
+                        tag: 'service$index',
+                        child: Image.asset(
+                          'assets/images/photographer.png',
                         ),
                       ),
                     ),
-                  )
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Expanded(
-                    child: Text(
-                      'Hermeland Studios',
-                      style: context.textTheme.bodyMedium
-                          ?.copyWith(fontSize: 15, fontWeight: FontWeight.w500),
-                    ),
+                    Positioned(
+                      right: 4,
+                      top: 4,
+                      child: CircleAvatar(
+                        radius: 17,
+                        backgroundColor:
+                            HintColor.color.shade300.withOpacity(0.5),
+                        child: IconButton(
+                          onPressed: () {},
+                          icon: const Icon(
+                            Ionicons.heart,
+                            // Ionicons.heart_outline,
+                            color: SecondaryColor.secondaryAccent,
+                            // Colors.white,
+                            size: 17,
+                          ),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+                Padding(
+                  padding: AppPaddings.mV,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Expanded(
+                        child: Text(
+                          'Hermeland Studios',
+                          style: context.textTheme.bodyMedium
+                              ?.copyWith(fontSize: 15, fontWeight: FontWeight.w500),
+                        ),
+                      ),
+                      const AppRating(value: '4.7'),
+                    ],
                   ),
-                  const AppRating(value: '4.7'),
-                ],
-              ),
-              const AppSpacing(
-                v: 5,
-              ),
-              LocationIcon(text: 'Kasoa, Ofankor'),
-              const AppSpacing(
-                v: 10,
-              ),
-              Text(
-                'Book for all your creative photos, videos and '
-                'studio shoots. I do door to door service. I do '
-                'Birthday parties, engagements, funerals, picnics',
-                overflow: TextOverflow.ellipsis,
-                maxLines: 4,
-                style: TextStyle(color: HintColor.color.shade400),
-              ),
-            ],
+                ),
+                const AppSpacing(
+                  v: 5,
+                ),
+                const IconText(text: 'Kasoa, Ofankor'),
+                const AppSpacing(
+                  v: 8,
+                ),
+                Text(
+                  'Book for all your creative photos, videos and '
+                  'studio shoots. I do door to door service. I do '
+                  'Birthday parties, engagements, funerals, picnics',
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 3,
+                  style: TextStyle(color: HintColor.color.shade400),
+                ),
+              ],
+            ),
           ),
         ),
       ),
