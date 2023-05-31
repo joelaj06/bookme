@@ -120,6 +120,7 @@ class _AppTextInputFieldState extends State<AppTextInputField> {
             children: <Widget>[
               Expanded(
                 child: TextFormField(
+
                   initialValue: widget.initialValue,
                   onTap: widget.onTap,
                   readOnly: widget.readOnly ?? false,

@@ -11,6 +11,7 @@ class AppButton extends StatefulWidget {
       this.loading = false,
       this.enabled = true,
       required this.text,
+        this.fontSize,
         this.backgroundColor =SecondaryColor.color,
       Key? key})
       : super(key: key);
@@ -20,6 +21,7 @@ class AppButton extends StatefulWidget {
   final bool enabled;
   final String text;
   late  Color backgroundColor;
+  final double? fontSize;
 
   @override
   State<AppButton> createState() => _AppButtonState();
@@ -81,7 +83,7 @@ class _AppButtonState extends State<AppButton> {
                     color: widget.enabled || widget.loading
                         ? Colors.white
                         : HintColor.color.shade50.withOpacity(0.5),
-                    fontSize: 22),
+                    fontSize: widget.fontSize?? 22),
               ),
             ),
           ),

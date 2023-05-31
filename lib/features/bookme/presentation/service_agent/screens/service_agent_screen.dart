@@ -254,7 +254,7 @@ class ServiceAgentScreen extends GetView<ServiceAgentController> {
                     ))
                 .toList(),
           ),
-        )
+        ),
       ],
     );
   }
