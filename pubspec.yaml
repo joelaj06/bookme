@@ -29,16 +29,19 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  calendar_date_picker2: ^0.5.2
   cupertino_icons: ^1.0.2
   flutter:
     sdk: flutter
   freezed_annotation: ^2.2.0
+  full_screen_image: ^2.0.0
   get: ^4.6.5
   http: ^0.13.5
   intl: ^0.18.0
   ionicons: ^0.1.2
   json_annotation: ^4.8.0
   logger: ^1.1.0
+  panara_dialogs: ^0.1.4
 
 dev_dependencies:
   flutter_lints: ^2.0.0

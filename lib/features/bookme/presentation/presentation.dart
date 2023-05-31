@@ -1,0 +1,13 @@
+export 'package:bookme/features/bookme/presentation/base/screen/base_screen.dart';
+export 'package:bookme/features/bookme/presentation/bookings/getx/bookings_bindings.dart';
+export 'package:bookme/features/bookme/presentation/bookings/screens/booking_details_screen.dart';
+export 'package:bookme/features/bookme/presentation/bookings/screens/bookings_screen.dart';
+export 'package:bookme/features/bookme/presentation/home/getx/home_bindings.dart';
+export 'package:bookme/features/bookme/presentation/more/screens/more_screen.dart';
+export 'package:bookme/features/bookme/presentation/promotions/getx/promotions_bindings.dart';
+export 'package:bookme/features/bookme/presentation/promotions/screens/promotions_screen.dart';
+export 'package:bookme/features/bookme/presentation/service_agent/screens/service_agent_screen.dart';
+export 'package:bookme/features/bookme/presentation/services/getx/services_bindings.dart';
+export 'package:bookme/features/bookme/presentation/services/screens/service_details_screen.dart';
+export 'package:bookme/features/bookme/presentation/services/screens/services_screen.dart';
+export '../../../features/bookme/presentation/home/screens/home_screen.dart';

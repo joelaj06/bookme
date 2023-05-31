@@ -91,7 +91,7 @@ class ServicesScreen extends GetView<ServicesController> {
             child: Padding(
               padding: AppPaddings.mA,
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+               // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   ClipRRect(
                     borderRadius: BorderRadius.circular(15),

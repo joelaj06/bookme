@@ -5,6 +5,7 @@ import 'package:bookme/core/presentation/utitls/app_spacing.dart';
 import 'package:bookme/features/bookme/presentation/bookings/getx/bookings_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:ionicons/ionicons.dart';
 
 class BookingsScreen extends GetView<BookingsController> {
   const BookingsScreen({Key? key}) : super(key: key);
@@ -29,7 +30,7 @@ class BookingsScreen extends GetView<BookingsController> {
           children: <Widget>[
             _buildTabHeader(context),
             Expanded(
-              child: _buildPageView(),
+              child: _buildPageView(context),
             ),
           ],
         ),
@@ -37,19 +38,102 @@ class BookingsScreen extends GetView<BookingsController> {
     );
   }
 
-  Widget _buildPageView() {
+  Widget _buildPageView(BuildContext context) {
     return PageView(
       controller: controller.pageController,
       onPageChanged: controller.onPageChanged,
-      children: const <Widget>[
-        Center(
-          child: Text('Pending Jobs'),
-        ),
-        Center(
-          child: Text('History'),
-        ),
+      children: <Widget>[
+        _buildJobHistoryContainer(context,'pending', 'Fri 30th June, 2023'),
+        _buildJobHistoryContainer(context,'completed', 'Sun 28th May, 2023')
       ],
     );
+  }
+
+  Widget _buildJobHistoryContainer(BuildContext context, String status,
+      String date,) {
+    final double width = MediaQuery.of(context).size.width;
+    return ListView.builder(
+        itemCount: 10,
+        physics: const BouncingScrollPhysics(),
+        shrinkWrap: true,
+        itemBuilder: (BuildContext context, int index) {
+          final bool isPending =  status == 'pending';
+          return Padding(
+            padding: AppPaddings.mA,
+            child: GestureDetector(
+              onTap: () {
+                controller.navigateToBookingDetailsScreen(index);
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  color: PrimaryColor.backgroundColor,
+                  borderRadius: BorderRadius.circular(15),
+                  //  border: Border.all(color: Colors.red),
+                  boxShadow: const <BoxShadow>[
+                    BoxShadow(
+                      offset: Offset(3, 3),
+                      spreadRadius: -8,
+                      blurRadius: 10,
+                      color: Color.fromRGBO(137, 137, 137, 1),
+                    ),
+                  ],
+                ),
+                height: 100,
+                width: width,
+                child: Padding(
+                  padding: AppPaddings.mA,
+                  child: Row(
+                    //mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(15),
+                        child: Hero(
+                          tag: 'service$index',
+                          child: Image.asset('assets/images/photographer.png'),
+                        ),
+                      ),
+                      const AppSpacing(
+                        h: 10,
+                      ),
+                      Flexible(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text(
+                              'John Doe',
+                              style: context.textTheme.bodyMedium?.copyWith(
+                                  fontSize: 15, fontWeight: FontWeight.w500),
+                            ),
+                            const Text('Wedding Photoshoot'),
+                            const SizedBox(
+                              child: Text(
+                                'Ghc 1200',
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(color: PrimaryColor.color),
+                              ),
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children:  <Widget>[
+                                Text(
+                                 date
+                                ),
+                                Icon( isPending ?Icons.pending_actions_outlined:
+                                  Ionicons.checkmark_circle,
+                                color: isPending ? Color(0xffbb8833):
+                                  Colors.green,)
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        });
   }
 
   Container _buildTabHeader(BuildContext context) {

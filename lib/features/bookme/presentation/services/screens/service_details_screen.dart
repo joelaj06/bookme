@@ -132,12 +132,14 @@ class ServiceDetailsScreen extends GetView<ServicesController> {
                         ],
                       ),
                       TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          controller.navigateToServiceAgentScreen();
+                        },
                         child: const Text('View Profile'),
                       ),
                     ],
                   ),
-                  IconText(
+                  const IconText(
                     text: 'Kasoa, Ofankor',
                     textColor: PrimaryColor.color,
                     iconColor: PrimaryColor.color,
@@ -158,15 +160,16 @@ class ServiceDetailsScreen extends GetView<ServicesController> {
   }
 
   Widget _buildBottomNavigationItems() {
-    return SizedBox(
+    return Container(
       height: 80,
+      padding: AppPaddings.mA,
       // color: Colors.red,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
           CircleAvatar(
-            radius: 30,
+            radius: 25,
             backgroundColor: HintColor.color.shade300.withOpacity(0.5),
             child: IconButton(
               onPressed: () {},
@@ -175,7 +178,7 @@ class ServiceDetailsScreen extends GetView<ServicesController> {
                 // Ionicons.heart_outline,
                 color: SecondaryColor.secondaryAccent,
                 // Colors.white,
-                size: 30,
+                size: 25,
               ),
             ),
           ),

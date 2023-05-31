@@ -1,17 +1,10 @@
 import 'package:bookme/core/presentation/routes/app_routes.dart';
-import 'package:bookme/features/bookme/presentation/base/screen/base_screen.dart';
-import 'package:bookme/features/bookme/presentation/bookings/getx/bookings_bindings.dart';
-import 'package:bookme/features/bookme/presentation/bookings/screens/bookings_screen.dart';
-import 'package:bookme/features/bookme/presentation/home/getx/home_bindings.dart';
-import 'package:bookme/features/bookme/presentation/more/screens/more_screen.dart';
-import 'package:bookme/features/bookme/presentation/promotions/getx/promotions_bindings.dart';
-import 'package:bookme/features/bookme/presentation/promotions/screens/promotions_screen.dart';
-import 'package:bookme/features/bookme/presentation/services/getx/services_bindings.dart';
-import 'package:bookme/features/bookme/presentation/services/screens/service_details_screen.dart';
-import 'package:bookme/features/bookme/presentation/services/screens/services_screen.dart';
+import 'package:bookme/features/bookme/presentation/service_agent/getx/service_agent_bindings.dart';
+import 'package:bookme/features/bookme/presentation/user_profile/getx/user_profile_bindings.dart';
+import 'package:bookme/features/bookme/presentation/user_profile/screens/user_profile_screen.dart';
 import 'package:get/get.dart';
+import '../../../features/bookme/presentation/presentation.dart';
 
-import '../../../features/bookme/presentation/home/screens/home_screen.dart';
 
 class Pages {
   static final List<GetPage<AppRoutes>> pages = <GetPage<AppRoutes>>[
@@ -21,6 +14,7 @@ class Pages {
       bindings: <Bindings>[
         ServicesBindings(),
         BookingBindings(),
+        UserProfileBindings(),
       ]
     ),
     GetPage<AppRoutes>(
@@ -48,6 +42,21 @@ class Pages {
       name: AppRoutes.serviceDetails,
       page: () => const ServiceDetailsScreen(),
       binding: ServicesBindings(),
+    ),
+    GetPage<AppRoutes>(
+      name: AppRoutes.bookingDetails,
+      page: () => const BookingDetailsScreen(),
+      binding: BookingBindings(),
+    ),
+    GetPage<AppRoutes>(
+      name: AppRoutes.serviceAgent,
+      page: () => const ServiceAgentScreen(),
+      binding: ServiceAgentBindings(),
+    ),
+    GetPage<AppRoutes>(
+      name: AppRoutes.userProfile,
+      page: () => const UserProfileScreen(),
+      binding: UserProfileBindings(),
     ),
   ];
 }

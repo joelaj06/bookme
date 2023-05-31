@@ -50,6 +50,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.1.1"
+  calendar_date_picker2:
+    dependency: "direct main"
+    description:
+      name: calendar_date_picker2
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.5.2"
   characters:
     dependency: transitive
     description:
@@ -151,6 +158,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.2.0"
+  full_screen_image:
+    dependency: "direct main"
+    description:
+      name: full_screen_image
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.0"
   get:
     dependency: "direct main"
     description:
@@ -256,6 +270,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.0"
+  panara_dialogs:
+    dependency: "direct main"
+    description:
+      name: panara_dialogs
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.4"
   path:
     dependency: transitive
     description:

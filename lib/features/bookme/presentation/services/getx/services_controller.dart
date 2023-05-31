@@ -30,6 +30,9 @@ class ServicesController extends GetxController{
 
 
 
+  void navigateToServiceAgentScreen() async{
+    await Get.toNamed<dynamic>(AppRoutes.serviceAgent);
+  }
 
   void onOtherImagesSelected(int index){
     imageIndex(index);

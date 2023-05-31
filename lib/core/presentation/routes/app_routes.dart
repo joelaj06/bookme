@@ -7,4 +7,8 @@ class AppRoutes{
   static const String more = '/more';
   static const String promotions = '/promotions';
   static const String serviceDetails = '/serviceDetails';
+  static const String bookingDetails = '/bookingDetails';
+  static const String chat = '/chat';
+  static const String serviceAgent = '/serviceAgent';
+  static const String userProfile = '/userProfile';
 }
