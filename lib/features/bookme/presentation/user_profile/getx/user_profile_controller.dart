@@ -1,8 +1,10 @@
+import 'package:bookme/core/utitls/base_64.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class UserProfileController extends GetxController {
-
   //reactive variables
   RxInt pageIndex = 0.obs;
   RxString firstName = ''.obs;
@@ -16,10 +18,15 @@ class UserProfileController extends GetxController {
   RxList<String> skills = <String>[].obs;
   Rx<TextEditingController> skillTextEditingController =
       TextEditingController().obs;
-
+  RxBool applyDiscount = false.obs;
+  RxString discountType = '%'.obs;
+  RxList<String> discountValues = <String>['%', 'Gh¢'].obs;
+  RxDouble leastPrice = (0.0).obs;
+  RxList<String> base64Images = <String>[].obs;
+  Rx<XFile?> selectedImageFile = XFile('').obs;
 
   PageController pageController = PageController(initialPage: 0);
-
+  ImagePicker picker = ImagePicker();
 
   @override
   void dispose() {
@@ -27,8 +34,38 @@ class UserProfileController extends GetxController {
     super.dispose();
   }
 
+  void addImage() async {
+    final Map<Permission, PermissionStatus> statuses = await <Permission>[
+      Permission.storage,
+      Permission.camera,
+    ].request();
+    if (statuses[Permission.storage]!.isGranted &&
+        statuses[Permission.camera]!.isGranted) {
+      showImagePicker();
+    } else {
+      debugPrint('no permission provided');
+    }
+  }
 
-  void onChipDeleted(int index){
+  void removeImage(int index) {
+    base64Images.removeAt(index);
+  }
+
+  void showImagePicker() async {
+    final XFile? imageFile =
+        await picker.pickImage(source: ImageSource.gallery);
+    if (imageFile != null) {
+      final String base64StringImage =
+          Base64Convertor().imageToBase64(imageFile.path);
+      base64Images.insert(0, base64StringImage);
+    }
+  }
+
+  void onApplyDiscountInputChanged(bool? value) {
+    applyDiscount(value);
+  }
+
+  void onChipDeleted(int index) {
     skills.removeAt(index);
   }
 
@@ -77,5 +114,4 @@ class UserProfileController extends GetxController {
   void onPageChanged(int index) {
     pageIndex(index);
   }
-
 }

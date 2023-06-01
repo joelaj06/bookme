@@ -103,11 +103,17 @@ class ServiceAgentScreen extends GetView<ServiceAgentController> {
         shrinkWrap: true,
           itemCount: 10,
           itemBuilder: (BuildContext context, int index){
-        return Padding(
-          padding: AppPaddings.mA,
-          child: _buildUserReviewCard(context),
+        return Column(
+          children: <Widget>[
+            Padding(
+              padding: AppPaddings.mA,
+              child: _buildUserReviewCard(context),
+            ),
+            const Divider(height: 1,),
+          ],
         );
-      }),
+      },
+      ),
     );
   }
 

@@ -37,11 +37,15 @@ dependencies:
   full_screen_image: ^2.0.0
   get: ^4.6.5
   http: ^0.13.5
+  image_picker: ^0.8.7
   intl: ^0.18.0
   ionicons: ^0.1.2
   json_annotation: ^4.8.0
   logger: ^1.1.0
+  open_file: ^3.2.1
   panara_dialogs: ^0.1.4
+  permission_handler: ^10.2.0
+  path_provider: ^2.0.11
 
 dev_dependencies:
   flutter_lints: ^2.0.0

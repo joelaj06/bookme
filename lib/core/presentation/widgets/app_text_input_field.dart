@@ -17,7 +17,7 @@ class AppTextInputField extends StatefulWidget {
       this.autoFocus,
       this.obscureText,
       this.padding,
-      this.disabled = false,
+      this.enabled = true,
       this.hideLabel,
       this.lableStyle,
       this.errorStyle,
@@ -57,7 +57,7 @@ class AppTextInputField extends StatefulWidget {
   final bool? autoFocus;
   final bool? obscureText;
   final EdgeInsets? padding;
-  final bool disabled;
+  final bool enabled;
   final bool? hideLabel;
   final TextStyle? lableStyle;
   final TextStyle? errorStyle;
@@ -102,8 +102,9 @@ class _AppTextInputFieldState extends State<AppTextInputField> {
         else
           Text(
             widget.labelText.toString(),
-            style: widget.lableStyle ?? const TextStyle(
+            style: widget.lableStyle ?? TextStyle(
               fontWeight: FontWeight.w500,
+              color: widget.enabled ? Colors.black: HintColor.color.shade100,
             ),
           ),
         const AppSpacing(v: 2,),
@@ -113,8 +114,8 @@ class _AppTextInputFieldState extends State<AppTextInputField> {
               borderRadius: BorderRadius.circular(15),
               border: Border.all(
                 width: 1,
-                color: widget.disabled ? HintColor.color.shade50 :
-                HintColor.color.shade100,
+                color: widget.enabled ? HintColor.color.shade100 :
+                HintColor.color.shade50,
               )),
           child: Row(
             children: <Widget>[
