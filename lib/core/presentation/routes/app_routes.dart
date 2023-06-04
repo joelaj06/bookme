@@ -11,4 +11,6 @@ class AppRoutes{
   static const String chat = '/chat';
   static const String serviceAgent = '/serviceAgent';
   static const String userProfile = '/userProfile';
+  static const String favorites = '/favorites';
+  static const String tasks = '/tasks';
 }

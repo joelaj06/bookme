@@ -55,7 +55,12 @@ class UserProfileScreen extends GetView<UserProfileController> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        _buildSubMenuCard(context, 'touch', 'Favorites', onTap: () {}),
+        _buildSubMenuCard(
+          context,
+          'touch',
+          'Favorites',
+          onTap: controller.navigateToFavoritesScreen
+        ),
         const AppSpacing(
           h: 20,
         ),
@@ -63,7 +68,7 @@ class UserProfileScreen extends GetView<UserProfileController> {
           context,
           'prioritize',
           'Tasks',
-          onTap: () {},
+          onTap: controller.navigateToTasksScreen,
         ),
       ],
     );
@@ -396,6 +401,7 @@ class UserProfileScreen extends GetView<UserProfileController> {
           const AppSpacing(
             v: 10,
           ),
+          //TODO discount end date
           AppTextInputField(
             labelText: 'Least Price',
             textInputType: Platform.isAndroid

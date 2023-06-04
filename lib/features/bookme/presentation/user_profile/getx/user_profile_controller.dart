@@ -1,3 +1,4 @@
+import 'package:bookme/core/presentation/routes/app_routes.dart';
 import 'package:bookme/core/utitls/base_64.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -32,6 +33,15 @@ class UserProfileController extends GetxController {
   void dispose() {
     pageController.dispose();
     super.dispose();
+  }
+
+
+
+  void navigateToTasksScreen(){
+    Get.toNamed<dynamic>(AppRoutes.tasks);
+  }
+ void navigateToFavoritesScreen(){
+    Get.toNamed<dynamic>(AppRoutes.favorites);
   }
 
   void addImage() async {

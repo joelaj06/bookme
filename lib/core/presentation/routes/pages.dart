@@ -1,5 +1,9 @@
 import 'package:bookme/core/presentation/routes/app_routes.dart';
+import 'package:bookme/features/bookme/presentation/favorites/getx/favorites_bindings.dart';
+import 'package:bookme/features/bookme/presentation/favorites/screens/favorite_screen.dart';
 import 'package:bookme/features/bookme/presentation/service_agent/getx/service_agent_bindings.dart';
+import 'package:bookme/features/bookme/presentation/tasks/getx/tasks_bindings.dart';
+import 'package:bookme/features/bookme/presentation/tasks/screens/tasks_screen.dart';
 import 'package:bookme/features/bookme/presentation/user_profile/getx/user_profile_bindings.dart';
 import 'package:bookme/features/bookme/presentation/user_profile/screens/user_profile_screen.dart';
 import 'package:get/get.dart';
@@ -54,9 +58,17 @@ class Pages {
       binding: ServiceAgentBindings(),
     ),
     GetPage<AppRoutes>(
+      name: AppRoutes.favorites,
+      page: () => const FavoriteScreen(),
+      binding: FavoritesBindings(),
+    ),GetPage<AppRoutes>(
       name: AppRoutes.userProfile,
       page: () => const UserProfileScreen(),
       binding: UserProfileBindings(),
+    ),GetPage<AppRoutes>(
+      name: AppRoutes.tasks,
+      page: () => const TasksScreen(),
+      binding: TasksBindings(),
     ),
   ];
 }

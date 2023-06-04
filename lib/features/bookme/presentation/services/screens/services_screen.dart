@@ -60,7 +60,7 @@ class ServicesScreen extends GetView<ServicesController> {
   }
 
   Widget _buildServiceListTile(BuildContext context){
-    double width = MediaQuery.of(context).size.width;
+    final double width = MediaQuery.of(context).size.width;
     return ListView.builder(
       itemCount: 10,
         physics: const BouncingScrollPhysics(),
@@ -110,7 +110,7 @@ class ServicesScreen extends GetView<ServicesController> {
                           style: context.textTheme.bodyMedium?.copyWith(
                               fontSize: 15, fontWeight: FontWeight.w500),
                         ),
-                       IconText(text: 'Kasoa, Ofankor'),
+                       const IconText(text: 'Kasoa, Ofankor'),
                         SizedBox(
                           child: Text(
                             controller.description,
