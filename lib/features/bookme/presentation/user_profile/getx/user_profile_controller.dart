@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:bookme/core/presentation/routes/app_routes.dart';
 import 'package:bookme/core/utitls/base_64.dart';
 import 'package:flutter/material.dart';
@@ -68,6 +71,10 @@ class UserProfileController extends GetxController {
       final String base64StringImage =
           Base64Convertor().imageToBase64(imageFile.path);
       base64Images.insert(0, base64StringImage);
+     // print(base64StringImage.length);
+      // Convert Base64 string to Uint8List
+      Uint8List buffer = base64Decode(base64StringImage.split(',')[1]);
+      print(buffer);
     }
   }
 

@@ -299,13 +299,15 @@ class HomeScreen extends GetView<HomeController> {
                 const AppSpacing(
                   v: 8,
                 ),
-                Text(
-                  'Book for all your creative photos, videos and '
-                  'studio shoots. I do door to door service. I do '
-                  'Birthday parties, engagements, funerals, picnics',
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 3,
-                  style: TextStyle(color: HintColor.color.shade400),
+                Expanded(
+                  child: Text(
+                    'Book for all your creative photos, videos and '
+                    'studio shoots. I do door to door service. I do '
+                    'Birthday parties, engagements, funerals, picnics',
+                    overflow: TextOverflow.fade,
+                    maxLines: 3,
+                    style: TextStyle(color: HintColor.color.shade400),
+                  ),
                 ),
               ],
             ),

@@ -1,14 +1,21 @@
+import 'package:bookme/core/errors/failure.dart';
 import 'package:bookme/core/presentation/routes/app_routes.dart';
 import 'package:bookme/core/presentation/theme/hint_color.dart';
 import 'package:bookme/core/presentation/utitls/app_padding.dart';
 import 'package:bookme/core/presentation/utitls/app_spacing.dart';
 import 'package:bookme/core/presentation/widgets/location_icon.dart';
+import 'package:bookme/core/utitls/base_64.dart';
 import 'package:bookme/features/bookme/presentation/services/getx/services_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:ionicons/ionicons.dart';
 
 import '../../../../../core/presentation/theme/primary_color.dart';
+import '../../../../../core/presentation/widgets/exception_indicators/empty_list_indicator.dart';
+import '../../../../../core/presentation/widgets/exception_indicators/error_indicator.dart';
+import '../../../data/models/response/service/service_model.dart';
 
 class ServicesScreen extends GetView<ServicesController> {
   const ServicesScreen({Key? key}) : super(key: key);
@@ -61,74 +68,119 @@ class ServicesScreen extends GetView<ServicesController> {
 
   Widget _buildServiceListTile(BuildContext context){
     final double width = MediaQuery.of(context).size.width;
-    return ListView.builder(
-      itemCount: 10,
-        physics: const BouncingScrollPhysics(),
-        shrinkWrap: true,
-        itemBuilder: (BuildContext context, int index){
-      return Padding(
-        padding: AppPaddings.mA,
-        child: GestureDetector(
-          onTap: () {
-            controller.navigateToServiceDetailsScreen(index);
+    return RefreshIndicator(
+      onRefresh: () => Future<void>.sync(
+            () {
+
+        },
+      ),
+      child: PagedListView<int, Service>.separated(
+        pagingController: controller.pagingController,
+        builderDelegate: PagedChildBuilderDelegate<Service>(
+          itemBuilder: (BuildContext context, Service service, int index) {
+            return Dismissible(
+              key: Key(service.id.toString()),
+              onDismissed: (DismissDirection direction) {
+                //  controller.deleteTheService(context, index);
+              },
+              child: _buildServiceCard(service,index, width, context),
+            );
           },
-          child: Container(
-            decoration: BoxDecoration(
-              color: PrimaryColor.backgroundColor,
-              borderRadius: BorderRadius.circular(15),
-              //  border: Border.all(color: Colors.red),
-              boxShadow: const <BoxShadow>[
-                BoxShadow(
-                  offset: Offset(3, 3),
-                  spreadRadius: -8,
-                  blurRadius: 10,
-                  color: Color.fromRGBO(137, 137, 137, 1),
+          firstPageErrorIndicatorBuilder: (BuildContext context) =>
+              ErrorIndicator(
+                error: controller.pagingController.value.error as Failure,
+                onTryAgain: () => controller.pagingController.refresh(),
+              ),
+          noItemsFoundIndicatorBuilder: (BuildContext context) =>
+          const EmptyListIndicator(),
+          newPageProgressIndicatorBuilder: (BuildContext context) =>
+          const Center(
+            child: CircularProgressIndicator.adaptive(),
+          ),
+          firstPageProgressIndicatorBuilder: (BuildContext context) =>
+          const Center(
+            child: CircularProgressIndicator.adaptive(),
+          ),
+        ),
+        padding: AppPaddings.lA,
+        separatorBuilder: (BuildContext context, int index) =>
+        const SizedBox.shrink(),
+      ),
+    );
+  }
+
+
+
+  Padding _buildServiceCard(Service service,int index, double width, BuildContext context) {
+    return Padding(
+      padding: AppPaddings.mA,
+      child: GestureDetector(
+        onTap: () {
+          controller.navigateToServiceDetailsScreen(index);
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            color: PrimaryColor.backgroundColor,
+            borderRadius: BorderRadius.circular(15),
+            //  border: Border.all(color: Colors.red),
+            boxShadow: const <BoxShadow>[
+              BoxShadow(
+                offset: Offset(3, 3),
+                spreadRadius: -8,
+                blurRadius: 10,
+                color: Color.fromRGBO(137, 137, 137, 1),
+              ),
+            ],
+          ),
+          height: 100,
+          width: width,
+          child: Padding(
+            padding: AppPaddings.mA,
+            child: Row(
+             // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                /*ClipRRect(
+                  borderRadius: BorderRadius.circular(15),
+                  child: Hero(
+                    tag: 'service$index',
+                      child:  Image.memory(
+                        fit: BoxFit.cover,
+                        Base64Convertor().base64toImage(
+                          '',
+                        ),
+                      ),
+                  ),
+                ),*/
+                const AppSpacing(h: 10,),
+                Flexible(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        service.title,
+                        style: context.textTheme.bodyMedium?.copyWith(
+                            fontSize: 15, fontWeight: FontWeight.w500),
+                      ),
+                      IconText(text: service.location ?? ''),
+                      SizedBox(
+                        child: Text(
+                          service.description,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 2,
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                              color: HintColor.color.shade400),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
-            height: 100,
-            width: width,
-            child: Padding(
-              padding: AppPaddings.mA,
-              child: Row(
-               // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(15),
-                    child: Hero(
-                      tag: 'service$index',
-                        child: Image.asset('assets/images/photographer.png'),
-                    ),
-                  ),
-                  const AppSpacing(h: 10,),
-                  Flexible(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          controller.company,
-                          style: context.textTheme.bodyMedium?.copyWith(
-                              fontSize: 15, fontWeight: FontWeight.w500),
-                        ),
-                       const IconText(text: 'Kasoa, Ofankor'),
-                        SizedBox(
-                          child: Text(
-                            controller.description,
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 2,
-                            style: TextStyle(color: HintColor.color.shade400),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
           ),
         ),
-      );
-    });
+      ),
+    );
   }
 
 
