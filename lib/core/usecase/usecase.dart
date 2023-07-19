@@ -14,10 +14,12 @@ class PageParams {
     this.query,
     this.startDate,
     this.endDate,
+    this.categoryId,
   });
 
   final int page;
   final int size;
+  final String? categoryId;
   final String? query;
   final String? startDate;
   final String? endDate;

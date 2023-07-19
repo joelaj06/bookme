@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ionicons/ionicons.dart';
 
+import '../../../data/models/response/category/category_model.dart';
 import '../getx/home_controller.dart';
 
 class HomeScreen extends GetView<HomeController> {
@@ -328,7 +329,7 @@ class HomeScreen extends GetView<HomeController> {
           shrinkWrap: false,
           itemCount: controller.categories.length,
           itemBuilder: (BuildContext context, int index) {
-            final String category = controller.categories[index];
+            final Category category = controller.categories[index];
             return Padding(
               padding: const EdgeInsets.all(4.0),
               child: GestureDetector(
@@ -348,7 +349,7 @@ class HomeScreen extends GetView<HomeController> {
                       padding: const EdgeInsets.all(8.0),
                       child: Center(
                         child: Text(
-                          category,
+                          category.name,
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: controller.selectedCategory.value == index

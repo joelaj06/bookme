@@ -20,7 +20,7 @@ class Category with _$Category {
 
   factory Category.empty() => const Category(
     id: '',
-    name: '',
+    name: 'All',
     description: ''
   );
 }

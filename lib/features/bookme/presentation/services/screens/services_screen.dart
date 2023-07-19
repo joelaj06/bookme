@@ -4,7 +4,7 @@ import 'package:bookme/core/presentation/theme/hint_color.dart';
 import 'package:bookme/core/presentation/utitls/app_padding.dart';
 import 'package:bookme/core/presentation/utitls/app_spacing.dart';
 import 'package:bookme/core/presentation/widgets/location_icon.dart';
-import 'package:bookme/core/utitls/base_64.dart';
+import 'package:bookme/features/bookme/data/models/response/category/category_model.dart';
 import 'package:bookme/features/bookme/presentation/services/getx/services_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -226,14 +226,14 @@ class ServicesScreen extends GetView<ServicesController> {
           scrollDirection: Axis.horizontal,
           physics: const BouncingScrollPhysics(),
           shrinkWrap: false,
-          itemCount: controller.categories.length,
+          itemCount: controller.homeController.categories.length,
           itemBuilder: (BuildContext context, int index) {
-            final String category = controller.categories[index];
+            final Category category = controller.homeController.categories[index];
             return Padding(
               padding: const EdgeInsets.all(4.0),
               child: GestureDetector(
                 onTap: () {
-                  controller.selectedCategory(index);
+                  controller.onCategorySelected(category.id,index);
                 },
                 child: Obx(
                   () => Container(
@@ -248,7 +248,7 @@ class ServicesScreen extends GetView<ServicesController> {
                       padding: const EdgeInsets.all(8.0),
                       child: Center(
                         child: Text(
-                          category,
+                          category.name,
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: controller.selectedCategory.value == index

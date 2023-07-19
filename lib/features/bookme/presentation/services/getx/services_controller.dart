@@ -4,6 +4,8 @@ import 'package:bookme/core/usecase/usecase.dart';
 import 'package:bookme/features/bookme/data/models/response/listpage/listpage.dart';
 import 'package:bookme/features/bookme/data/models/response/service/service_model.dart';
 import 'package:bookme/features/bookme/domain/usecases/service/fetch_services.dart';
+import 'package:bookme/features/bookme/domain/usecases/service/fetch_services_by_category.dart';
+import 'package:bookme/features/bookme/presentation/home/getx/home_controller.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
@@ -12,25 +14,15 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 class ServicesController extends GetxController {
   ServicesController({
     required this.fetchServices,
+    required this.fetchServicesByCategory,
   });
 
   FetchServices fetchServices;
+  FetchServicesByCategory fetchServicesByCategory;
 
   //reactive variables
   final RxInt selectedCategory = 0.obs;
-  final List<String> categories = <String>[
-    'All',
-    'Beauty and Personal Care',
-    'Home Services',
-    'Event Services',
-    'Health and Wellness',
-    'Tutoring and Education',
-    'Automotive Services',
-    'Pet Services',
-    'Fitness and Sports',
-    'Travel and Transportation',
-    'Fashion and Clothing',
-  ];
+
   final Rx<TextEditingController> searchQueryTextEditingController =
       TextEditingController().obs;
   final RxString query = ''.obs;
@@ -39,22 +31,21 @@ class ServicesController extends GetxController {
       'studio shoots. I do door to door service. I do '
       'Birthday parties, engagements, funerals, picnics';
   final RxInt imageIndex = 0.obs;
-  final RxBool isLoading= false.obs;
+  final RxBool isLoading = false.obs;
+  final RxString categoryId = ''.obs;
 
 
+  // Home controller
+  final HomeController homeController = Get.find();
   // Paging controller
   final PagingController<int, Service> pagingController =
-  PagingController<int, Service>(firstPageKey: 1);
+      PagingController<int, Service>(firstPageKey: 1);
 
   @override
   void onInit() {
     pagingController.addPageRequestListener((int pageKey) {
-      print('paging controller called');
       getAllServices(pageKey);
     });
-
-   // getAllServices(1);
-
     super.onInit();
   }
 
@@ -64,12 +55,21 @@ class ServicesController extends GetxController {
     super.dispose();
   }
 
+  void onCategorySelected(String catId, int index){
+    selectedCategory(index);
+    categoryId(catId);
+    pagingController.refresh();
+  }
+
   void getAllServices(int pageKey) async {
-    final Either<Failure, ListPage<Service>> failureOrServices =
-        await fetchServices(const PageParams(
-      page: 1,
-      size: 10,
-    ));
+    final Either<Failure, ListPage<Service>> failureOrServices = categoryId
+            .value.isEmpty
+        ? await fetchServices(PageParams(
+            page: pageKey,
+            size: 10,
+          ))
+        : await fetchServicesByCategory(
+            PageParams(page: pageKey, size: 10, categoryId: categoryId.value));
     failureOrServices.fold(
       (Failure failure) {},
       (ListPage<Service> newPage) {
@@ -81,13 +81,10 @@ class ServicesController extends GetxController {
 
         if (isLastPage) {
           pagingController.appendLastPage(newItems);
-
         } else {
           final int nextPageKey = pageKey + 1;
           pagingController.appendPage(newItems, nextPageKey);
-
         }
-
       },
     );
   }
