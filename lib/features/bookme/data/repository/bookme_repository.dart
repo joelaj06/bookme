@@ -4,6 +4,8 @@ import 'package:bookme/features/bookme/data/models/response/listpage/listpage.da
 import 'package:bookme/features/bookme/data/models/response/service/service_model.dart';
 import 'package:dartz/dartz.dart';
 
+import '../models/response/review/review_model.dart';
+
 abstract class BookmeRepository{
   Future<Either<Failure,ListPage<Service>>> fetchServices(
   {required int size, required int page, String? query,String? serviceId}
@@ -14,4 +16,6 @@ abstract class BookmeRepository{
       );
 
   Future<Either<Failure, List<Category>>> fetchCategories();
+
+  Future<Either<Failure, List<Review>>> fetchPopularServices();
 }

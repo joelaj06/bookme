@@ -4,8 +4,8 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 
-const String baseUrl = 'http://10.0.2.2:3000/api/';
-const String baseUrlExt = '192.168.42.138:300/api/';
+const String baseUrlLocal = 'http://10.0.2.2:3000/api/';
+const String baseUrl = 'https://bookme-vfk0.onrender.com/api/';
 
 enum Environment { development, production }
 
@@ -53,7 +53,7 @@ extension EnvironmentX on Environment {
   String get url {
     return <Environment, String>{
       Environment.development: baseUrl,
-      Environment.production: '',
+      Environment.production: baseUrl,
     }[this]!;
   }
 }

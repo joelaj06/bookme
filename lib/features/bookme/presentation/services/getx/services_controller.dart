@@ -33,6 +33,7 @@ class ServicesController extends GetxController {
   final RxInt imageIndex = 0.obs;
   final RxBool isLoading = false.obs;
   final RxString categoryId = ''.obs;
+  final RxList<Service> services = <Service>[].obs;
 
 
   // Home controller
@@ -78,7 +79,7 @@ class ServicesController extends GetxController {
 
         final bool isLastPage = newPage.isLastPage(previouslyFetchedItemsCount);
         final List<Service> newItems = newPage.itemList;
-
+        services(newItems);
         if (isLastPage) {
           pagingController.appendLastPage(newItems);
         } else {

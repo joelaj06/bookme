@@ -15,6 +15,7 @@ class AppHTTPClient {
   static  String baseUrl = environment.url;
 
 
+
   //GET
   Future<Map<String,dynamic>> get(String endpoint) async {
     final Uri uri = Uri.parse(

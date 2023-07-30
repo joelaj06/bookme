@@ -3,6 +3,7 @@ import 'package:bookme/features/bookme/data/datasources/bookme_endpoints.dart';
 import 'package:bookme/features/bookme/data/datasources/bookme_remote_datasource.dart';
 import 'package:bookme/features/bookme/data/models/response/category/category_model.dart';
 import 'package:bookme/features/bookme/data/models/response/listpage/listpage.dart';
+import 'package:bookme/features/bookme/data/models/response/review/review_model.dart';
 import 'package:bookme/features/bookme/data/models/response/service/service_model.dart';
 
 class BookmeRemoteDatasourceImpl implements BookmeRemoteDatasource{
@@ -50,6 +51,18 @@ class BookmeRemoteDatasourceImpl implements BookmeRemoteDatasource{
       ),
     );
     return categories;
+  }
+
+  @override
+  Future<List<Review>> fetchPopularServices() async{
+    final Map<String,dynamic> json = await _client.get(BookmeEndpoints.popularServices);
+    final List<dynamic> items = json['items'] as List<dynamic>;
+    final List<Review> popularServices = List<Review>.from(
+      items.map<Review>(
+            (dynamic json) => Review.fromJson(json as Map<String, dynamic>),
+      ),
+    );
+    return popularServices;
   }
 
 }

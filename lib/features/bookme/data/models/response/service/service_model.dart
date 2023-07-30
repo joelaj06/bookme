@@ -16,7 +16,7 @@ class Service with _$Service {
     @JsonKey(name: 'cover_image') String? coverImage,
     String? location,
     User? user,
-    required List<Category> categories,
+    required List<Category>? categories,
     List<String>? images,
     required String description,
     required String title,

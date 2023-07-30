@@ -5,11 +5,13 @@ import 'package:bookme/core/presentation/utitls/app_padding.dart';
 import 'package:bookme/core/presentation/utitls/app_spacing.dart';
 import 'package:bookme/core/presentation/widgets/app_rating_widget.dart';
 import 'package:bookme/core/presentation/widgets/location_icon.dart';
+import 'package:bookme/core/utitls/string_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ionicons/ionicons.dart';
 
 import '../../../data/models/response/category/category_model.dart';
+import '../../../data/models/response/review/review_model.dart';
 import '../getx/home_controller.dart';
 
 class HomeScreen extends GetView<HomeController> {
@@ -215,14 +217,15 @@ class HomeScreen extends GetView<HomeController> {
           scrollDirection: Axis.horizontal,
           physics: const BouncingScrollPhysics(),
           shrinkWrap: false,
-          itemCount: 6,
+          itemCount: controller.popularServices.length,
           itemBuilder: (BuildContext context, int index) {
-            return _buildPopularServiceCard(context, index);
+            return Obx(() =>_buildPopularServiceCard(context, index,controller.popularServices[index]),
+            );
           }),
     );
   }
 
-  Widget _buildPopularServiceCard(BuildContext context,int index) {
+  Widget _buildPopularServiceCard(BuildContext context,int index, Review service) {
     return GestureDetector(
       onTap: () => controller.navigateToServiceDetailsScreen(index),
       child: Padding(
@@ -284,27 +287,25 @@ class HomeScreen extends GetView<HomeController> {
                     children: <Widget>[
                       Expanded(
                         child: Text(
-                          'Hermeland Studios',
+                          service.serviceData!.title.toTitleCase(),
                           style: context.textTheme.bodyMedium
                               ?.copyWith(fontSize: 15, fontWeight: FontWeight.w500),
                         ),
                       ),
-                      const AppRating(value: '4.7'),
+                       AppRating(value: service.rating.toString()),
                     ],
                   ),
                 ),
                 const AppSpacing(
                   v: 5,
                 ),
-                const IconText(text: 'Kasoa, Ofankor'),
+                 IconText(text: service.serviceData!.location!.toTitleCase()),
                 const AppSpacing(
                   v: 8,
                 ),
                 Expanded(
                   child: Text(
-                    'Book for all your creative photos, videos and '
-                    'studio shoots. I do door to door service. I do '
-                    'Birthday parties, engagements, funerals, picnics',
+                    service.serviceData!.description.toTitleCase(),
                     overflow: TextOverflow.fade,
                     maxLines: 3,
                     style: TextStyle(color: HintColor.color.shade400),
@@ -323,48 +324,49 @@ class HomeScreen extends GetView<HomeController> {
     return SizedBox(
       width: width,
       height: 50,
-      child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          physics: const BouncingScrollPhysics(),
-          shrinkWrap: false,
-          itemCount: controller.categories.length,
-          itemBuilder: (BuildContext context, int index) {
-            final Category category = controller.categories[index];
-            return Padding(
-              padding: const EdgeInsets.all(4.0),
-              child: GestureDetector(
-                onTap: () {
-                  controller.selectedCategory(index);
-                },
-                child: Obx(
-                  () => Container(
-                    //width: width,
-                    decoration: BoxDecoration(
-                      color: controller.selectedCategory.value == index
-                          ? PrimaryColor.color
-                          : HintColor.color.shade50,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Center(
-                        child: Text(
-                          category.name,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: controller.selectedCategory.value == index
-                                ? Colors.white
-                                : Colors.black54,
-                            //fontWeight: FontWeight.w600,
+      child: Obx(() =>ListView.builder(
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            shrinkWrap: false,
+            itemCount: controller.categories.length,
+            itemBuilder: (BuildContext context, int index) {
+              final Category category = controller.categories[index];
+              return Padding(
+                padding: const EdgeInsets.all(4.0),
+                child: GestureDetector(
+                  onTap: () {
+                    controller.selectedCategory(index);
+                  },
+                  child: Obx(
+                    () => Container(
+                      //width: width,
+                      decoration: BoxDecoration(
+                        color: controller.selectedCategory.value == index
+                            ? PrimaryColor.color
+                            : HintColor.color.shade50,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Center(
+                          child: Text(
+                            category.name,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: controller.selectedCategory.value == index
+                                  ? Colors.white
+                                  : Colors.black54,
+                              //fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            );
-          }),
+              );
+            }),
+      ),
     );
   }
 }

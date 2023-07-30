@@ -3,6 +3,7 @@ import 'package:bookme/core/utitls/repository.dart';
 import 'package:bookme/features/bookme/data/datasources/bookme_remote_datasource.dart';
 import 'package:bookme/features/bookme/data/models/response/category/category_model.dart';
 import 'package:bookme/features/bookme/data/models/response/listpage/listpage.dart';
+import 'package:bookme/features/bookme/data/models/response/review/review_model.dart';
 import 'package:bookme/features/bookme/data/models/response/service/service_model.dart';
 import 'package:bookme/features/bookme/data/repository/bookme_repository.dart';
 import 'package:dartz/dartz.dart';
@@ -25,6 +26,11 @@ class BookmeRepositoryImpl extends Repository implements BookmeRepository {
   @override
   Future<Either<Failure, List<Category>>> fetchCategories() {
     return makeRequest(bookmeRemoteDatasource.fetchCategories());
+  }
+
+  @override
+  Future<Either<Failure, List<Review>>> fetchPopularServices() {
+    return makeRequest(bookmeRemoteDatasource.fetchPopularServices());
   }
 
 }
