@@ -1,6 +1,7 @@
 // ignore_for_file: invalid_annotation_target
 
 import 'package:bookme/features/bookme/data/models/response/category/category_model.dart';
+import 'package:bookme/features/bookme/data/models/response/discount/discount_model.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../../../../../authentication/data/models/response/user/user_model.dart';
@@ -20,6 +21,7 @@ class Service with _$Service {
     List<String>? images,
     required String description,
     required String title,
+    Discount? discount,
     double? price,
     String? createdAt,
   }) = _Service;

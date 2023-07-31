@@ -10,6 +10,7 @@ class Discount with _$Discount {
   const factory Discount({
     required String type,
     required double value,
+    String? title,
     @JsonKey(name: 'start_date') String? startDate,
     @JsonKey(name: 'end_date') String? endDate,
   }) = _Discount;

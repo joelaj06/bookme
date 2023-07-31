@@ -65,4 +65,19 @@ class BookmeRemoteDatasourceImpl implements BookmeRemoteDatasource{
     return popularServices;
   }
 
+  @override
+  Future<ListPage<Service>> fetchPromotedServices({required int page, required int size}) async {
+    final Map<String,dynamic> json = await _client.get(BookmeEndpoints.promotedServices(page, size));
+    final List<dynamic> items = json['items'] as List<dynamic>;
+    final List<Service> services = List<Service>.from(
+      items.map<Service>(
+            (dynamic json) => Service.fromJson(json as Map<String, dynamic>),
+      ),
+    );
+    return ListPage<Service>(
+      grandTotalCount: int.parse(json['total_count'] as String),
+      itemList: services,
+    );
+  }
+
 }

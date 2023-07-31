@@ -4,34 +4,63 @@ import 'package:bookme/features/bookme/data/models/response/category/category_mo
 import 'package:bookme/features/bookme/data/models/response/review/review_model.dart';
 import 'package:bookme/features/bookme/domain/usecases/category/fetch_categories.dart';
 import 'package:bookme/features/bookme/domain/usecases/service/fetch_popular_services.dart';
+import 'package:bookme/features/bookme/domain/usecases/service/fetch_promoted_services.dart';
 import 'package:dartz/dartz.dart';
 import 'package:get/get.dart';
 
 import '../../../../../core/errors/failure.dart';
+import '../../../data/models/response/listpage/listpage.dart';
+import '../../../data/models/response/service/service_model.dart';
 
 class HomeController extends GetxController {
   HomeController({
     required this.fetchCategories,
     required this.fetchPopularServices,
+    required this.fetchPromotedServices,
   });
 
   final FetchCategories fetchCategories;
   final FetchPopularServices fetchPopularServices;
+  final FetchPromotedServices fetchPromotedServices;
 
   //reactive variables
   final RxInt selectedCategory = 0.obs;
   final RxList<Category> categories = <Category>[].obs;
   final RxList<Review> popularServices = <Review>[].obs;
-  final RxBool isLoading = false.obs;
+  final RxList<Service> promotedServices = <Service>[].obs;
+  final RxBool isLoading = true.obs;
+  final RxBool isPromotedServicesLoading = true.obs;
+
+
 
   @override
   void onInit() {
     getAllCategories();
     getAllPopularServices();
+    getPromotedServices();
     super.onInit();
   }
 
+  void getPromotedServices() async{
+    isPromotedServicesLoading(true);
+    final Either<Failure, ListPage<Service>> failureOrServices =  await fetchPromotedServices(const PageParams(
+      page: 1,
+      size: 5,
+    ));
+    failureOrServices.fold(
+          (Failure failure) {
+            isPromotedServicesLoading(false);
+          },
+          (ListPage<Service> newPage) {
+            isPromotedServicesLoading(false);
+        final List<Service> newItems = newPage.itemList;
+        promotedServices(newItems);
+      },
+    );
+  }
+
   void getAllPopularServices() async {
+    isLoading(true);
     final Either<Failure, List<Review>> failureOrPopularServices =
         await fetchPopularServices(NoParams());
     failureOrPopularServices.fold(

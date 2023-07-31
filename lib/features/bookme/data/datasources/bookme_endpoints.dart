@@ -9,6 +9,6 @@ class BookmeEndpoints{
 
   static const String popularServices = 'services/popular_services';
 
-  static String servicePromotions(int page, int size) =>
+  static String promotedServices(int page, int size) =>
       'services/promotions?page=$page&size=$size';
 }

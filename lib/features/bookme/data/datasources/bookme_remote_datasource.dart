@@ -16,4 +16,9 @@ abstract class BookmeRemoteDatasource {
   Future<List<Category>> fetchCategories();
 
   Future<List<Review>> fetchPopularServices();
+
+  Future<ListPage<Service>> fetchPromotedServices(
+      {required int page,
+        required int size,
+        });
 }

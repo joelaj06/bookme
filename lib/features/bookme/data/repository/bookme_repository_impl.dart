@@ -33,4 +33,9 @@ class BookmeRepositoryImpl extends Repository implements BookmeRepository {
     return makeRequest(bookmeRemoteDatasource.fetchPopularServices());
   }
 
+  @override
+  Future<Either<Failure, ListPage<Service>>> fetchPromotedServices({required int size, required int page}) {
+    return makeRequest(bookmeRemoteDatasource.fetchPromotedServices(page: page, size: size));
+  }
+
 }

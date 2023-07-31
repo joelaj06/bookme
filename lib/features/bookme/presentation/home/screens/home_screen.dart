@@ -12,6 +12,7 @@ import 'package:ionicons/ionicons.dart';
 
 import '../../../data/models/response/category/category_model.dart';
 import '../../../data/models/response/review/review_model.dart';
+import '../../../data/models/response/service/service_model.dart';
 import '../getx/home_controller.dart';
 
 class HomeScreen extends GetView<HomeController> {
@@ -36,7 +37,7 @@ class HomeScreen extends GetView<HomeController> {
                   IconButton(
                     onPressed: () {},
                     icon: const Icon(
-                     Ionicons.search_outline,
+                      Ionicons.search_outline,
                     ),
                   )
                 ],
@@ -115,96 +116,121 @@ class HomeScreen extends GetView<HomeController> {
   }
 
   Widget _buildPromotionServices(BuildContext context) {
-    return ListView.builder(
-      itemCount: 5,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemBuilder: (BuildContext context, int index) {
-        return _buildPromotionServiceCard(context,index);
-      },
+    return Obx(
+      () => controller.isPromotedServicesLoading.value
+          ? const Center(
+              child: SizedBox(
+                height: 40,
+                width: 40,
+                child: CircularProgressIndicator.adaptive(),
+              ),
+            )
+          : ListView.builder(
+              itemCount: controller.promotedServices.length,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemBuilder: (BuildContext context, int index) {
+                return _buildPromotionServiceCard(
+                    context, index, controller.promotedServices[index]);
+              },
+            ),
     );
   }
 
-  GestureDetector _buildPromotionServiceCard(BuildContext context,int index) {
+  GestureDetector _buildPromotionServiceCard(
+      BuildContext context, int index, Service service) {
+    final String title = service.discount!.title ?? service.title;
+    final String discountType = service.discount!.type;
+    final double value = service.discount!.value;
     return GestureDetector(
       onTap: () => controller.navigateToServiceDetailsScreen(index),
       child: Padding(
-          padding: AppPaddings.mA,
-          child: Container(
-            decoration: BoxDecoration(
-              color: PrimaryColor.primaryAccent,
-              borderRadius: BorderRadius.circular(15),
-              //  border: Border.all(color: Colors.red),
-              boxShadow: const <BoxShadow>[
-                BoxShadow(
-                  offset: Offset(3, 3),
-                  spreadRadius: -8,
-                  blurRadius: 10,
-                  color: Color.fromRGBO(137, 137, 137, 1),
+        padding: AppPaddings.mA,
+        child: Container(
+          decoration: BoxDecoration(
+            color: PrimaryColor.primaryAccent,
+            borderRadius: BorderRadius.circular(15),
+            //  border: Border.all(color: Colors.red),
+            boxShadow: const <BoxShadow>[
+              BoxShadow(
+                offset: Offset(3, 3),
+                spreadRadius: -8,
+                blurRadius: 10,
+                color: Color.fromRGBO(137, 137, 137, 1),
+              ),
+            ],
+          ),
+          height: 100,
+          child: Padding(
+            padding: AppPaddings.mA,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(15),
+                      child: Image.asset('assets/images/cake.png'),
+                    ),
+                    const AppSpacing(
+                      h: 10,
+                    ),
+                    Column(
+                      children: <Widget>[
+                        Text(
+                          title,
+                          style: context.textTheme.bodyMedium?.copyWith(
+                              fontSize: 15, fontWeight: FontWeight.w500),
+                        ),
+                        Text(service.title.toTitleCase()),
+                      ],
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            height: 100,
-            child: Padding(
-              padding: AppPaddings.mA,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Row(
-                    children: <Widget>[
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(15),
-                        child: Image.asset('assets/images/cake.png'),
-                      ),
-                      const AppSpacing(h: 10,),
-                      Column(
-                        children: <Widget>[
-                          Text(
-                            'Birthday Cake',
-                            style: context.textTheme.bodyMedium?.copyWith(
-                                fontSize: 15, fontWeight: FontWeight.w500),
-                          ),
-                          const Text('Floral\'s Bakery'),
-                        ],
+                Container(
+                  width: 80,
+                  padding: AppPaddings.mA,
+                  decoration: BoxDecoration(
+                    color: SecondaryColor.color,
+                    borderRadius: BorderRadius.circular(15),
+                    boxShadow: const <BoxShadow>[
+                      BoxShadow(
+                        offset: Offset(3, 3),
+                        spreadRadius: -8,
+                        blurRadius: 10,
+                        color: Color.fromRGBO(137, 137, 137, 1),
                       ),
                     ],
                   ),
-                  Container(
-                    width: 80,
-                    padding: AppPaddings.mA,
-                    decoration: BoxDecoration(
-                        color: SecondaryColor.color,
-                        borderRadius: BorderRadius.circular(15),
-                        boxShadow: const <BoxShadow>[
-                          BoxShadow(
-                            offset: Offset(3, 3),
-                            spreadRadius: -8,
-                            blurRadius: 10,
-                            color: Color.fromRGBO(137, 137, 137, 1),
-                          ),
-                        ],),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children:  <Widget>[
-                        FittedBox(
-                          fit: BoxFit.fill,
-                          child: Text('10%',
-                            style: context.textTheme.bodyLarge
-                                ?.copyWith(fontSize: 30, fontWeight: FontWeight.w500,
-                            color: Colors.white),),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      FittedBox(
+                        fit: BoxFit.fill,
+                        child: Text(
+                          discountType == 'amount' ? 'GHS $value' : '$value%',
+                          style: context.textTheme.bodyLarge?.copyWith(
+                              fontSize: 30,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.white),
                         ),
-                        Text('Off',
-                          style: context.textTheme.bodyMedium
-                              ?.copyWith(fontSize: 15, fontWeight: FontWeight.w500,
-                          color: Colors.white),),
-                      ],
-                    ),
-                  )
-                ],
-              ),
+                      ),
+                      Text(
+                        'Off',
+                        style: context.textTheme.bodyMedium?.copyWith(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white),
+                      ),
+                    ],
+                  ),
+                )
+              ],
             ),
           ),
         ),
+      ),
     );
   }
 
@@ -213,19 +239,29 @@ class HomeScreen extends GetView<HomeController> {
     return SizedBox(
       width: width,
       height: 300,
-      child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          physics: const BouncingScrollPhysics(),
-          shrinkWrap: false,
-          itemCount: controller.popularServices.length,
-          itemBuilder: (BuildContext context, int index) {
-            return Obx(() =>_buildPopularServiceCard(context, index,controller.popularServices[index]),
-            );
-          }),
+      child: Obx(
+        () => controller.isLoading.value
+            ? const Center(
+                child: SizedBox(
+                    height: 40,
+                    width: 40,
+                    child: CircularProgressIndicator.adaptive()),
+              )
+            : ListView.builder(
+                scrollDirection: Axis.horizontal,
+                physics: const BouncingScrollPhysics(),
+                shrinkWrap: false,
+                itemCount: controller.popularServices.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return _buildPopularServiceCard(
+                      context, index, controller.popularServices[index]);
+                }),
+      ),
     );
   }
 
-  Widget _buildPopularServiceCard(BuildContext context,int index, Review service) {
+  Widget _buildPopularServiceCard(
+      BuildContext context, int index, Review service) {
     return GestureDetector(
       onTap: () => controller.navigateToServiceDetailsScreen(index),
       child: Padding(
@@ -288,18 +324,18 @@ class HomeScreen extends GetView<HomeController> {
                       Expanded(
                         child: Text(
                           service.serviceData!.title.toTitleCase(),
-                          style: context.textTheme.bodyMedium
-                              ?.copyWith(fontSize: 15, fontWeight: FontWeight.w500),
+                          style: context.textTheme.bodyMedium?.copyWith(
+                              fontSize: 15, fontWeight: FontWeight.w500),
                         ),
                       ),
-                       AppRating(value: service.rating.toString()),
+                      AppRating(value: service.rating.toString()),
                     ],
                   ),
                 ),
                 const AppSpacing(
                   v: 5,
                 ),
-                 IconText(text: service.serviceData!.location!.toTitleCase()),
+                IconText(text: service.serviceData!.location!.toTitleCase()),
                 const AppSpacing(
                   v: 8,
                 ),
@@ -324,7 +360,8 @@ class HomeScreen extends GetView<HomeController> {
     return SizedBox(
       width: width,
       height: 50,
-      child: Obx(() =>ListView.builder(
+      child: Obx(
+        () => ListView.builder(
             scrollDirection: Axis.horizontal,
             physics: const BouncingScrollPhysics(),
             shrinkWrap: false,
