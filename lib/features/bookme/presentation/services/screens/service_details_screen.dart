@@ -6,17 +6,24 @@ import 'package:bookme/core/presentation/utitls/app_spacing.dart';
 import 'package:bookme/core/presentation/widgets/app_button.dart';
 import 'package:bookme/core/presentation/widgets/app_rating_widget.dart';
 import 'package:bookme/core/presentation/widgets/location_icon.dart';
+import 'package:bookme/features/bookme/presentation/services/arguments/service_arguments.dart';
 import 'package:bookme/features/bookme/presentation/services/getx/services_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ionicons/ionicons.dart';
+
 
 class ServiceDetailsScreen extends GetView<ServicesController> {
   const ServiceDetailsScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final int? args = ModalRoute.of(context)?.settings.arguments as int?;
+    final ServiceArgument? args =
+        ModalRoute.of(context)?.settings.arguments as ServiceArgument?;
+
+    if (args != null) {
+      controller.getAgentReviews(args.service.user?.id ?? args.service.userData!.id, null,);
+    }
 
     return Scaffold(
       extendBodyBehindAppBar: true, // Extend the body behind the AppBar
@@ -34,7 +41,7 @@ class ServiceDetailsScreen extends GetView<ServicesController> {
                     bottomLeft: Radius.circular(30),
                   ),
                   child: Hero(
-                    tag: 'service$args',
+                    tag: 'service${args?.service.id}',
                     child: Obx(
                       () => Image.asset(
                         controller.imageIndex.value == 0
@@ -108,27 +115,33 @@ class ServiceDetailsScreen extends GetView<ServicesController> {
                     children: <Widget>[
                       Flexible(
                         child: Text(
-                          controller.company,
+                          args?.service.title ?? '',
                           style: context.textTheme.bodyLarge?.copyWith(
                             color: SecondaryColor.color,
                             fontSize: 30,
                           ),
                         ),
                       ),
-                      const AppRating(value: '4.7'),
+                       Obx(() =>AppRating(value: controller.averageRating.value.toString(),
+                         ),
+                       ),
                     ],
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
                       Row(
-                        children:  <Widget>[
+                        children: <Widget>[
                           const Icon(Ionicons.person_circle_outline),
-                          const AppSpacing(h: 10,),
-                          Text('John Doe',
-                          style: context.textTheme.bodyLarge?.copyWith(
-                            fontSize: 20,
-                          ),),
+                          const AppSpacing(
+                            h: 10,
+                          ),
+                          Text(
+                           '${args?.service.user?.firstName} ${args?.service.user?.lastName}',
+                            style: context.textTheme.bodyLarge?.copyWith(
+                              fontSize: 20,
+                            ),
+                          ),
                         ],
                       ),
                       TextButton(
@@ -139,8 +152,8 @@ class ServiceDetailsScreen extends GetView<ServicesController> {
                       ),
                     ],
                   ),
-                  const IconText(
-                    text: 'Kasoa, Ofankor',
+                   IconText(
+                    text: args?.service.location ?? '',
                     textColor: PrimaryColor.color,
                     iconColor: PrimaryColor.color,
                   ),
@@ -148,7 +161,7 @@ class ServiceDetailsScreen extends GetView<ServicesController> {
                     v: 10,
                   ),
                   Text(
-                    controller.description,
+                    args?.service.description ?? '',
                   )
                 ],
               ),

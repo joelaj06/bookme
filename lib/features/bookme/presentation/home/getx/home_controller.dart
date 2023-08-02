@@ -5,7 +5,9 @@ import 'package:bookme/features/bookme/data/models/response/review/review_model.
 import 'package:bookme/features/bookme/domain/usecases/category/fetch_categories.dart';
 import 'package:bookme/features/bookme/domain/usecases/service/fetch_popular_services.dart';
 import 'package:bookme/features/bookme/domain/usecases/service/fetch_promoted_services.dart';
+import 'package:bookme/features/bookme/presentation/services/arguments/service_arguments.dart';
 import 'package:dartz/dartz.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 
 import '../../../../../core/errors/failure.dart';
@@ -31,8 +33,6 @@ class HomeController extends GetxController {
   final RxBool isLoading = true.obs;
   final RxBool isPromotedServicesLoading = true.obs;
 
-
-
   @override
   void onInit() {
     getAllCategories();
@@ -41,18 +41,20 @@ class HomeController extends GetxController {
     super.onInit();
   }
 
-  void getPromotedServices() async{
+  void getPromotedServices() async {
     isPromotedServicesLoading(true);
-    final Either<Failure, ListPage<Service>> failureOrServices =  await fetchPromotedServices(const PageParams(
+    final Either<Failure, ListPage<Service>> failureOrServices =
+        await fetchPromotedServices(const PageParams(
       page: 1,
       size: 5,
     ));
     failureOrServices.fold(
-          (Failure failure) {
-            isPromotedServicesLoading(false);
-          },
-          (ListPage<Service> newPage) {
-            isPromotedServicesLoading(false);
+      (Failure failure) {
+        isPromotedServicesLoading(false);
+        debugPrint(failure.message);
+      },
+      (ListPage<Service> newPage) {
+        isPromotedServicesLoading(false);
         final List<Service> newItems = newPage.itemList;
         promotedServices(newItems);
       },
@@ -86,8 +88,23 @@ class HomeController extends GetxController {
     );
   }
 
-  void navigateToServiceDetailsScreen(int index) async {
-    await Get.toNamed<dynamic>(AppRoutes.serviceDetails, arguments: index);
+  void navigateToServiceDetailsScreenReview(Review review) async {
+    final Service service =  Service(
+      id: review.serviceData!.id,
+      title: review.serviceData!.title,
+      description: review.serviceData!.description,
+      location: review.serviceData!.location,
+      user: review.agentData,
+      categories: [],
+    );
+
+    await Get.toNamed<dynamic>(AppRoutes.serviceDetails,
+        arguments: ServiceArgument(service));
+  }
+
+  void navigateToServiceDetailsScreen(Service service) async {
+    await Get.toNamed<dynamic>(AppRoutes.serviceDetails,
+        arguments: ServiceArgument(service));
   }
 
   void navigateToPromotionsPage() async {

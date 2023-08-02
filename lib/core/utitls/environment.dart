@@ -52,7 +52,7 @@ extension EnvironmentX on Environment {
 
   String get url {
     return <Environment, String>{
-      Environment.development: baseUrl,
+      Environment.development: baseUrlLocal,
       Environment.production: baseUrl,
     }[this]!;
   }

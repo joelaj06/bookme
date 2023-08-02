@@ -3,6 +3,7 @@ import 'package:bookme/core/utitls/repository.dart';
 import 'package:bookme/features/bookme/data/datasources/bookme_remote_datasource.dart';
 import 'package:bookme/features/bookme/data/models/response/category/category_model.dart';
 import 'package:bookme/features/bookme/data/models/response/listpage/listpage.dart';
+import 'package:bookme/features/bookme/data/models/response/review/agent_rating_model.dart';
 import 'package:bookme/features/bookme/data/models/response/review/review_model.dart';
 import 'package:bookme/features/bookme/data/models/response/service/service_model.dart';
 import 'package:bookme/features/bookme/data/repository/bookme_repository.dart';
@@ -15,7 +16,7 @@ class BookmeRepositoryImpl extends Repository implements BookmeRepository {
   final BookmeRemoteDatasource bookmeRemoteDatasource;
   @override
   Future<Either<Failure, ListPage<Service>>> fetchServices({required int size, required int page, String? query, String? serviceId}) {
-    return makeRequest(bookmeRemoteDatasource.fetchServices(page: page, size: size));
+    return makeRequest(bookmeRemoteDatasource.fetchServices(page: page, size: size, query: query));
   }
 
   @override
@@ -34,8 +35,13 @@ class BookmeRepositoryImpl extends Repository implements BookmeRepository {
   }
 
   @override
-  Future<Either<Failure, ListPage<Service>>> fetchPromotedServices({required int size, required int page}) {
-    return makeRequest(bookmeRemoteDatasource.fetchPromotedServices(page: page, size: size));
+  Future<Either<Failure, ListPage<Service>>> fetchPromotedServices({required int size, required int page, String? query}) {
+    return makeRequest(bookmeRemoteDatasource.fetchPromotedServices(page: page, size: size,query:query));
+  }
+
+  @override
+  Future<Either<Failure, AgentRating>> fetchAgentReviews({required String agentId, String? userId}) {
+    return makeRequest(bookmeRemoteDatasource.fetchAgentReviews(agentId: agentId, userId: userId));
   }
 
 }

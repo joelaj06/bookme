@@ -11,8 +11,8 @@ class FetchServices implements UseCase<ListPage<Service>, PageParams>{
   final BookmeRepository bookmeRepository;
   @override
   Future<Either<Failure, ListPage<Service>>> call(PageParams params) {
-    print('********************************');
-    return bookmeRepository.fetchServices(size: params.size, page: params.page);
+    return bookmeRepository.fetchServices(size: params.size, page: params.page,
+    query: params.query,);
   }
 
 }

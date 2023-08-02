@@ -3,6 +3,7 @@ import 'package:bookme/features/bookme/data/datasources/bookme_endpoints.dart';
 import 'package:bookme/features/bookme/data/datasources/bookme_remote_datasource.dart';
 import 'package:bookme/features/bookme/data/models/response/category/category_model.dart';
 import 'package:bookme/features/bookme/data/models/response/listpage/listpage.dart';
+import 'package:bookme/features/bookme/data/models/response/review/agent_rating_model.dart';
 import 'package:bookme/features/bookme/data/models/response/review/review_model.dart';
 import 'package:bookme/features/bookme/data/models/response/service/service_model.dart';
 
@@ -13,7 +14,13 @@ class BookmeRemoteDatasourceImpl implements BookmeRemoteDatasource{
   final AppHTTPClient _client;
   @override
   Future<ListPage<Service>> fetchServices({required int page, required int size, String? query,  String? serviceId}) async {
-    final Map<String,dynamic> json = await _client.get(BookmeEndpoints.services(page, size, serviceId));
+    final Map<String,dynamic> json;
+    print(query);
+    if( query == null || query.isEmpty){
+    json = await _client.get(BookmeEndpoints.services(page, size, serviceId));
+    }else{
+      json = await _client.get(BookmeEndpoints.servicesWithQuery(page, size, query));
+    }
     final List<dynamic> items = json['items'] as List<dynamic>;
     final List<Service> services = List<Service>.from(
       items.map<Service>(
@@ -66,8 +73,15 @@ class BookmeRemoteDatasourceImpl implements BookmeRemoteDatasource{
   }
 
   @override
-  Future<ListPage<Service>> fetchPromotedServices({required int page, required int size}) async {
-    final Map<String,dynamic> json = await _client.get(BookmeEndpoints.promotedServices(page, size));
+  Future<ListPage<Service>> fetchPromotedServices({required int page, required int size,String? query}) async {
+
+    final Map<String,dynamic> json;
+    if(query == null || query.isEmpty){
+    json = await _client.get(BookmeEndpoints.promotedServices(page, size));
+
+    }else{
+      json = await _client.get(BookmeEndpoints.promotedServicesWithQuery(page, size,query));
+    }
     final List<dynamic> items = json['items'] as List<dynamic>;
     final List<Service> services = List<Service>.from(
       items.map<Service>(
@@ -78,6 +92,12 @@ class BookmeRemoteDatasourceImpl implements BookmeRemoteDatasource{
       grandTotalCount: int.parse(json['total_count'] as String),
       itemList: services,
     );
+  }
+
+  @override
+  Future<AgentRating> fetchAgentReviews({required String agentId, String? userId}) async{
+    final Map<String,dynamic> json = await _client.get(BookmeEndpoints.reviews(agentId, userId));
+    return AgentRating.fromJson(json);
   }
 
 }

@@ -10,7 +10,7 @@ import 'app_log.dart';
 
 class AppHTTPClient {
 
-  static const int requestTimeout = 10;
+  static const int requestTimeout = 30;
 
   static  String baseUrl = environment.url;
 

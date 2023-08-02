@@ -2,7 +2,9 @@ import 'package:bookme/core/errors/failure.dart';
 import 'package:bookme/core/presentation/routes/app_routes.dart';
 import 'package:bookme/core/usecase/usecase.dart';
 import 'package:bookme/features/bookme/data/models/response/listpage/listpage.dart';
+import 'package:bookme/features/bookme/data/models/response/review/agent_rating_model.dart';
 import 'package:bookme/features/bookme/data/models/response/service/service_model.dart';
+import 'package:bookme/features/bookme/domain/usecases/review/fetch_agent_review.dart';
 import 'package:bookme/features/bookme/domain/usecases/service/fetch_services.dart';
 import 'package:bookme/features/bookme/domain/usecases/service/fetch_services_by_category.dart';
 import 'package:bookme/features/bookme/presentation/home/getx/home_controller.dart';
@@ -11,14 +13,18 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
+import '../arguments/service_arguments.dart';
+
 class ServicesController extends GetxController {
   ServicesController({
     required this.fetchServices,
     required this.fetchServicesByCategory,
+    required this.fetchAgentReview,
   });
 
   FetchServices fetchServices;
   FetchServicesByCategory fetchServicesByCategory;
+  FetchAgentReview fetchAgentReview;
 
   //reactive variables
   final RxInt selectedCategory = 0.obs;
@@ -34,10 +40,11 @@ class ServicesController extends GetxController {
   final RxBool isLoading = false.obs;
   final RxString categoryId = ''.obs;
   final RxList<Service> services = <Service>[].obs;
-
+  final RxDouble averageRating = (0.0).obs;
 
   // Home controller
   final HomeController homeController = Get.find();
+
   // Paging controller
   final PagingController<int, Service> pagingController =
       PagingController<int, Service>(firstPageKey: 1);
@@ -56,10 +63,21 @@ class ServicesController extends GetxController {
     super.dispose();
   }
 
-  void onCategorySelected(String catId, int index){
+  void onCategorySelected(String catId, int index) {
     selectedCategory(index);
     categoryId(catId);
     pagingController.refresh();
+  }
+
+  void getAgentReviews(String agentId, String? userId) async {
+    final Either<Failure, AgentRating> failureOrReview = await fetchAgentReview(
+        PageParams(page: 0, size: 0, agentId: agentId, userId: userId));
+    failureOrReview.fold(
+      (Failure failure) {},
+      (AgentRating rating) {
+        averageRating(rating.averageRating);
+      },
+    );
   }
 
   void getAllServices(int pageKey) async {
@@ -68,6 +86,7 @@ class ServicesController extends GetxController {
         ? await fetchServices(PageParams(
             page: pageKey,
             size: 10,
+            query: query.value,
           ))
         : await fetchServicesByCategory(
             PageParams(page: pageKey, size: 10, categoryId: categoryId.value));
@@ -98,17 +117,18 @@ class ServicesController extends GetxController {
     imageIndex(index);
   }
 
-  void navigateToServiceDetailsScreen(int index) async {
-    await Get.toNamed<dynamic>(AppRoutes.serviceDetails, arguments: index);
+  void navigateToServiceDetailsScreen(Service service) async {
+    await Get.toNamed<dynamic>(AppRoutes.serviceDetails, arguments: ServiceArgument(service));
   }
 
   void clearSearchField() {
     query('');
     searchQueryTextEditingController.value.text = '';
+    pagingController.refresh();
   }
 
-  void onSearchServiceQueryChange(String? value) {
+  void onSearchServiceQuerySubmit(String? value) {
     query(value);
-    searchQueryTextEditingController.value.text = value ?? '';
+    pagingController.refresh();
   }
 }

@@ -12,7 +12,8 @@ class FetchPromotedServices implements UseCase<ListPage<Service>,PageParams>{
   final BookmeRepository bookmeRepository;
   @override
   Future<Either<Failure, ListPage<Service>>> call(PageParams params) {
-    return bookmeRepository.fetchPromotedServices(size: params.size, page: params.page);
+    return bookmeRepository.fetchPromotedServices(size: params.size, page: params.page,
+    query: params.query);
   }
 
 }

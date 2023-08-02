@@ -143,7 +143,7 @@ class HomeScreen extends GetView<HomeController> {
     final String discountType = service.discount!.type;
     final double value = service.discount!.value;
     return GestureDetector(
-      onTap: () => controller.navigateToServiceDetailsScreen(index),
+      onTap: () => controller.navigateToServiceDetailsScreen(service),
       child: Padding(
         padding: AppPaddings.mA,
         child: Container(
@@ -263,7 +263,7 @@ class HomeScreen extends GetView<HomeController> {
   Widget _buildPopularServiceCard(
       BuildContext context, int index, Review service) {
     return GestureDetector(
-      onTap: () => controller.navigateToServiceDetailsScreen(index),
+      onTap: () => controller.navigateToServiceDetailsScreenReview(service),
       child: Padding(
         padding: AppPaddings.mA,
         child: Container(

@@ -1,11 +1,19 @@
 import 'package:bookme/core/presentation/theme/primary_color.dart';
 import 'package:bookme/core/presentation/utitls/app_padding.dart';
+import 'package:bookme/core/utitls/date_formatter.dart';
+import 'package:bookme/core/utitls/string_utils.dart';
+import 'package:bookme/features/bookme/data/models/response/discount/discount_model.dart';
 import 'package:bookme/features/bookme/presentation/promotions/getx/promotions_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:ionicons/ionicons.dart';
 
+import '../../../../../core/errors/failure.dart';
 import '../../../../../core/presentation/utitls/app_spacing.dart';
+import '../../../../../core/presentation/widgets/exception_indicators/empty_list_indicator.dart';
+import '../../../../../core/presentation/widgets/exception_indicators/error_indicator.dart';
+import '../../../data/models/response/service/service_model.dart';
 
 class PromotionsScreen extends GetView<PromotionsController> {
   const PromotionsScreen({Key? key}) : super(key: key);
@@ -114,18 +122,51 @@ class PromotionsScreen extends GetView<PromotionsController> {
     );
   }
 
-  Widget _buildPromotionListTile(BuildContext context) {
-    return ListView.builder(
-      itemCount: 10,
-      shrinkWrap: true,
-      physics: const BouncingScrollPhysics(),
-      itemBuilder: (BuildContext context, int index) {
-        return _buildPromotionServiceCard(context,index);
-      },
+  Widget _buildPromotionListTile(BuildContext context){
+   // final double width = MediaQuery.of(context).size.width;
+    return RefreshIndicator(
+      onRefresh: () => Future<void>.sync(
+            () {
+             controller.promotedServicesPagingController.refresh();
+        },
+      ),
+      child: PagedListView<int, Service>.separated(
+        pagingController: controller.promotedServicesPagingController,
+        builderDelegate: PagedChildBuilderDelegate<Service>(
+          itemBuilder: (BuildContext context, Service service, int index) {
+            return Dismissible(
+              key: Key(service.id.toString()),
+              onDismissed: (DismissDirection direction) {
+                //  controller.deleteTheService(context, index);
+              },
+              child: _buildPromotionServiceCard(context,index,service),
+            );
+          },
+          firstPageErrorIndicatorBuilder: (BuildContext context) =>
+              ErrorIndicator(
+                error: controller.promotedServicesPagingController.value.error as Failure,
+                onTryAgain: () => controller.promotedServicesPagingController.refresh(),
+              ),
+          noItemsFoundIndicatorBuilder: (BuildContext context) =>
+          const EmptyListIndicator(),
+          newPageProgressIndicatorBuilder: (BuildContext context) =>
+          const Center(
+            child: CircularProgressIndicator.adaptive(),
+          ),
+          firstPageProgressIndicatorBuilder: (BuildContext context) =>
+          const Center(
+            child: CircularProgressIndicator.adaptive(),
+          ),
+        ),
+        //padding: AppPaddings.lA,
+        separatorBuilder: (BuildContext context, int index) =>
+        const SizedBox.shrink(),
+      ),
     );
   }
 
-  GestureDetector _buildPromotionServiceCard(BuildContext context,int index) {
+  GestureDetector _buildPromotionServiceCard(BuildContext context,int index, Service service) {
+   final String title = service.discount!.title ?? service.title;
     return GestureDetector(
       onTap: () => controller.navigateToServiceDetailsScreen(index,),
       child: Padding(
@@ -163,18 +204,18 @@ class PromotionsScreen extends GetView<PromotionsController> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         Text(
-                          'Birthday Cake',
+                          title.toTitleCase(),
                           style: context.textTheme.bodyMedium?.copyWith(
                             fontSize: 15,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                        const Text('Floral\'s Bakery'),
-                        const Text('Valid up to'),
+                         Text(service.title.toTitleCase()),
+                        const Expanded(child: Text('Valid up to')),
                         Text(
-                          '3rd June, 2023',
+                          DateFormatter.dateToString(service.discount!.endDate ?? ''),
                           style: context.textTheme.bodyMedium?.copyWith(
-                            fontSize: 15,
+                            //fontSize: 15,
                             fontWeight: FontWeight.w500,
                             color: PrimaryColor.color,
                           ),
@@ -183,7 +224,7 @@ class PromotionsScreen extends GetView<PromotionsController> {
                     ),
                   ],
                 ),
-                _buildDiscountBanner(context)
+                _buildDiscountBanner(context,service.discount!)
               ],
             ),
           ),
@@ -192,7 +233,8 @@ class PromotionsScreen extends GetView<PromotionsController> {
     );
   }
 
-  Container _buildDiscountBanner(BuildContext context) {
+  Container _buildDiscountBanner(BuildContext context, Discount discount) {
+    final double value = discount.value;
     return Container(
       width: 60,
       height: 60,
@@ -219,7 +261,7 @@ class PromotionsScreen extends GetView<PromotionsController> {
             child: FittedBox(
               fit: BoxFit.fill,
               child: Text(
-                '10%',
+                discount.type == 'amount' ? 'GHS $value' : '$value%',
                 style: context.textTheme.bodyLarge?.copyWith(
                     fontSize: 30,
                     fontWeight: FontWeight.w500,
@@ -250,8 +292,8 @@ class PromotionsScreen extends GetView<PromotionsController> {
   }) {
     return TextFormField(
       controller: controller.searchQueryTextEditingController.value,
-      onChanged: (String? value) {
-        controller.onSearchServiceQueryChange(value);
+      onFieldSubmitted: (String? value) {
+        controller.onSearchServiceQuerySubmit(value);
       },
       style: TextStyle(
         color: color,

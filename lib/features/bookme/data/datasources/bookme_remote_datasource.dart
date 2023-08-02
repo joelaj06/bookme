@@ -1,5 +1,6 @@
 import 'package:bookme/features/bookme/data/models/response/category/category_model.dart';
 import 'package:bookme/features/bookme/data/models/response/listpage/listpage.dart';
+import 'package:bookme/features/bookme/data/models/response/review/agent_rating_model.dart';
 import 'package:bookme/features/bookme/data/models/response/review/review_model.dart';
 import 'package:bookme/features/bookme/data/models/response/service/service_model.dart';
 
@@ -19,6 +20,9 @@ abstract class BookmeRemoteDatasource {
 
   Future<ListPage<Service>> fetchPromotedServices(
       {required int page,
-        required int size,
+        required int size, String? query,
         });
+
+  Future<AgentRating> fetchAgentReviews({required String agentId,
+  String? userId});
 }

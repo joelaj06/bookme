@@ -116,7 +116,7 @@ class ServicesScreen extends GetView<ServicesController> {
       padding: AppPaddings.mA,
       child: GestureDetector(
         onTap: () {
-          controller.navigateToServiceDetailsScreen(index);
+          controller.navigateToServiceDetailsScreen(service);
         },
         child: Container(
           decoration: BoxDecoration(
@@ -191,8 +191,8 @@ class ServicesScreen extends GetView<ServicesController> {
   }) {
     return TextFormField(
       controller: controller.searchQueryTextEditingController.value,
-      onChanged: (String? value) {
-        controller.onSearchServiceQueryChange(value);
+      onFieldSubmitted: (String? value) {
+        controller.onSearchServiceQuerySubmit(value);
       },
       style: TextStyle(
         color: color,
