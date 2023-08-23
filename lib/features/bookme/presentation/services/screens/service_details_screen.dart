@@ -12,6 +12,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ionicons/ionicons.dart';
 
+import '../../../../../core/utitls/base_64.dart';
+
 
 class ServiceDetailsScreen extends GetView<ServicesController> {
   const ServiceDetailsScreen({Key? key}) : super(key: key);
@@ -25,52 +27,55 @@ class ServiceDetailsScreen extends GetView<ServicesController> {
       controller.getAgentReviews(args.service.user?.id ?? args.service.userData!.id, null,);
     }
 
+    final String coverImage = args?.service.coverImage ?? '';
+
+    final List<String?> images = <String?>[coverImage, ...args?.service.images ?? <String>[]];
+
+
     return Scaffold(
       extendBodyBehindAppBar: true, // Extend the body behind the AppBar
       bottomNavigationBar: _buildBottomNavigationItems(),
+      appBar: AppBar(
+        leading:  Padding(
+          padding: const EdgeInsets.only(left: 8.0),
+          child: CircleAvatar(
+            backgroundColor: HintColor.color.shade300.withOpacity(0.5),
+            child: IconButton(
+              icon: Icon(
+                Icons.arrow_back,
+                color: HintColor.color.shade50,
+              ),
+              onPressed: () {
+                controller.imageIndex(0);
+                Navigator.pop(context);
+              },
+            ),
+          ),
+        ),
+      ),
       body: Column(
         children: <Widget>[
-          Stack(
-            children: <Widget>[
-              SizedBox(
-                width: double.infinity,
-                height: MediaQuery.of(context).size.height * 0.4,
-                child: ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                    bottomRight: Radius.circular(30),
-                    bottomLeft: Radius.circular(30),
-                  ),
-                  child: Hero(
-                    tag: 'service${args?.service.id}',
-                    child: Obx(
-                      () => Image.asset(
-                        controller.imageIndex.value == 0
-                            ? 'assets/images/photographer.png'
-                            : 'assets/images/p${controller.imageIndex.value}.jpg',
-                        fit: BoxFit.cover,
-                      ),
+          SizedBox(
+            width: double.infinity,
+            height: MediaQuery.of(context).size.height * 0.4,
+            child: ClipRRect(
+              borderRadius: const BorderRadius.only(
+                bottomRight: Radius.circular(30),
+                bottomLeft: Radius.circular(30),
+              ),
+              child: Hero(
+                tag: 'service${args?.service.id}',
+                child: Obx(
+                  () =>Image.memory(
+                    Base64Convertor().base64toImage(
+                      images[controller.imageIndex.value]!,
                     ),
+                    fit: BoxFit.cover,
                   ),
+
                 ),
               ),
-              Positioned(
-                top: 30,
-                left: 16,
-                child: CircleAvatar(
-                  backgroundColor: HintColor.color.shade300.withOpacity(0.5),
-                  child: IconButton(
-                    icon: Icon(
-                      Icons.arrow_back,
-                      color: HintColor.color.shade50,
-                    ),
-                    onPressed: () {
-                      controller.imageIndex(0);
-                      Navigator.pop(context);
-                    },
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
           SizedBox(
             height: 100,
@@ -78,9 +83,8 @@ class ServiceDetailsScreen extends GetView<ServicesController> {
               shrinkWrap: true,
               physics: const BouncingScrollPhysics(),
               scrollDirection: Axis.horizontal,
-              itemCount: 5,
+              itemCount: images.length,
               itemBuilder: (BuildContext context, int index) {
-                index += 1;
                 return GestureDetector(
                   onTap: () {
                     controller.onOtherImagesSelected(index);
@@ -94,7 +98,12 @@ class ServiceDetailsScreen extends GetView<ServicesController> {
                         color: HintColor.color.shade50,
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(15),
-                          child: Image.asset('assets/images/p$index.jpg'),
+                          child: Image.memory(
+                            fit: BoxFit.cover,
+                            Base64Convertor().base64toImage(
+                              images[index]!,
+                            ),
+                          ),
                         ),
                       ),
                     ),
