@@ -6,12 +6,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
+import '../../../features/authentication/data/datasource/auth_local_data_source.dart';
+import '../../utitls/shared_preferences_wrapper.dart';
 import '../routes/pages.dart';
 class BookMeApp extends StatelessWidget {
   const BookMeApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+
+    Get.put<SharedPreferencesWrapper>(
+      SharedPreferencesWrapper(),
+    );
+
+    Get.put<AuthLocalDataSource>(
+      AuthLocalDataSourceImpl(Get.find()),
+    );
 
     return ScreenUtilInit(
       designSize: const Size(375, 812),

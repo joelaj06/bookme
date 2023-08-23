@@ -5,6 +5,11 @@ import 'package:bookme/features/bookme/data/repository/bookme_repository_impl.da
 import 'package:get/get.dart';
 
 import 'core/utitls/shared_preferences_wrapper.dart';
+import 'features/authentication/data/datasource/auth_local_data_source.dart';
+import 'features/authentication/data/datasource/auth_remote_data_source.dart';
+import 'features/authentication/data/datasource/auth_remote_data_source_impl.dart';
+import 'features/authentication/data/repositories/auth_repository.dart';
+import 'features/authentication/data/repositories/auth_repository_impl.dart';
 
 class MainBindings extends Bindings {
   @override
@@ -13,8 +18,23 @@ class MainBindings extends Bindings {
       SharedPreferencesWrapper(),
     );
 
+    Get.put<AuthLocalDataSource>(
+      AuthLocalDataSourceImpl(Get.find()),
+    );
+
     Get.put<AppHTTPClient>(
       AppHTTPClient(),
+    );
+
+    Get.put<AuthRemoteDataSource>(
+      AuthRemoteDataSourceImpl(client: Get.find()),
+    );
+
+    Get.put<AuthRepository>(
+      AuthRepositoryImpl(
+        authRemoteDataSource: Get.find(),
+        authLocalDataSource: Get.find(),
+      ),
     );
 
     Get.put<BookmeRepository>(

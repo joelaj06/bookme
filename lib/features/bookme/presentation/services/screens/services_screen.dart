@@ -15,6 +15,7 @@ import 'package:ionicons/ionicons.dart';
 import '../../../../../core/presentation/theme/primary_color.dart';
 import '../../../../../core/presentation/widgets/exception_indicators/empty_list_indicator.dart';
 import '../../../../../core/presentation/widgets/exception_indicators/error_indicator.dart';
+import '../../../../../core/utitls/base_64.dart';
 import '../../../data/models/response/service/service_model.dart';
 
 class ServicesScreen extends GetView<ServicesController> {
@@ -71,7 +72,7 @@ class ServicesScreen extends GetView<ServicesController> {
     return RefreshIndicator(
       onRefresh: () => Future<void>.sync(
             () {
-
+            controller.pagingController.refresh();
         },
       ),
       child: PagedListView<int, Service>.separated(
@@ -102,7 +103,7 @@ class ServicesScreen extends GetView<ServicesController> {
             child: CircularProgressIndicator.adaptive(),
           ),
         ),
-        padding: AppPaddings.lA,
+        //padding: AppPaddings.lA,
         separatorBuilder: (BuildContext context, int index) =>
         const SizedBox.shrink(),
       ),
@@ -112,6 +113,7 @@ class ServicesScreen extends GetView<ServicesController> {
 
 
   Padding _buildServiceCard(Service service,int index, double width, BuildContext context) {
+    final String image = service.coverImage ?? '';
     return Padding(
       padding: AppPaddings.mA,
       child: GestureDetector(
@@ -139,18 +141,20 @@ class ServicesScreen extends GetView<ServicesController> {
             child: Row(
              // mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                /*ClipRRect(
+                ClipRRect(
                   borderRadius: BorderRadius.circular(15),
                   child: Hero(
                     tag: 'service$index',
-                      child:  Image.memory(
+                      child: image.isEmpty ?
+                          Image.asset('assets/images/no_image.png')
+                      :Image.memory(
                         fit: BoxFit.cover,
                         Base64Convertor().base64toImage(
-                          '',
+                          image,
                         ),
                       ),
                   ),
-                ),*/
+                ),
                 const AppSpacing(h: 10,),
                 Flexible(
                   child: Column(

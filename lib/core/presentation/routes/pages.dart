@@ -1,4 +1,7 @@
 import 'package:bookme/core/presentation/routes/app_routes.dart';
+import 'package:bookme/core/presentation/routes/auth_middleware.dart';
+import 'package:bookme/features/authentication/presentation/login/getx/login_bindings.dart';
+import 'package:bookme/features/authentication/presentation/login/screens/login_screen.dart';
 import 'package:bookme/features/bookme/presentation/favorites/getx/favorites_bindings.dart';
 import 'package:bookme/features/bookme/presentation/service_agent/getx/service_agent_bindings.dart';
 import 'package:bookme/features/bookme/presentation/tasks/getx/tasks_bindings.dart';
@@ -23,6 +26,10 @@ class Pages {
       ]
     ),
     GetPage<AppRoutes>(
+        name: AppRoutes.login,
+        page: () => const LoginScreen(),
+        binding: LoginBindings()),
+    GetPage<AppRoutes>(
         name: AppRoutes.home,
         page: () => const HomeScreen(),
         binding: HomeBindings()),
@@ -33,7 +40,9 @@ class Pages {
     GetPage<AppRoutes>(
         name: AppRoutes.bookings,
         page: () => const BookingsScreen(),
-        binding: BookingBindings()),
+        binding: BookingBindings(),
+        middlewares: <GetMiddleware>[AuthMiddleware()]
+    ),
     GetPage<AppRoutes>(
       name: AppRoutes.more,
       page: () => const MoreScreen(),
@@ -52,24 +61,29 @@ class Pages {
       name: AppRoutes.bookingDetails,
       page: () => const BookingDetailsScreen(),
       binding: BookingBindings(),
+        middlewares: <GetMiddleware>[AuthMiddleware()]
     ),
     GetPage<AppRoutes>(
       name: AppRoutes.serviceAgent,
       page: () => const ServiceAgentScreen(),
       binding: ServiceAgentBindings(),
+        middlewares: <GetMiddleware>[AuthMiddleware()]
     ),
     GetPage<AppRoutes>(
       name: AppRoutes.favorites,
       page: () => const FavoriteScreen(),
       binding: FavoritesBindings(),
+        middlewares: <GetMiddleware>[AuthMiddleware()]
     ),GetPage<AppRoutes>(
       name: AppRoutes.userProfile,
       page: () => const UserProfileScreen(),
       binding: UserProfileBindings(),
+        middlewares: <GetMiddleware>[AuthMiddleware()]
     ),GetPage<AppRoutes>(
       name: AppRoutes.tasks,
       page: () => const TasksScreen(),
       binding: TasksBindings(),
+        middlewares: <GetMiddleware>[AuthMiddleware()]
     ),
   ];
 }

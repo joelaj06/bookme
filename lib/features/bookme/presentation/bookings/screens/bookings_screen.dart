@@ -105,11 +105,13 @@ class BookingsScreen extends GetView<BookingsController> {
                                   fontSize: 15, fontWeight: FontWeight.w500),
                             ),
                             const Text('Wedding Photoshoot'),
-                            const SizedBox(
-                              child: Text(
-                                'Ghc 1200',
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(color: PrimaryColor.color),
+                            const Expanded(
+                              child: SizedBox(
+                                child: Text(
+                                  'Ghc 1200',
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(color: PrimaryColor.color),
+                                ),
                               ),
                             ),
                             Row(
@@ -118,7 +120,7 @@ class BookingsScreen extends GetView<BookingsController> {
                                 Text(
                                  date
                                 ),
-                                Icon( isPending ?Icons.pending_actions_outlined:
+                                Icon(isPending ?Icons.pending_actions_outlined:
                                   Ionicons.checkmark_circle,
                                 color: isPending ? Color(0xffbb8833):
                                   Colors.green,)

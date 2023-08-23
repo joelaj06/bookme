@@ -46,7 +46,8 @@ class Base64Convertor {
   }
 
   Uint8List base64toImage(String base64String) {
-    final String base64 = base64String.split(',')[1];
+    final String base64 = base64String.contains(',') ?
+    base64String.split(',')[1] : base64String;
     final Uint8List bytes = const Base64Decoder().convert(base64);
     return bytes;
   }

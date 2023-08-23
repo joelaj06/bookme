@@ -13,6 +13,11 @@ class BadRequestException extends AppException {
       : super(message, 'Bad Request', url);
 }
 
+class CacheException extends AppException {
+  CacheException(String message,  String url)
+      : super(message, 'Couldn\'t find cached data.', url);
+}
+
 class FetchDataException extends AppException {
   FetchDataException(String message,  String url)
       : super(message, 'Unable to process', url);

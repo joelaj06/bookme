@@ -29,7 +29,7 @@ class AppHTTPClient {
       final http.Response response = await http.get(uri).timeout(
             const Duration(seconds: requestTimeout),
           );
-      return _processResponse(response);
+      return _processResponse(response,endpoint);
     } on SocketException catch(err) {
       throw FetchDataException('Connection problem: $err', uri.toString());
     } on TimeoutException catch(err) {
@@ -48,7 +48,7 @@ class AppHTTPClient {
     try {
       final http.Response response =
           await http.post(uri, body: jsonEncode(body));
-      return _processResponse(response);
+      return _processResponse(response,endpoint);
     } on SocketException {
       throw FetchDataException('Connection problem', uri.toString());
     } on TimeoutException {
@@ -65,7 +65,7 @@ class AppHTTPClient {
     AppLog.i(body as Map<String, dynamic>);
     try {
       final http.Response response = await http.put(uri, body: body);
-      return _processResponse(response);
+      return _processResponse(response,endpoint);
     } on SocketException {
       throw FetchDataException('Connection problem', uri.toString());
     } on TimeoutException {
@@ -81,7 +81,7 @@ class AppHTTPClient {
     AppLog.i(endpoint);
     try {
       final http.Response response = await http.delete(uri);
-      return _processResponse(response);
+      return _processResponse(response,endpoint);
     } on SocketException {
       throw FetchDataException('Connection problem', uri.toString());
     } on TimeoutException {
@@ -89,8 +89,7 @@ class AppHTTPClient {
     }
   }
 
-  Map<String, dynamic> _processResponse(http.Response response) {
-    print(response.body);
+  Map<String, dynamic> _processResponse(http.Response response,String endpoint) {
     switch (response.statusCode) {
       case 200:
         final dynamic responseJson =
@@ -107,7 +106,13 @@ class AppHTTPClient {
         }
 
         if(responseJson is Map<String,dynamic>){
-          data = responseJson;
+          if(endpoint.contains('auth/login')){
+            final Map<String, String> header = response.headers;
+            data = responseJson;
+            data['user_token_validation']['token'] = header['token'];
+          }else{
+            data = responseJson;
+          }
         }
         //AppLog.i(responseJson);
         return data;
