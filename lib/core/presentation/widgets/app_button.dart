@@ -13,6 +13,7 @@ class AppButton extends StatefulWidget {
       required this.text,
         this.fontSize,
         this.backgroundColor =SecondaryColor.color,
+        this.padding,
       Key? key})
       : super(key: key);
 
@@ -22,6 +23,7 @@ class AppButton extends StatefulWidget {
   final String text;
   late  Color backgroundColor;
   final double? fontSize;
+  final EdgeInsets? padding;
 
   @override
   State<AppButton> createState() => _AppButtonState();
@@ -64,6 +66,7 @@ class _AppButtonState extends State<AppButton> {
         },
         child: AnimatedContainer(
           // width: width / 2,
+          padding: widget.padding,
           decoration: BoxDecoration(
             color: widget.enabled
                 ? widget.backgroundColor

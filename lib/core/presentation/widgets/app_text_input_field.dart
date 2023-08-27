@@ -91,44 +91,50 @@ class AppTextInputField extends StatefulWidget {
 }
 
 class _AppTextInputFieldState extends State<AppTextInputField> {
+  String? _errorText;
+  bool _showError = false;
+
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         if (widget.labelText == null)
-
           const SizedBox.shrink()
         else
           Text(
             widget.labelText.toString(),
-            style: widget.lableStyle ?? TextStyle(
-              fontWeight: FontWeight.w500,
-              color: widget.enabled ? Colors.black: HintColor.color.shade100,
-            ),
+            style: widget.lableStyle ??
+                TextStyle(
+                  fontWeight: FontWeight.w500,
+                  color:
+                      widget.enabled ? Colors.black : HintColor.color.shade100,
+                ),
           ),
-        const AppSpacing(v: 2,),
+        const AppSpacing(
+          v: 2,
+        ),
         Container(
-         // height: 50,
+          // height: 50,
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(15),
               border: Border.all(
                 width: 1,
-                color: widget.enabled ? HintColor.color.shade100 :
-                HintColor.color.shade50,
+                color: widget.enabled
+                    ? HintColor.color.shade100
+                    : HintColor.color.shade50,
               )),
           child: Row(
             children: <Widget>[
               Expanded(
                 child: TextFormField(
-
                   initialValue: widget.initialValue,
                   onTap: widget.onTap,
                   readOnly: widget.readOnly ?? false,
                   focusNode: widget.focusNode,
                   autofillHints: widget.autofillHints,
                   obscuringCharacter: '*',
-                  //obscureText: widget.obscuringText,
+                  obscureText: widget.obscureText ?? false,
                   controller: widget.controller,
                   cursorColor: widget.textColor,
                   textInputAction: widget.textInputAction,
@@ -138,14 +144,26 @@ class _AppTextInputFieldState extends State<AppTextInputField> {
                   textAlignVertical: widget.textAlignVertical,
                   minLines: widget.minLines,
                   keyboardType: widget.textInputType,
-
                   onEditingComplete: widget.onEditingComplete,
-                  onChanged: widget.onChanged,
+                  // onChanged: widget.onChanged,
+                  onChanged: (String value) {
+                    setState(() {
+                      if (widget.validator != null) {
+                        final errorMessage = widget.validator!(value);
+                        if (errorMessage != null) {
+                          showError(errorMessage);
+                        } else {
+                          hideError();
+                        }
+                      }
+                      _errorText = widget.validator?.call(value);
+                    });
+                    widget.onChanged?.call(value);
+                  },
                   textAlign: widget.textAlign ?? TextAlign.start,
                   inputFormatters: widget.inputFormatters,
                   onFieldSubmitted: widget.onFieldSubmitted,
                   decoration: InputDecoration(
-
                     focusedBorder:
                         const OutlineInputBorder(borderSide: BorderSide.none),
 
@@ -181,7 +199,38 @@ class _AppTextInputFieldState extends State<AppTextInputField> {
             ],
           ),
         ),
+        if (_errorText != null)
+          AnimatedOpacity(
+            opacity: _showError ? 1.0 : 0.0,
+            duration: Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 12.0, top: 4.0),
+              child: Text(
+                _errorText ?? '',
+                style: widget.errorStyle ??
+                    TextStyle(
+                      color: Colors.red,
+                      fontSize: 12,
+                    ),
+              ),
+            ),
+          ),
       ],
     );
+  }
+
+  void showError(String errorMessage) {
+    setState(() {
+      _errorText = errorMessage;
+      _showError = true;
+    });
+  }
+
+  void hideError() {
+    setState(() {
+      _errorText = null;
+      _showError = false;
+    });
   }
 }
