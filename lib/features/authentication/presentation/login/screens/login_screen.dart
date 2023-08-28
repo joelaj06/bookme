@@ -36,7 +36,7 @@ class LoginScreen extends GetView<LoginController> {
 
   Widget _buildForm(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(10.0),
+      padding: const EdgeInsets.symmetric(vertical: 20,horizontal: 10.0),
       child: Column(
         children: <Widget>[
           AppTextInputField(
@@ -48,7 +48,7 @@ class LoginScreen extends GetView<LoginController> {
             textInputType: TextInputType.emailAddress,
           ),
           const AppSpacing(
-            v: 20,
+            v: 10,
           ),
           Obx(() => AppTextInputField(
               maxLines: 1,
@@ -87,7 +87,7 @@ class LoginScreen extends GetView<LoginController> {
             v: 20,
           ),
           Obx(() => AppButton(
-              onPressed: () {},
+              onPressed:() => controller.login(context),
               text: 'Login',
               padding: const EdgeInsets.all(10),
               enabled: controller.formIsValid.value,

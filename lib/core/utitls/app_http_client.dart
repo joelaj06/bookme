@@ -3,21 +3,33 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:bookme/core/utitls/environment.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_interceptor/http/intercepted_client.dart';
+import 'package:http_interceptor/http/interceptor_contract.dart';
+import 'package:http_interceptor/models/request_data.dart';
+import 'package:http_interceptor/models/response_data.dart';
 
+import '../../features/authentication/data/datasource/auth_local_data_source.dart';
+import '../../features/authentication/data/models/response/login/login_response.dart';
 import '../errors/app_exceptions.dart';
 import 'app_log.dart';
 
 class AppHTTPClient {
+  AppHTTPClient(this.authLocalDataSource);
+
+  final AuthLocalDataSource authLocalDataSource;
+
+  final http.Client _client = InterceptedClient.build(
+      interceptors: <InterceptorContract>[
+        AuthInterceptor(authLocalDataSource: Get.find())
+      ]);
 
   static const int requestTimeout = 30;
-
-  static  String baseUrl = environment.url;
-
-
+  static String baseUrl = environment.url;
 
   //GET
-  Future<Map<String,dynamic>> get(String endpoint) async {
+  Future<Map<String, dynamic>> get(String endpoint) async {
     final Uri uri = Uri.parse(
       baseUrl + endpoint,
     );
@@ -26,31 +38,33 @@ class AppHTTPClient {
     AppLog.i('============================ ENDPOINT ========================');
     AppLog.i(endpoint);
     try {
-      final http.Response response = await http.get(uri).timeout(
+      final http.Response response = await _client.get(uri).timeout(
             const Duration(seconds: requestTimeout),
           );
-      return _processResponse(response,endpoint);
-    } on SocketException catch(err) {
+      return _processResponse(response, endpoint);
+    } on SocketException catch (err) {
       throw FetchDataException('Connection problem: $err', uri.toString());
-    } on TimeoutException catch(err) {
+    } on TimeoutException catch (err) {
       throw ApiNotRespondingException('Request Timeout: $err', uri.toString());
     }
   }
 
   // POST
-  Future<Map<String,dynamic>> post(String endpoint,
+  Future<Map<String, dynamic>> post(String endpoint,
       {required Map<String, dynamic> body}) async {
     final Uri uri = Uri.parse(baseUrl + endpoint);
+    AppLog.i('============================ BASE URL ========================');
+    AppLog.i(baseUrl);
     AppLog.i('============================ ENDPOINT ========================');
     AppLog.i(endpoint);
     AppLog.i('====================== BODY SENT =========================');
     AppLog.i(body);
     try {
       final http.Response response =
-          await http.post(uri, body: jsonEncode(body));
-      return _processResponse(response,endpoint);
+          await _client.post(uri, body: jsonEncode(body));
+      return _processResponse(response, endpoint);
     } on SocketException {
-      throw FetchDataException('Connection problem', uri.toString());
+      throw FetchDataException('Connection problem ', uri.toString());
     } on TimeoutException {
       throw ApiNotRespondingException('Request Timeout', uri.toString());
     }
@@ -64,8 +78,8 @@ class AppHTTPClient {
     AppLog.i('====================== BODY SENT =========================');
     AppLog.i(body as Map<String, dynamic>);
     try {
-      final http.Response response = await http.put(uri, body: body);
-      return _processResponse(response,endpoint);
+      final http.Response response = await _client.put(uri, body: body);
+      return _processResponse(response, endpoint);
     } on SocketException {
       throw FetchDataException('Connection problem', uri.toString());
     } on TimeoutException {
@@ -80,8 +94,8 @@ class AppHTTPClient {
     AppLog.i('============================ ENDPOINT ========================');
     AppLog.i(endpoint);
     try {
-      final http.Response response = await http.delete(uri);
-      return _processResponse(response,endpoint);
+      final http.Response response = await _client.delete(uri);
+      return _processResponse(response, endpoint);
     } on SocketException {
       throw FetchDataException('Connection problem', uri.toString());
     } on TimeoutException {
@@ -89,32 +103,38 @@ class AppHTTPClient {
     }
   }
 
-  Map<String, dynamic> _processResponse(http.Response response,String endpoint) {
+  Map<String, dynamic> _processResponse(
+      http.Response response, String endpoint) {
+    print(response.statusCode);
+    if(response.statusCode != 200 || response.statusCode != 201){
+      AppLog.i('============================ ERROR THROWN ========================');
+      AppLog.i(utf8.decode(response.bodyBytes));
+    }
     switch (response.statusCode) {
       case 200:
         final dynamic responseJson =
             jsonDecode(utf8.decode(response.bodyBytes));
         final String? totalCount = response.headers['total-count'];
-        AppLog.i('============================ BODY RECEIVED ========================');
+        AppLog.i(
+            '============================ BODY RECEIVED ========================');
         AppLog.i(response.body);
         late Map<String, dynamic> data;
-        if(responseJson is List){
-          data = <String,dynamic>{
+        if (responseJson is List) {
+          data = <String, dynamic>{
             'items': responseJson,
             'total_count': totalCount
           };
         }
 
-        if(responseJson is Map<String,dynamic>){
-          if(endpoint.contains('auth/login')){
+        if (responseJson is Map<String, dynamic>) {
+          if (endpoint.contains('users/auth/login')) {
             final Map<String, String> header = response.headers;
             data = responseJson;
             data['user_token_validation']['token'] = header['token'];
-          }else{
+          } else {
             data = responseJson;
           }
         }
-        //AppLog.i(responseJson);
         return data;
       case 400:
         throw BadRequestException(
@@ -142,5 +162,36 @@ class AppHTTPClient {
           response.request!.url.toString(),
         );
     }
+  }
+
+
+
+}
+
+class AuthInterceptor implements InterceptorContract {
+  AuthInterceptor({required AuthLocalDataSource authLocalDataSource})
+      : _authLocalDataSource = authLocalDataSource;
+
+  final AuthLocalDataSource _authLocalDataSource;
+
+  @override
+  Future<RequestData> interceptRequest({required RequestData data}) async {
+    final LoginResponse? response = _authLocalDataSource.authResponse ??
+        await _authLocalDataSource.getAuthResponse();
+
+    final Map<String, String> headers = <String, String>{
+      'Content-type': 'application/json',
+      'Authorization': 'Bearer ${response?.user.token}'
+    };
+    data.headers.addAll(headers);
+    AppLog.i('==================== HEADER SENT IS ==================');
+    AppLog.i(data.headers);
+
+    return data;
+  }
+
+  @override
+  Future<ResponseData> interceptResponse({required ResponseData data}) async {
+    return data;
   }
 }

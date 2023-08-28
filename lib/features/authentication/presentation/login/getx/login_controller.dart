@@ -1,11 +1,19 @@
+import 'package:bookme/features/authentication/data/domain/usecase/login_user.dart';
+import 'package:dartz/dartz.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 
+import '../../../../../core/errors/failure.dart';
+import '../../../../../core/presentation/widgets/app_snacks.dart';
+import '../../../data/models/request/login/login_request.dart';
+import '../../../data/models/response/user/user_model.dart';
+
 class LoginController extends GetxController{
+  LoginController({required this.loginUser});
+
+  final LoginUser loginUser;
 
   //text editing controllers
-  Rx<TextEditingController> passwordTextEditingController =
-      TextEditingController().obs;
   RxBool showPassword = false.obs;
   RxBool isLoading = false.obs;
   RxString email = ''.obs;
@@ -13,10 +21,30 @@ class LoginController extends GetxController{
 
 
 
-  @override
-  void dispose() {
-    passwordTextEditingController.value.dispose();
-    super.dispose();
+
+  void login(BuildContext context) async {
+    // ignore: unawaited_futures
+    isLoading(true);
+
+    final Either<Failure, User> failureOrUser = await loginUser(
+      LoginRequest(
+        email: email.value,
+        password: password.value,
+      ),
+    );
+
+    // ignore: unawaited_futures
+    failureOrUser.fold(
+          (Failure failure) {
+        isLoading(false);
+        AppSnacks.showError('Login', failure.message);
+      },
+          (User user) {
+        isLoading(false);
+        AppSnacks.showError('Login', 'You signed in successfully');
+        Get.back<dynamic>();
+      },
+    );
   }
 
 

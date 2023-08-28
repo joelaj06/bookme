@@ -23,6 +23,11 @@ class FetchDataException extends AppException {
       : super(message, 'Unable to process', url);
 }
 
+class ServerException extends AppException {
+  ServerException(String message,  String url)
+      : super(message, 'Internal Server Error', url);
+}
+
 class ApiNotRespondingException extends AppException {
   ApiNotRespondingException(String message,  String url)
       : super(message, 'Api Not Responding', url);

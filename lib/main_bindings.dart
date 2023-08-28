@@ -23,7 +23,7 @@ class MainBindings extends Bindings {
     );
 
     Get.put<AppHTTPClient>(
-      AppHTTPClient(),
+      AppHTTPClient(Get.find()),
     );
 
     Get.put<AuthRemoteDataSource>(
