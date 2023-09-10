@@ -105,12 +105,12 @@ class AppHTTPClient {
 
   Map<String, dynamic> _processResponse(
       http.Response response, String endpoint) {
-    print(response.statusCode);
-    if(response.statusCode != 200 || response.statusCode != 201){
+    if(response.statusCode != 200 && response.statusCode != 201){
       AppLog.i('============================ ERROR THROWN ========================');
       AppLog.i(utf8.decode(response.bodyBytes));
     }
     switch (response.statusCode) {
+      case 201:
       case 200:
         final dynamic responseJson =
             jsonDecode(utf8.decode(response.bodyBytes));
@@ -130,7 +130,7 @@ class AppHTTPClient {
           if (endpoint.contains('users/auth/login')) {
             final Map<String, String> header = response.headers;
             data = responseJson;
-            data['user_token_validation']['token'] = header['token'];
+            data['user_token_validation']['token'] = header['access_token'];
           } else {
             data = responseJson;
           }

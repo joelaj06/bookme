@@ -27,7 +27,9 @@ class LoginScreen extends GetView<LoginController> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               const Text("Don't have an account?"),
-              TextButton(onPressed: () {}, child: const Text('Register'),
+              TextButton(
+                onPressed: () {},
+                child: const Text('Register'),
               )
             ],
           )),
@@ -36,7 +38,7 @@ class LoginScreen extends GetView<LoginController> {
 
   Widget _buildForm(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 20,horizontal: 10.0),
+      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10.0),
       child: Column(
         children: <Widget>[
           AppTextInputField(
@@ -50,7 +52,8 @@ class LoginScreen extends GetView<LoginController> {
           const AppSpacing(
             v: 10,
           ),
-          Obx(() => AppTextInputField(
+          Obx(
+            () => AppTextInputField(
               maxLines: 1,
               labelText: 'Password',
               onChanged: controller.onPasswordInputChanged,
@@ -61,8 +64,7 @@ class LoginScreen extends GetView<LoginController> {
                 transitionBuilder:
                     (Widget? child, Animation<double> animation) {
                   final Animation<double> offset =
-                  Tween<double>(begin: 0, end: 1.0)
-                      .animate(animation);
+                      Tween<double>(begin: 0, end: 1.0).animate(animation);
                   return ScaleTransition(scale: offset, child: child);
                 },
                 switchInCurve: Curves.elasticOut,
@@ -70,15 +72,17 @@ class LoginScreen extends GetView<LoginController> {
                 child: IconButton(
                   key: ValueKey<bool>(controller.showPassword.value),
                   onPressed: controller.togglePassword,
-                  icon: Obx(() => controller.showPassword.value ? const Icon(
-                    Icons.visibility,
-                    size: 20,
-                  )
-                      : const Icon(
-                    Icons.visibility_off,
-                    size: 20,
-                  ),),
-
+                  icon: Obx(
+                    () => controller.showPassword.value
+                        ? const Icon(
+                            Icons.visibility,
+                            size: 20,
+                          )
+                        : const Icon(
+                            Icons.visibility_off,
+                            size: 20,
+                          ),
+                  ),
                 ),
               ),
             ),
@@ -86,8 +90,9 @@ class LoginScreen extends GetView<LoginController> {
           const AppSpacing(
             v: 20,
           ),
-          Obx(() => AppButton(
-              onPressed:() => controller.login(context),
+          Obx(
+            () => AppButton(
+              onPressed: () => controller.login(context),
               text: 'Login',
               padding: const EdgeInsets.all(10),
               enabled: controller.formIsValid.value,

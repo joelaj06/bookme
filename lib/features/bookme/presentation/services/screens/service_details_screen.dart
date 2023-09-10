@@ -4,7 +4,6 @@ import 'package:bookme/core/presentation/theme/secondary_color.dart';
 import 'package:bookme/core/presentation/utitls/app_padding.dart';
 import 'package:bookme/core/presentation/utitls/app_spacing.dart';
 import 'package:bookme/core/presentation/widgets/app_button.dart';
-import 'package:bookme/core/presentation/widgets/app_rating_widget.dart';
 import 'package:bookme/core/presentation/widgets/location_icon.dart';
 import 'package:bookme/features/bookme/presentation/services/arguments/service_arguments.dart';
 import 'package:bookme/features/bookme/presentation/services/getx/services_controller.dart';
@@ -22,10 +21,6 @@ class ServiceDetailsScreen extends GetView<ServicesController> {
   Widget build(BuildContext context) {
     final ServiceArgument? args =
         ModalRoute.of(context)?.settings.arguments as ServiceArgument?;
-
-    if (args != null) {
-      controller.getAgentReviews(args.service.user?.id ?? args.service.userData!.id, null,);
-    }
 
     final String coverImage = args?.service.coverImage ?? '';
 
@@ -131,9 +126,6 @@ class ServiceDetailsScreen extends GetView<ServicesController> {
                           ),
                         ),
                       ),
-                       Obx(() =>AppRating(value: controller.averageRating.value.toString(),
-                         ),
-                       ),
                     ],
                   ),
                   Row(
@@ -155,7 +147,7 @@ class ServiceDetailsScreen extends GetView<ServicesController> {
                       ),
                       TextButton(
                         onPressed: () {
-                          controller.navigateToServiceAgentScreen();
+                          controller.navigateToServiceAgentScreen(args!.service);
                         },
                         child: const Text('View Profile'),
                       ),

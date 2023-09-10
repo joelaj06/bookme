@@ -3,16 +3,29 @@ import 'package:bookme/core/presentation/theme/primary_color.dart';
 import 'package:bookme/core/presentation/utitls/app_padding.dart';
 import 'package:bookme/core/presentation/utitls/app_spacing.dart';
 import 'package:bookme/core/presentation/widgets/app_ratings_icon.dart';
+import 'package:bookme/features/bookme/data/models/response/review/review_model.dart';
 import 'package:bookme/features/bookme/presentation/service_agent/getx/service_agent_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:full_screen_image/full_screen_image.dart';
 import 'package:get/get.dart';
+
+import '../../services/arguments/service_arguments.dart';
 
 class ServiceAgentScreen extends GetView<ServiceAgentController> {
   const ServiceAgentScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final ServiceArgument? args =
+        ModalRoute.of(context)?.settings.arguments as ServiceArgument?;
+
+    if (args != null) {
+      controller.getAgentReviews(
+        args.service.user?.id ?? args.service.userData!.id,
+        null,
+      );
+    }
+
     return Scaffold(
       //  extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -34,17 +47,45 @@ class ServiceAgentScreen extends GetView<ServiceAgentController> {
                       borderRadius: BorderRadius.circular(15),
                       child: Image.asset('assets/images/user.jpg'),
                     ),
-                    const Text(
-                      'John Doe',
-                      style: TextStyle(
-                        fontSize: 30,
-                        fontWeight: FontWeight.w600,
+                    Obx(
+                      () => Text(
+                        '${controller.agent.value.firstName} ${controller.agent.value.lastName}',
+                        style: const TextStyle(
+                          fontSize: 30,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
-                    const Text('Photographer @ Hermeland Studios'),
-                    const Text(
-                      ' I do door to door service. I do '
-                      'Birthday parties, engagements, funerals, picnics',
+                    Obx(
+                      () => RichText(
+                        text: TextSpan(
+                          children: <InlineSpan>[
+                            TextSpan(
+                              text: controller.agent.value.jobTitle ?? '',
+                              style: const TextStyle(
+                                color: Colors.black,
+                              ),
+                            ),
+                            const TextSpan(
+                              text: ' @ ',
+                              style: TextStyle(
+                                color: Colors.black,
+                              ),
+                            ),
+                            TextSpan(
+                              text: controller.agent.value.company,
+                              style: const TextStyle(
+                                color: Colors.black,
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                    Obx(
+                      () => Text(
+                        controller.agent.value.jobDescription ?? '',
+                      ),
                     ),
                     const AppSpacing(
                       v: 10,
@@ -62,7 +103,8 @@ class ServiceAgentScreen extends GetView<ServiceAgentController> {
                 children: <Widget>[
                   _buildSkillsList(context),
                   _buildJobImages(context),
-                  _buildAgentReview(context,
+                  _buildAgentReview(
+                    context,
                   ),
                 ],
               ),
@@ -85,39 +127,48 @@ class ServiceAgentScreen extends GetView<ServiceAgentController> {
           ),
         ),
         _buildTotalRatingCard(context),
-        const AppSpacing(v: 20,),
+        const AppSpacing(
+          v: 20,
+        ),
         _buildUserReviewsTile(context),
       ],
     );
   }
 
-  Widget _buildUserReviewsTile(BuildContext context){
+  Widget _buildUserReviewsTile(BuildContext context) {
     return Container(
       padding: AppPaddings.mA,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(15),
       ),
-      child: ListView.builder(
-        physics: const NeverScrollableScrollPhysics(),
-        shrinkWrap: true,
-          itemCount: 10,
-          itemBuilder: (BuildContext context, int index){
-        return Column(
-          children: <Widget>[
-            Padding(
-              padding: AppPaddings.mA,
-              child: _buildUserReviewCard(context),
-            ),
-            const Divider(height: 1,),
-          ],
-        );
-      },
+      child: Obx(
+        () => ListView.builder(
+          physics: const NeverScrollableScrollPhysics(),
+          shrinkWrap: true,
+          itemCount: controller.reviews.length,
+          itemBuilder: (BuildContext context, int index) {
+            return Column(
+              children: <Widget>[
+                Padding(
+                  padding: AppPaddings.mA,
+                  child: _buildUserReviewCard(
+                    context,
+                    controller.reviews[index],
+                  ),
+                ),
+                const Divider(
+                  height: 1,
+                ),
+              ],
+            );
+          },
+        ),
       ),
     );
   }
 
-  Widget _buildUserReviewCard(BuildContext context){
+  Widget _buildUserReviewCard(BuildContext context, Review review) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -129,24 +180,25 @@ class ServiceAgentScreen extends GetView<ServiceAgentController> {
                 child: Image.asset('assets/images/user2.jpg'),
               ),
             ),
-            const AppSpacing(h: 10,),
+            const AppSpacing(
+              h: 10,
+            ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const <Widget>[
-                Text('Efya Adepa'),
-                AppRatingsIcon(ratings: 4),
+              children: <Widget>[
+                Text(review.user?.firstName ?? ''),
+                AppRatingsIcon(ratings: (review.rating.round())),
               ],
             )
           ],
         ),
-        const AppSpacing(v:10,),
-        const Text('Wow such an amazing guy, he is always on time and '
-            'serious when working. Thanks John 😊😊')
+        const AppSpacing(
+          v: 10,
+        ),
+        Text(review.comment)
       ],
     );
   }
-
-
 
   Widget _buildTotalRatingCard(BuildContext context) {
     return Container(
@@ -154,21 +206,30 @@ class ServiceAgentScreen extends GetView<ServiceAgentController> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(15),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Row(
-            children: const <Widget>[
-              Text('4.7',
-              style: TextStyle(
-                fontSize: 30,
-                fontWeight: FontWeight.w500,
-              ),),
-              AppRatingsIcon(ratings: 5),
-            ],
-          ),
-          const Text('(223) Reviews'),
-        ],
+      child: Obx(
+        () => Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Obx(
+              () => Row(
+                children: <Widget>[
+                  Text(
+                    controller.agentReview.value.averageRating
+                        .toStringAsFixed(1),
+                    style: const TextStyle(
+                      fontSize: 30,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  AppRatingsIcon(
+                      ratings:
+                          (controller.agentReview.value.averageRating.round())),
+                ],
+              ),
+            ),
+            Text('${controller.agentReview.value.reviews.length} Reviews'),
+          ],
+        ),
       ),
     );
   }
@@ -250,15 +311,17 @@ class ServiceAgentScreen extends GetView<ServiceAgentController> {
               color: HintColor.color.shade50,
             ),
           ),
-          child: Wrap(
-            children: controller.skills
-                .map((String skill) => Padding(
-                      padding: const EdgeInsets.all(2.0),
-                      child: Chip(
-                        label: Text(skill),
-                      ),
-                    ))
-                .toList(),
+          child: Obx(
+            () => Wrap(
+              children: controller.skills
+                  .map((String skill) => Padding(
+                        padding: const EdgeInsets.all(2.0),
+                        child: Chip(
+                          label: Text(skill),
+                        ),
+                      ))
+                  .toList(),
+            ),
           ),
         ),
       ],

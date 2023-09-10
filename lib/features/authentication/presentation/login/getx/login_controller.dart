@@ -32,7 +32,6 @@ class LoginController extends GetxController{
         password: password.value,
       ),
     );
-
     // ignore: unawaited_futures
     failureOrUser.fold(
           (Failure failure) {
@@ -41,8 +40,8 @@ class LoginController extends GetxController{
       },
           (User user) {
         isLoading(false);
-        AppSnacks.showError('Login', 'You signed in successfully');
-        Get.back<dynamic>();
+       Get.back<dynamic>();
+        AppSnacks.showSuccess('Login', 'You signed in successfully');
       },
     );
   }

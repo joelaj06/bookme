@@ -27,6 +27,7 @@ class AuthRepositoryImpl extends Repository implements AuthRepository {
     return response.fold((Failure failure) => left(failure),
         (LoginResponse response) async {
       await authLocalDataSource.persistAuthResponse(response);
+      print(response.user.firstName);
       return right(response.user);
     });
   }
