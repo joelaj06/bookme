@@ -4,6 +4,8 @@ import 'package:bookme/features/bookme/data/models/response/review/agent_rating_
 import 'package:bookme/features/bookme/data/models/response/review/review_model.dart';
 import 'package:bookme/features/bookme/data/models/response/service/service_model.dart';
 
+import '../models/response/booking/booking_model.dart';
+
 abstract class BookmeRemoteDatasource {
   Future<ListPage<Service>> fetchServices(
       {required int page, required int size, String? query, String? serviceId});
@@ -25,4 +27,6 @@ abstract class BookmeRemoteDatasource {
 
   Future<AgentRating> fetchAgentReviews({required String agentId,
   String? userId});
+
+  Future<List<Booking>> fetchBookings({ String? agentId, required String? userId});
 }

@@ -1,4 +1,5 @@
 import 'package:bookme/core/errors/failure.dart';
+import 'package:bookme/features/bookme/data/models/response/booking/booking_model.dart';
 import 'package:bookme/features/bookme/data/models/response/category/category_model.dart';
 import 'package:bookme/features/bookme/data/models/response/listpage/listpage.dart';
 import 'package:bookme/features/bookme/data/models/response/review/agent_rating_model.dart';
@@ -25,4 +26,5 @@ abstract class BookmeRepository {
       {required int size, required int page, String? query});
 
   Future<Either<Failure, AgentRating>> fetchAgentReviews({required String agentId, String? userId});
+  Future<Either<Failure, List<Booking>>> fetchBookings({ String? agentId, required String? userId});
 }

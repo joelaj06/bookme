@@ -1,6 +1,7 @@
 import 'package:bookme/core/utitls/app_http_client.dart';
 import 'package:bookme/features/bookme/data/datasources/bookme_endpoints.dart';
 import 'package:bookme/features/bookme/data/datasources/bookme_remote_datasource.dart';
+import 'package:bookme/features/bookme/data/models/response/booking/booking_model.dart';
 import 'package:bookme/features/bookme/data/models/response/category/category_model.dart';
 import 'package:bookme/features/bookme/data/models/response/listpage/listpage.dart';
 import 'package:bookme/features/bookme/data/models/response/review/agent_rating_model.dart';
@@ -98,6 +99,18 @@ class BookmeRemoteDatasourceImpl implements BookmeRemoteDatasource{
   Future<AgentRating> fetchAgentReviews({required String agentId, String? userId}) async{
     final Map<String,dynamic> json = await _client.get(BookmeEndpoints.reviews(agentId, userId));
     return AgentRating.fromJson(json);
+  }
+
+  @override
+  Future<List<Booking>> fetchBookings({String? agentId, required String? userId}) async{
+    final Map<String,dynamic> json = await _client.get(BookmeEndpoints.bookings(agentId, userId));
+    final List<dynamic> items = json['items'] as List<dynamic>;
+    final List<Booking> bookings = List<Booking>.from(
+      items.map<Booking>(
+            (dynamic json) => Booking.fromJson(json as Map<String, dynamic>),
+      ),
+    );
+    return bookings;
   }
 
 }

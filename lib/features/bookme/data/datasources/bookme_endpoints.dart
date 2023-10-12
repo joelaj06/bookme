@@ -22,5 +22,9 @@ class BookmeEndpoints{
       userId == null ? 'reviews/?agent_id=$agentId':
       'reviews/?agent_id=$agentId&user_id=$userId';
 
+  static String bookings(String? agentId, String? userId) =>
+      userId != null ? 'bookings/?user_id=$userId' :
+      'bookings/?agent_id=$agentId';
+
   
 }

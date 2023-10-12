@@ -7,11 +7,21 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ionicons/ionicons.dart';
 
+import '../../../../authentication/data/models/response/user/user_model.dart';
+import '../../../data/models/response/booking/booking_model.dart';
+
 class BookingsScreen extends GetView<BookingsController> {
   const BookingsScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    if (controller.isAuthenticated.value) {
+      return Builder(builder: (BuildContext context) {
+        controller.navigateToLogin();
+        return Container();
+      });
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Bookings'),
@@ -30,7 +40,14 @@ class BookingsScreen extends GetView<BookingsController> {
           children: <Widget>[
             _buildTabHeader(context),
             Expanded(
-              child: _buildPageView(context),
+              child: FutureBuilder<User?>(
+                  future: controller.getUser(),
+                  builder:
+                      (BuildContext context, AsyncSnapshot<User?> snapshot) {
+                    final User user = snapshot.data ?? User.empty();
+                    controller.getBookings(user.id);
+                    return _buildPageView(context, user.id);
+                  }),
             ),
           ],
         ),
@@ -38,104 +55,128 @@ class BookingsScreen extends GetView<BookingsController> {
     );
   }
 
-  Widget _buildPageView(BuildContext context) {
+  Widget _buildPageView(BuildContext context, String userId) {
     return PageView(
       controller: controller.pageController,
       onPageChanged: controller.onPageChanged,
       children: <Widget>[
-        _buildJobHistoryContainer(context,'pending', 'Fri 30th June, 2023'),
-        _buildJobHistoryContainer(context,'completed', 'Sun 28th May, 2023')
+        _buildJobHistoryContainer(
+            userId, context, 'pending', 'Fri 30th June, 2023'),
+        _buildJobHistoryContainer(
+            userId, context, 'completed', 'Sun 28th May, 2023')
       ],
     );
   }
 
-  Widget _buildJobHistoryContainer(BuildContext context, String status,
-      String date,) {
+  Widget _buildJobHistoryContainer(
+    String userId,
+    BuildContext context,
+    String status,
+    String date,
+  ) {
     final double width = MediaQuery.of(context).size.width;
-    return ListView.builder(
-        itemCount: 10,
-        physics: const BouncingScrollPhysics(),
-        shrinkWrap: true,
-        itemBuilder: (BuildContext context, int index) {
-          final bool isPending =  status == 'pending';
-          return Padding(
+    return RefreshIndicator(
+      onRefresh: () {
+        return controller.getBookings(userId);
+      },
+      child: ListView.builder(
+          itemCount: controller.bookings.length,
+          physics: const BouncingScrollPhysics(
+            parent: AlwaysScrollableScrollPhysics(),
+          ),
+        // shrinkWrap: true,
+          itemBuilder: (BuildContext context, int index) {
+            final bool isPending =
+                controller.bookings[index].status == 'pending';
+            return _buildPendingJobCard(
+                index, controller.bookings[index], width, context, isPending);
+          }),
+    );
+  }
+
+  Padding _buildPendingJobCard(int index, Booking booking, double width,
+      BuildContext context, bool isPending) {
+    return Padding(
+      padding: AppPaddings.mA,
+      child: GestureDetector(
+        onTap: () {
+          controller.navigateToBookingDetailsScreen(index);
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            color: PrimaryColor.backgroundColor,
+            borderRadius: BorderRadius.circular(15),
+            //  border: Border.all(color: Colors.red),
+            boxShadow: const <BoxShadow>[
+              BoxShadow(
+                offset: Offset(3, 3),
+                spreadRadius: -8,
+                blurRadius: 10,
+                color: Color.fromRGBO(137, 137, 137, 1),
+              ),
+            ],
+          ),
+          height: 100,
+          width: width,
+          child: Padding(
             padding: AppPaddings.mA,
-            child: GestureDetector(
-              onTap: () {
-                controller.navigateToBookingDetailsScreen(index);
-              },
-              child: Container(
-                decoration: BoxDecoration(
-                  color: PrimaryColor.backgroundColor,
+            child: Row(
+              //mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                ClipRRect(
                   borderRadius: BorderRadius.circular(15),
-                  //  border: Border.all(color: Colors.red),
-                  boxShadow: const <BoxShadow>[
-                    BoxShadow(
-                      offset: Offset(3, 3),
-                      spreadRadius: -8,
-                      blurRadius: 10,
-                      color: Color.fromRGBO(137, 137, 137, 1),
-                    ),
-                  ],
+                  child: Hero(
+                    tag: 'service$index',
+                    child: Image.asset('assets/images/photographer.png'),
+                  ),
                 ),
-                height: 100,
-                width: width,
-                child: Padding(
-                  padding: AppPaddings.mA,
-                  child: Row(
-                    //mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                const AppSpacing(
+                  h: 10,
+                ),
+                Flexible(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(15),
-                        child: Hero(
-                          tag: 'service$index',
-                          child: Image.asset('assets/images/photographer.png'),
+                      Text(
+                        booking.agent.firstName,
+                        style: context.textTheme.bodyMedium?.copyWith(
+                            fontSize: 15, fontWeight: FontWeight.w500),
+                      ),
+                      Text(booking.service.title),
+                      Expanded(
+                        child: SizedBox(
+                          child: Text(
+                            'Ghc ${booking.preliminaryCost}',
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(color: PrimaryColor.color),
+                          ),
                         ),
                       ),
-                      const AppSpacing(
-                        h: 10,
-                      ),
-                      Flexible(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text(
-                              'John Doe',
-                              style: context.textTheme.bodyMedium?.copyWith(
-                                  fontSize: 15, fontWeight: FontWeight.w500),
-                            ),
-                            const Text('Wedding Photoshoot'),
-                            const Expanded(
-                              child: SizedBox(
-                                child: Text(
-                                  'Ghc 1200',
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(color: PrimaryColor.color),
-                                ),
-                              ),
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children:  <Widget>[
-                                Text(
-                                 date
-                                ),
-                                Icon(isPending ?Icons.pending_actions_outlined:
-                                  Ionicons.checkmark_circle,
-                                color: isPending ? Color(0xffbb8833):
-                                  Colors.green,)
-                              ],
-                            ),
-                          ],
-                        ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Text(
+                            booking.endDate ?? '',
+                          ),
+                          Icon(
+                            isPending
+                                ? Icons.pending_actions_outlined
+                                : Ionicons.checkmark_circle,
+                            color: isPending
+                                ? const Color(0xffbb8833)
+                                : Colors.green,
+                          )
+                        ],
                       ),
                     ],
                   ),
                 ),
-              ),
+              ],
             ),
-          );
-        });
+          ),
+        ),
+      ),
+    );
   }
 
   Container _buildTabHeader(BuildContext context) {
