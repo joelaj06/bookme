@@ -25,13 +25,13 @@ class BookingsScreen extends GetView<BookingsController> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Bookings'),
-        actions: <Widget>[
-          IconButton(
+        actions: const <Widget>[
+         /* IconButton(
             onPressed: () {},
             icon: const Icon(
               Icons.filter_list,
             ),
-          ),
+          ),*/
         ],
       ),
       body: Padding(

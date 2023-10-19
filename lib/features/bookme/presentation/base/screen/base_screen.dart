@@ -39,7 +39,8 @@ class _BaseScreenState extends State<BaseScreen> {
           _selectedIndexItem = index;
         });
       },
-      child: SizedBox(
+      child: Container(
+        color: Colors.transparent,
         height: 60,
         width: width / navIconList.length,
         child: Icon(

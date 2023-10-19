@@ -15,4 +15,8 @@ class AppRoutes{
   static const String userProfile = '/userProfile';
   static const String favorites = '/favorites';
   static const String tasks = '/tasks';
+  static const String updateJob = '/updateJob';
+  static const String userReview = '/userReview';
+  static const String updateUser = '/updateUser';
+  static const String user = '/user';
 }

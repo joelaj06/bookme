@@ -79,12 +79,14 @@ class FavoriteScreen extends GetView<FavoritesController> {
                                   fontSize: 15, fontWeight: FontWeight.w500),
                             ),
                             const IconText(text: 'Kasoa, Ofankor'),
-                            SizedBox(
-                              child: Text(
-                                controller.description,
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 2,
-                                style: TextStyle(color: HintColor.color.shade400),
+                            Expanded(
+                              child: SizedBox(
+                                child: Text(
+                                  controller.description,
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 2,
+                                  style: TextStyle(color: HintColor.color.shade400),
+                                ),
                               ),
                             ),
                           ],

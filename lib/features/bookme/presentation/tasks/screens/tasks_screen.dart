@@ -105,17 +105,19 @@ class TasksScreen extends GetView<TasksController> {
                                 style: TextStyle(color: PrimaryColor.color),
                               ),
                             ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children:  <Widget>[
-                                Text(
-                                    date
-                                ),
-                                Icon( isPending ?Icons.pending_actions_outlined:
-                                Ionicons.checkmark_circle,
-                                  color: isPending ? Color(0xffbb8833):
-                                  Colors.green,)
-                              ],
+                            Expanded(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children:  <Widget>[
+                                  Text(
+                                      date
+                                  ),
+                                  Icon( isPending ?Icons.pending_actions_outlined:
+                                  Ionicons.checkmark_circle,
+                                    color: isPending ? Color(0xffbb8833):
+                                    Colors.green,)
+                                ],
+                              ),
                             ),
                           ],
                         ),
