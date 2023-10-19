@@ -20,6 +20,7 @@ class HomeScreen extends GetView<HomeController> {
 
   @override
   Widget build(BuildContext context) {
+    controller.loadDependencies();
     return Scaffold(
       body: SafeArea(
         child: Padding(

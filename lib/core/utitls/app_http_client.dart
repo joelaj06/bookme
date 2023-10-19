@@ -71,14 +71,22 @@ class AppHTTPClient {
   }
 
   //PUT
-  Future<dynamic> put(String endpoint, {dynamic body}) async {
+  Future<Map<String, dynamic>> put(String endpoint, {dynamic body}) async {
+    // Filter out null values from the body
+    final Map<String, dynamic> filteredBody = (body as Map<String, dynamic>)
+        .entries
+        .where((MapEntry<String, dynamic> entry) => entry.value != null)
+        .fold<Map<String, dynamic>>(
+        <String, dynamic>{}, (Map<String, dynamic> map, MapEntry<String, dynamic> entry) => map..[entry.key] = entry.value);
+
     final Uri uri = Uri.parse(baseUrl + endpoint);
     AppLog.i('============================ ENDPOINT ========================');
     AppLog.i(endpoint);
     AppLog.i('====================== BODY SENT =========================');
-    AppLog.i(body as Map<String, dynamic>);
+    AppLog.i(filteredBody);
     try {
-      final http.Response response = await _client.put(uri, body: body);
+      final http.Response response =
+          await _client.put(uri, body: jsonEncode(filteredBody));
       return _processResponse(response, endpoint);
     } on SocketException {
       throw FetchDataException('Connection problem', uri.toString());
@@ -105,8 +113,9 @@ class AppHTTPClient {
 
   Map<String, dynamic> _processResponse(
       http.Response response, String endpoint) {
-    if(response.statusCode != 200 && response.statusCode != 201){
-      AppLog.i('============================ ERROR THROWN ========================');
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      AppLog.i(
+          '============================ ERROR THROWN ========================');
       AppLog.i(utf8.decode(response.bodyBytes));
     }
     switch (response.statusCode) {
@@ -163,9 +172,6 @@ class AppHTTPClient {
         );
     }
   }
-
-
-
 }
 
 class AuthInterceptor implements InterceptorContract {

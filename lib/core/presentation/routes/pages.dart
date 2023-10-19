@@ -3,6 +3,7 @@ import 'package:bookme/core/presentation/routes/auth_middleware.dart';
 import 'package:bookme/features/authentication/presentation/login/getx/login_bindings.dart';
 import 'package:bookme/features/authentication/presentation/login/screens/login_screen.dart';
 import 'package:bookme/features/bookme/presentation/favorites/getx/favorites_bindings.dart';
+import 'package:bookme/features/bookme/presentation/reviews/getx/user_review_bindings.dart';
 import 'package:bookme/features/bookme/presentation/service_agent/getx/service_agent_bindings.dart';
 import 'package:bookme/features/bookme/presentation/tasks/getx/tasks_bindings.dart';
 import 'package:bookme/features/bookme/presentation/tasks/screens/tasks_screen.dart';
@@ -99,7 +100,7 @@ class Pages {
     ),GetPage<AppRoutes>(
       name: AppRoutes.userReview,
       page: () => const UserReviewScreen(),
-      binding: UserProfileBindings(),
+      binding: UserReviewBindings(),
     ),
   ];
 }

@@ -41,8 +41,16 @@ class HomeController extends GetxController {
     super.onInit();
   }
 
+  void loadDependencies() {
+    getAllCategories();
+    getAllPopularServices();
+    getPromotedServices();
+  }
+
   void getPromotedServices() async {
-    isPromotedServicesLoading(true);
+    if (promotedServices.isEmpty) {
+      isPromotedServicesLoading(true);
+    }
     final Either<Failure, ListPage<Service>> failureOrServices =
         await fetchPromotedServices(const PageParams(
       page: 1,
@@ -62,7 +70,9 @@ class HomeController extends GetxController {
   }
 
   void getAllPopularServices() async {
-    isLoading(true);
+    if(popularServices.isEmpty){
+       isLoading(true);
+    }
     final Either<Failure, List<Review>> failureOrPopularServices =
         await fetchPopularServices(NoParams());
     failureOrPopularServices.fold(
@@ -89,7 +99,7 @@ class HomeController extends GetxController {
   }
 
   void navigateToServiceDetailsScreenReview(Review review) async {
-    final Service service =  Service(
+    final Service service = Service(
       id: review.serviceData!.id,
       title: review.serviceData!.title,
       description: review.serviceData!.description,
