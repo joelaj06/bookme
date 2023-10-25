@@ -77,7 +77,10 @@ class AppHTTPClient {
         .entries
         .where((MapEntry<String, dynamic> entry) => entry.value != null)
         .fold<Map<String, dynamic>>(
-        <String, dynamic>{}, (Map<String, dynamic> map, MapEntry<String, dynamic> entry) => map..[entry.key] = entry.value);
+      <String, dynamic>{},
+      (Map<String, dynamic> map, MapEntry<String, dynamic> entry) =>
+          map..[entry.key] = entry.value,
+    );
 
     final Uri uri = Uri.parse(baseUrl + endpoint);
     AppLog.i('============================ ENDPOINT ========================');

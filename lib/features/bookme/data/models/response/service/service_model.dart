@@ -19,7 +19,7 @@ class Service with _$Service {
     User? user,
     @JsonKey(name: 'user_data') User? userData,
     required List<Category>? categories,
-    List<String?>? images,
+    List<String>? images,
     required String description,
     required String title,
     Discount? discount,

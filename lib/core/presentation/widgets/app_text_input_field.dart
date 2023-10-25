@@ -149,7 +149,7 @@ class _AppTextInputFieldState extends State<AppTextInputField> {
                   onChanged: (String value) {
                     setState(() {
                       if (widget.validator != null) {
-                        final errorMessage = widget.validator!(value);
+                        final String? errorMessage = widget.validator!(value);
                         if (errorMessage != null) {
                           showError(errorMessage);
                         } else {

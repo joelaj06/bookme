@@ -1,5 +1,8 @@
 import 'dart:io';
 
+import 'package:bookme/core/presentation/widgets/animated_column.dart';
+import 'package:bookme/core/presentation/widgets/app_loading_box.dart';
+import 'package:bookme/features/bookme/data/models/response/category/category_model.dart';
 import 'package:bookme/features/bookme/presentation/user_profile/getx/user_profile_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -14,46 +17,65 @@ import '../../../../../core/presentation/utitls/app_spacing.dart';
 import '../../../../../core/presentation/widgets/app_button.dart';
 import '../../../../../core/presentation/widgets/app_text_input_field.dart';
 import '../../../../../core/utitls/base_64.dart';
+import '../../../data/models/response/service/service_model.dart';
+
 class UpdateJobScreen extends GetView<UserProfileController> {
   const UpdateJobScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
+    return Scaffold(
       appBar: AppBar(
-        title: const Text('Update Job'),
-
+        title: const Text('Job'),
       ),
-      bottomNavigationBar:  SizedBox(
+      bottomNavigationBar: SizedBox(
         height: 60,
         child: AppButton(
-          onPressed: () {},
+          onPressed: () {
+            controller.updateTheService();
+          },
           text: 'Update Job',
           fontSize: 18,
         ),
       ),
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-          child: _buildJobPage(context),),
-
+      body: FutureBuilder<void>(
+          future: controller.getUserService(),
+          builder: (BuildContext context, _) {
+            return Obx(() => AppLoadingBox(
+                loading: controller.isLoading.value,
+                child: Obx(
+                  () => SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    child: _buildJobPage(
+                      context,
+                      controller.service.value,
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }),
     );
   }
 
-
-  Widget _buildJobPage(BuildContext context) {
+  Widget _buildJobPage(BuildContext context, Service service) {
     return Padding(
       padding: AppPaddings.mA,
-      child: Column(
+      child: AppAnimatedColumn(
         children: <Widget>[
           AppTextInputField(
             labelText: 'Job Tittle',
+            initialValue: service.title,
+            onChanged: controller.onServiceTitleInputChanged,
           ),
           const AppSpacing(
             v: 10,
           ),
           AppTextInputField(
             labelText: 'Job Description',
+            initialValue: service.description,
             maxLines: 3,
+            onChanged: controller.onServiceDescriptionInputChanged,
           ),
           Row(
             children: <Widget>[
@@ -67,11 +89,11 @@ class UpdateJobScreen extends GetView<UserProfileController> {
                 h: 10,
               ),
               Obx(
-                    () => Checkbox(
+                () => Checkbox(
                   value: controller.applyDiscount.value,
                   onChanged: controller.onApplyDiscountInputChanged,
                   fillColor: MaterialStateProperty.resolveWith(
-                        (Set<MaterialState> states) {
+                    (Set<MaterialState> states) {
                       if (states.contains(MaterialState.disabled)) {
                         return Colors.transparent;
                       }
@@ -83,10 +105,13 @@ class UpdateJobScreen extends GetView<UserProfileController> {
             ],
           ),
           Obx(
-                () => AppTextInputField(
+            () => AppTextInputField(
               labelText: 'Discount',
+              initialValue:
+                  controller.discountValue.value.toStringAsFixed(2) ?? '0.0',
               enabled: controller.applyDiscount.value,
               readOnly: !controller.applyDiscount.value,
+              onChanged: controller.onDiscountValueInputChanged,
               textInputType: Platform.isAndroid
                   ? TextInputType.number
                   : const TextInputType.numberWithOptions(decimal: true),
@@ -115,10 +140,10 @@ class UpdateJobScreen extends GetView<UserProfileController> {
                             controller.discountValues
                                 .map<PopupMenuEntry<String>>(
                                   (dynamic value) => PopupMenuItem<String>(
-                                value: value.toString(),
-                                child: Text(value.toString()),
-                              ),
-                            )
+                                    value: value.toString(),
+                                    child: Text(value.toString()),
+                                  ),
+                                )
                                 .toList(),
                         child: Padding(
                           padding: const EdgeInsets.all(
@@ -144,6 +169,8 @@ class UpdateJobScreen extends GetView<UserProfileController> {
           //TODO discount end date
           AppTextInputField(
             labelText: 'Least Price',
+            onChanged: controller.onLeastPriceInputChanged,
+            initialValue: service.price?.toStringAsFixed(2) ?? '0.0',
             textInputType: Platform.isAndroid
                 ? TextInputType.number
                 : const TextInputType.numberWithOptions(decimal: true),
@@ -159,11 +186,69 @@ class UpdateJobScreen extends GetView<UserProfileController> {
           ),
           _buildImageUploadContainer(),
           const AppSpacing(
-            v: 20,
+            v: 10,
           ),
-
+          const Text(
+            'Select category',
+            style: TextStyle(
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const AppSpacing(
+            v: 10,
+          ),
+          SizedBox(
+            height: 500,
+            child: _buildCategoryList(),
+          )
         ],
       ),
+    );
+  }
+
+  Widget _buildCategoryList() {
+    return Obx(() {
+        bool load = false;
+        if (controller.selectedCategories.isEmpty) {
+          load = true;
+        }
+        load = false;
+        return AppLoadingBox(
+          loading: load,
+          child: ListView.builder(
+              itemCount: controller.homeController.categories.length,
+              itemBuilder: (BuildContext context, int index) {
+                final Category category =
+                    controller.homeController.categories[index];
+                final bool isSelected =
+                    controller.selectedCategories.contains(category.id);
+                if (category.id == '') {
+                  return const SizedBox.shrink();
+                }
+                return ListTile(
+                  title: Text(category.name),
+                  trailing: Checkbox(
+                    fillColor: MaterialStateProperty.resolveWith((Set states) {
+                      if (states.contains(MaterialState.disabled)) {
+                        return Colors.orange.withOpacity(.32);
+                      }
+                      return PrimaryColor.color;
+                    }),
+                    value: isSelected,
+                    onChanged: (bool? value) {
+                      print('added to list');
+                      if (isSelected) {
+                        controller.selectedCategories.remove(category.id);
+                      } else {
+                        controller.selectedCategories.add(category.id);
+                      }
+                    },
+                  ),
+                  subtitle: Text(category.description),
+                );
+              }),
+        );
+      },
     );
   }
 
@@ -189,6 +274,9 @@ class UpdateJobScreen extends GetView<UserProfileController> {
             ),
             IconButton(
               onPressed: () {
+                if (controller.base64Images.length == 4) {
+                  return;
+                }
                 controller.addImage();
               },
               icon: const Icon(
@@ -209,7 +297,7 @@ class UpdateJobScreen extends GetView<UserProfileController> {
     return SizedBox(
       height: 100,
       child: Obx(
-            () => ListView.builder(
+        () => ListView.builder(
           shrinkWrap: true,
           physics: const BouncingScrollPhysics(),
           scrollDirection: Axis.horizontal,
@@ -232,7 +320,7 @@ class UpdateJobScreen extends GetView<UserProfileController> {
                           child: ClipRRect(
                               borderRadius: BorderRadius.circular(15),
                               child: Image.memory(
-                                fit: BoxFit.cover,
+                                fit: BoxFit.contain,
                                 Base64Convertor().base64toImage(
                                   image,
                                 ),
@@ -249,7 +337,10 @@ class UpdateJobScreen extends GetView<UserProfileController> {
                     onPressed: () {
                       controller.removeImage(index);
                     },
-                    icon: const Icon(Icons.remove_circle),
+                    icon: const Icon(
+                      Icons.remove_circle,
+                      color: Colors.red,
+                    ),
                   ),
                 )
               ],

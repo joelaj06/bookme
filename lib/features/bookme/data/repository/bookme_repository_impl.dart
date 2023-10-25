@@ -1,6 +1,7 @@
 import 'package:bookme/core/errors/failure.dart';
 import 'package:bookme/core/utitls/repository.dart';
 import 'package:bookme/features/bookme/data/datasources/bookme_remote_datasource.dart';
+import 'package:bookme/features/bookme/data/models/request/service_request.dart';
 import 'package:bookme/features/bookme/data/models/response/booking/booking_model.dart';
 import 'package:bookme/features/bookme/data/models/response/category/category_model.dart';
 import 'package:bookme/features/bookme/data/models/response/listpage/listpage.dart';
@@ -9,7 +10,7 @@ import 'package:bookme/features/bookme/data/models/response/review/review_model.
 import 'package:bookme/features/bookme/data/models/response/service/service_model.dart';
 import 'package:bookme/features/bookme/data/repository/bookme_repository.dart';
 import 'package:dartz/dartz.dart';
-
+//todo sort imports
 class BookmeRepositoryImpl extends Repository implements BookmeRepository {
   BookmeRepositoryImpl({required this.bookmeRemoteDatasource});
 
@@ -50,5 +51,17 @@ class BookmeRepositoryImpl extends Repository implements BookmeRepository {
     return makeRequest(bookmeRemoteDatasource.fetchBookings(agentId: agentId, userId: userId));
 
   }
+
+  @override
+  Future<Either<Failure, Service>> fetchServiceByUser() {
+    return makeRequest(bookmeRemoteDatasource.fetchUserService());
+  }
+
+  @override
+  Future<Either<Failure, Service>> updateService({required String serviceId, required ServiceRequest serviceRequest}) {
+    return makeRequest(bookmeRemoteDatasource.updateService(serviceId: serviceId, serviceRequest: serviceRequest));
+  }
+
+
 
 }

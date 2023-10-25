@@ -22,6 +22,6 @@ class Discount with _$Discount {
 
   factory Discount.empty() => const Discount(
    type: '',
-    value: 0
+    value: 0,
   );
 }

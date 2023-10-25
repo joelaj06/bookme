@@ -42,7 +42,7 @@ class UserProfileScreen extends GetView<UserProfileController> {
         FutureBuilder<void>(
           future: controller.getUser(),
           builder: (BuildContext context,_) {
-            //Todo: implement loading skeleton before widget builds
+            //Todo implement loading skeleton before widget builds
             return Padding(
               padding: AppPaddings.mA,
               child: Obx(() => _buildUserProfile(

@@ -2,12 +2,18 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:bookme/core/presentation/routes/app_routes.dart';
+import 'package:bookme/core/usecase/usecase.dart';
 import 'package:bookme/core/utitls/base_64.dart';
 import 'package:bookme/features/authentication/data/datasource/auth_local_data_source.dart';
 import 'package:bookme/features/authentication/data/domain/usecase/user/fetch_user.dart';
 import 'package:bookme/features/authentication/data/domain/usecase/user/update_user.dart';
 import 'package:bookme/features/authentication/data/models/request/user/user_request.dart';
 import 'package:bookme/features/authentication/data/models/response/user/user_model.dart';
+import 'package:bookme/features/bookme/data/models/response/category/category_model.dart';
+import 'package:bookme/features/bookme/data/models/response/discount/discount_model.dart';
+import 'package:bookme/features/bookme/domain/usecases/service/fetch_service_by_user.dart';
+import 'package:bookme/features/bookme/domain/usecases/service/update_service.dart';
+import 'package:bookme/features/bookme/presentation/home/getx/home_controller.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -16,15 +22,21 @@ import 'package:permission_handler/permission_handler.dart';
 
 import '../../../../../core/errors/failure.dart';
 import '../../../../authentication/data/models/response/login/login_response.dart';
+import '../../../data/models/request/service_request.dart';
+import '../../../data/models/response/service/service_model.dart';
 
 class UserProfileController extends GetxController {
   UserProfileController({
     required this.fetchUser,
     required this.updateUser,
+    required this.fetchServiceByUser,
+    required this.updateService,
   });
 
   final FetchUser fetchUser;
   final UpdateUser updateUser;
+  final FetchServiceByUser fetchServiceByUser;
+  final UpdateService updateService;
 
   //reactive variables
   RxInt pageIndex = 0.obs;
@@ -47,7 +59,15 @@ class UserProfileController extends GetxController {
   RxList<String> base64Images = <String>[].obs;
   Rx<XFile?> selectedImageFile = XFile('').obs;
   Rx<User> user = User.empty().obs;
+  RxBool isLoading = false.obs;
+  Rx<Service> service = Service.empty().obs;
+  RxString serviceTitle = ''.obs;
+  RxString serviceDescription = ''.obs;
+  RxDouble discountValue = 0.0.obs;
+  RxList<String> selectedCategories = <String>[].obs;
+  RxList<Category> categories = <Category>[].obs;
 
+  final HomeController homeController = Get.find();
   PageController pageController = PageController(initialPage: 0);
   ImagePicker picker = ImagePicker();
   final AuthLocalDataSource _authLocalDataSource = Get.find();
@@ -56,6 +76,81 @@ class UserProfileController extends GetxController {
   void dispose() {
     pageController.dispose();
     super.dispose();
+  }
+
+  void updateTheService() async {
+    if (base64Images.isEmpty || selectedCategories.isEmpty) {
+      //Todo empty image alert
+      return;
+    }
+
+    isLoading(true);
+    final Discount discount = Discount(
+      type: discountType.value == '%' ? 'percentage' : 'amount',
+      value: discountValue.value,
+    );
+    final ServiceRequest serviceRequest = ServiceRequest(
+      id: service.value.id,
+      categories: selectedCategories,
+      description:
+          serviceDescription.value.isEmpty ? null : serviceDescription.value,
+      title: serviceTitle.value.isEmpty ? null : serviceTitle.value,
+      isSpecialOffer: applyDiscount.value,
+      price: leastPrice.value == (0.0) ? null : leastPrice.value,
+      images: base64Images,
+      discount: discount,
+    );
+    final Either<Failure, Service> failureOrService =
+        await updateService(serviceRequest);
+
+    failureOrService.fold(
+      (Failure failure) {
+        isLoading(false);
+        //todo handle failure
+      },
+      (Service service) {
+        isLoading(false);
+        Get.back<dynamic>();
+      },
+    );
+  }
+
+  void updateDiscount(Discount? discount, bool discountApplied) {
+    if (discount == null) {
+      return;
+    }
+    applyDiscount(discountApplied);
+    discountValue(discount.value);
+    if (discount.type == 'amount') {
+      discountType('Gh¢');
+    } else {
+      discountType('%');
+    }
+  }
+
+  Future<void> getUserService() async {
+    isLoading(true);
+    final Either<Failure, Service> failureOrService =
+        await fetchServiceByUser(NoParams());
+    failureOrService.fold(
+      (Failure failure) {
+        isLoading(false);
+        //todo handle failure
+      },
+      (Service userService) {
+        isLoading(false);
+        service(userService);
+        final List<String> catIds =
+            userService.categories!.map((Category cat) => cat.id).toList();
+        selectedCategories(catIds);
+        updateDiscount(
+            userService.discount, userService.isSpecialOffer ?? false);
+        // update images
+        if (userService.images != null && userService.images!.isNotEmpty) {
+          base64Images(userService.images);
+        }
+      },
+    );
   }
 
   void updateTheUser() async {
@@ -137,18 +232,33 @@ class UserProfileController extends GetxController {
       final String base64StringImage =
           Base64Convertor().imageToBase64(imageFile.path);
       base64Images.insert(0, base64StringImage);
-      // print(base64StringImage.length);
       // Convert Base64 string to Uint8List
       Uint8List buffer = base64Decode(base64StringImage.split(',')[1]);
       print(buffer);
     }
   }
 
-  void navigateToUpdateProfileScreen() async{
+  void navigateToUpdateProfileScreen() async {
     final dynamic result = await Get.toNamed<dynamic>(AppRoutes.updateUser);
-    if(result != null){
+    if (result != null) {
       await getUser();
     }
+  }
+
+  void onServiceTitleInputChanged(String value) {
+    serviceTitle(value);
+  }
+
+  void onServiceDescriptionInputChanged(String value) {
+    serviceDescription(value);
+  }
+
+  void onDiscountValueInputChanged(String? value) {
+    discountValue(double.tryParse(value ?? '0.0'));
+  }
+
+  void onLeastPriceInputChanged(String? value) {
+    leastPrice(double.tryParse(value ?? '0.0'));
   }
 
   void onApplyDiscountInputChanged(bool? value) {
@@ -169,7 +279,7 @@ class UserProfileController extends GetxController {
     skill('');
   }
 
-  void onPhoneInputChanged(String value){
+  void onPhoneInputChanged(String value) {
     phone(value);
   }
 

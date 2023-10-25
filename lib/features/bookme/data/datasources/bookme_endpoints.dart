@@ -26,5 +26,7 @@ class BookmeEndpoints{
       userId != null ? 'bookings/?user_id=$userId' :
       'bookings/?agent_id=$agentId';
 
-  
+  static const String userService = 'services/user';
+  static String service(String serviceId) => 'services/$serviceId';
+
 }
