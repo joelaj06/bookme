@@ -100,7 +100,7 @@ class BookingsScreen extends GetView<BookingsController> {
       padding: AppPaddings.mA,
       child: GestureDetector(
         onTap: () {
-          controller.navigateToBookingDetailsScreen(index);
+          controller.navigateToBookingDetailsScreen(booking);
         },
         child: Container(
           decoration: BoxDecoration(

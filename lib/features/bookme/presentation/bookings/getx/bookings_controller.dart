@@ -6,6 +6,7 @@ import 'package:bookme/core/usecase/usecase.dart';
 import 'package:bookme/features/authentication/data/models/response/user/user_model.dart';
 import 'package:bookme/features/bookme/data/models/response/booking/booking_model.dart';
 import 'package:bookme/features/bookme/domain/usecases/booking/fetch_bookings.dart';
+import 'package:bookme/features/bookme/presentation/bookings/args/booking_arguments.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -57,7 +58,6 @@ class BookingsController extends GetxController {
   void checkAuthentication() async {
     final bool isAuth = await authLocalDataSource.isAuthenticated();
     isAuthenticated(isAuth);
-
   }
 
   @override
@@ -134,10 +134,10 @@ class BookingsController extends GetxController {
     print(values);
   }
 
-  void navigateToBookingDetailsScreen(int index) {
+  void navigateToBookingDetailsScreen(Booking booking) {
     Get.toNamed<dynamic>(
       AppRoutes.bookingDetails,
-      arguments: index,
+      arguments: BookingArgument(booking),
     );
   }
 

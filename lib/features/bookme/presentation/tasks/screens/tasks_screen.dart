@@ -1,3 +1,6 @@
+import 'package:bookme/core/presentation/widgets/app_loading_box.dart';
+import 'package:bookme/core/utitls/date_formatter.dart';
+import 'package:bookme/features/bookme/data/models/response/booking/booking_model.dart';
 import 'package:bookme/features/bookme/presentation/tasks/getx/tasks_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -7,6 +10,8 @@ import '../../../../../core/presentation/theme/hint_color.dart';
 import '../../../../../core/presentation/theme/primary_color.dart';
 import '../../../../../core/presentation/utitls/app_padding.dart';
 import '../../../../../core/presentation/utitls/app_spacing.dart';
+import '../../../../../core/utitls/base_64.dart';
+
 class TasksScreen extends GetView<TasksController> {
   const TasksScreen({Key? key}) : super(key: key);
 
@@ -15,17 +20,21 @@ class TasksScreen extends GetView<TasksController> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Tasks'),
-
       ),
-      body: Padding(
-        padding: AppPaddings.mA,
-        child: Column(
-          children: <Widget>[
-            _buildTabHeader(context),
-            Expanded(
-              child: _buildPageView(context),
+      body: Obx(
+        () => AppLoadingBox(
+          loading: controller.isLoading.value,
+          child: Padding(
+            padding: AppPaddings.mA,
+            child: Column(
+              children: <Widget>[
+                _buildTabHeader(context),
+                Expanded(
+                  child: _buildPageView(context),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -36,99 +45,160 @@ class TasksScreen extends GetView<TasksController> {
       controller: controller.pageController,
       onPageChanged: controller.onPageChanged,
       children: <Widget>[
-        _buildJobHistoryContainer(context,'pending', 'Fri 30th June, 2023'),
-        _buildJobHistoryContainer(context,'completed', 'Sun 28th May, 2023')
+        _buildPendingContainer(context),
+        _buildCompletedContainer(context)
       ],
     );
   }
 
-  Widget _buildJobHistoryContainer(BuildContext context, String status,
-      String date,) {
+  Widget _buildCompletedContainer(BuildContext context) {
     final double width = MediaQuery.of(context).size.width;
-    return ListView.builder(
-        itemCount: 10,
-        physics: const BouncingScrollPhysics(),
-        shrinkWrap: true,
-        itemBuilder: (BuildContext context, int index) {
-          final bool isPending =  status == 'pending';
-          return Padding(
+
+    return RefreshIndicator(
+      onRefresh: () {
+        return controller.getBookings();
+      },
+      child: controller.isBookingStatusEmpty('completed')
+          ? const Text('No result')
+          : ListView.builder(
+              itemCount: controller.bookings.length,
+              physics: const BouncingScrollPhysics(
+                parent: AlwaysScrollableScrollPhysics(),
+              ),
+              // shrinkWrap: true,
+              itemBuilder: (BuildContext context, int index) {
+                final bool isPending =
+                    controller.bookings[index].status == 'pending';
+                if (isPending) {
+                  return const SizedBox.shrink();
+                }
+                return _buildTaskCard(index, width, context,
+                    controller.bookings[index], isPending);
+              }),
+    );
+  }
+
+  Widget _buildPendingContainer(BuildContext context) {
+    final double width = MediaQuery.of(context).size.width;
+    return RefreshIndicator(
+      onRefresh: () {
+        return controller.getBookings();
+      },
+      child: controller.isBookingStatusEmpty('pending')
+          ? const Text('No result')
+          : ListView.builder(
+              itemCount: controller.bookings.length,
+              physics: const BouncingScrollPhysics(
+                parent: AlwaysScrollableScrollPhysics(),
+              ),
+              // shrinkWrap: true,
+              itemBuilder: (BuildContext context, int index) {
+                final bool isPending =
+                    controller.bookings[index].status == 'pending';
+                if (isPending) {
+                  return _buildTaskCard(index, width, context,
+                      controller.bookings[index], isPending);
+                }
+                return const SizedBox.shrink();
+              }),
+    );
+  }
+
+  Padding _buildTaskCard(int index, double width, BuildContext context,
+      Booking booking, bool isPending) {
+    final String image = booking.service.coverImage ?? '';
+    final String note = booking.notes ?? '';
+    return Padding(
+      padding: AppPaddings.mA,
+      child: GestureDetector(
+        onTap: () {
+           controller.navigateToBookingDetailsScreen(index);
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            color: PrimaryColor.backgroundColor,
+            borderRadius: BorderRadius.circular(15),
+            //  border: Border.all(color: Colors.red),
+            boxShadow: const <BoxShadow>[
+              BoxShadow(
+                offset: Offset(3, 3),
+                spreadRadius: -8,
+                blurRadius: 10,
+                color: Color.fromRGBO(137, 137, 137, 1),
+              ),
+            ],
+          ),
+          height: 100,
+          width: width,
+          child: Padding(
             padding: AppPaddings.mA,
-            child: GestureDetector(
-              onTap: () {
-                controller.navigateToBookingDetailsScreen(index);
-              },
-              child: Container(
-                decoration: BoxDecoration(
-                  color: PrimaryColor.backgroundColor,
+            child: Row(
+              //mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                ClipRRect(
                   borderRadius: BorderRadius.circular(15),
-                  //  border: Border.all(color: Colors.red),
-                  boxShadow: const <BoxShadow>[
-                    BoxShadow(
-                      offset: Offset(3, 3),
-                      spreadRadius: -8,
-                      blurRadius: 10,
-                      color: Color.fromRGBO(137, 137, 137, 1),
-                    ),
-                  ],
+                  child: Hero(
+                    tag: 'service$index',
+                    child: image.isEmpty
+                        ? Image.asset('assets/images/no_image.png')
+                        : Image.memory(
+                            fit: BoxFit.cover,
+                            Base64Convertor().base64toImage(
+                              image,
+                            ),
+                          ),
+                  ),
                 ),
-                height: 100,
-                width: width,
-                child: Padding(
-                  padding: AppPaddings.mA,
-                  child: Row(
-                    //mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                const AppSpacing(
+                  h: 10,
+                ),
+                Flexible(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(15),
-                        child: Hero(
-                          tag: 'service$index',
-                          child: Image.asset('assets/images/photographer.png'),
+                      Text(
+                        '${booking.user.firstName} ${booking.user.lastName}',
+                        style: context.textTheme.bodyMedium?.copyWith(
+                            fontSize: 15, fontWeight: FontWeight.w500),
+                      ),
+                      Text(
+                        note.isEmpty ? booking.service.title : note,
+                      ),
+                      SizedBox(
+                        child: Text(
+                          DataFormatter.getLocalCurrencyFormatter(context)
+                              .format(booking.preliminaryCost),
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(color: PrimaryColor.color),
                         ),
                       ),
-                      const AppSpacing(
-                        h: 10,
-                      ),
-                      Flexible(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                      Expanded(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
                             Text(
-                              'John Doe',
-                              style: context.textTheme.bodyMedium?.copyWith(
-                                  fontSize: 15, fontWeight: FontWeight.w500),
+                              DataFormatter.formatDate(booking.endDate ?? ''),
                             ),
-                            const Text('Wedding Photoshoot'),
-                            const SizedBox(
-                              child: Text(
-                                'Ghc 1200',
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(color: PrimaryColor.color),
-                              ),
-                            ),
-                            Expanded(
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children:  <Widget>[
-                                  Text(
-                                      date
-                                  ),
-                                  Icon( isPending ?Icons.pending_actions_outlined:
-                                  Ionicons.checkmark_circle,
-                                    color: isPending ? Color(0xffbb8833):
-                                    Colors.green,)
-                                ],
-                              ),
-                            ),
+                            Icon(
+                              isPending
+                                  ? Icons.pending_actions_outlined
+                                  : Ionicons.checkmark_circle,
+                              color: isPending
+                                  ? const Color(0xffbb8833)
+                                  : Colors.green,
+                            )
                           ],
                         ),
                       ),
                     ],
                   ),
                 ),
-              ),
+              ],
             ),
-          );
-        });
+          ),
+        ),
+      ),
+    );
   }
 
   Container _buildTabHeader(BuildContext context) {
@@ -151,7 +221,7 @@ class TasksScreen extends GetView<TasksController> {
                 controller.navigatePages(0);
               },
               child: Obx(
-                    () => _buildTabHeaderContent(
+                () => _buildTabHeaderContent(
                   context,
                   text: 'Pending',
                   isActive: controller.pageIndex.value == 0,
@@ -169,7 +239,7 @@ class TasksScreen extends GetView<TasksController> {
                 controller.navigatePages(1);
               },
               child: Obx(
-                    () => _buildTabHeaderContent(
+                () => _buildTabHeaderContent(
                   context,
                   text: 'Completed',
                   isActive: controller.pageIndex.value == 1,
@@ -183,25 +253,25 @@ class TasksScreen extends GetView<TasksController> {
   }
 
   Container _buildTabHeaderContent(
-      BuildContext context, {
-        required String text,
-        required bool isActive,
-      }) {
+    BuildContext context, {
+    required String text,
+    required bool isActive,
+  }) {
     return Container(
       // width: MediaQuery.of(context).size.width / 2,
       decoration: isActive
           ? BoxDecoration(
-        color: PrimaryColor.backgroundColor,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: const <BoxShadow>[
-          BoxShadow(
-            offset: Offset(0, 5),
-            spreadRadius: -16,
-            blurRadius: 20,
-            color: Color.fromRGBO(0, 0, 0, 1),
-          )
-        ],
-      )
+              color: PrimaryColor.backgroundColor,
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: const <BoxShadow>[
+                BoxShadow(
+                  offset: Offset(0, 5),
+                  spreadRadius: -16,
+                  blurRadius: 20,
+                  color: Color.fromRGBO(0, 0, 0, 1),
+                )
+              ],
+            )
           : null,
       child: Center(
         child: Text(
@@ -215,5 +285,3 @@ class TasksScreen extends GetView<TasksController> {
     );
   }
 }
-
-

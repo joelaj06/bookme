@@ -213,7 +213,7 @@ class PromotionsScreen extends GetView<PromotionsController> {
                          Text(service.title.toTitleCase()),
                         const Expanded(child: Text('Valid up to')),
                         Text(
-                          DateFormatter.dateToString(service.discount!.endDate ?? ''),
+                          DataFormatter.dateToString(service.discount!.endDate ?? ''),
                           style: context.textTheme.bodyMedium?.copyWith(
                             //fontSize: 15,
                             fontWeight: FontWeight.w500,
