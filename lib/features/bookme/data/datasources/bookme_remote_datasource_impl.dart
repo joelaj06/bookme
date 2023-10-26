@@ -1,7 +1,8 @@
 import 'package:bookme/core/utitls/app_http_client.dart';
 import 'package:bookme/features/bookme/data/datasources/bookme_endpoints.dart';
 import 'package:bookme/features/bookme/data/datasources/bookme_remote_datasource.dart';
-import 'package:bookme/features/bookme/data/models/request/service_request.dart';
+import 'package:bookme/features/bookme/data/models/request/booking/booking_request.dart';
+import 'package:bookme/features/bookme/data/models/request/service/service_request.dart';
 import 'package:bookme/features/bookme/data/models/response/booking/booking_model.dart';
 import 'package:bookme/features/bookme/data/models/response/category/category_model.dart';
 import 'package:bookme/features/bookme/data/models/response/listpage/listpage.dart';
@@ -125,6 +126,13 @@ class BookmeRemoteDatasourceImpl implements BookmeRemoteDatasource{
     final Map<String, dynamic> json = await _client.put(BookmeEndpoints.service(serviceId),
     body: serviceRequest.toJson());
     return Service.fromJson(json);
+  }
+
+  @override
+  Future<Booking> updateBooking({required String bookingId, required BookingRequest bookingRequest}) async {
+    final Map<String, dynamic> json = await _client.put(BookmeEndpoints.booking(bookingId),
+    body: bookingRequest.toJson());
+    return Booking.fromJson(json);
   }
 
 }

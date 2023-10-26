@@ -29,4 +29,6 @@ class BookmeEndpoints{
   static const String userService = 'services/user';
   static String service(String serviceId) => 'services/$serviceId';
 
+  static String booking(String bookingId) => 'bookings/$bookingId';
+
 }

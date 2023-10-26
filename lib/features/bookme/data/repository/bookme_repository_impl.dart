@@ -1,7 +1,8 @@
 import 'package:bookme/core/errors/failure.dart';
 import 'package:bookme/core/utitls/repository.dart';
 import 'package:bookme/features/bookme/data/datasources/bookme_remote_datasource.dart';
-import 'package:bookme/features/bookme/data/models/request/service_request.dart';
+import 'package:bookme/features/bookme/data/models/request/booking/booking_request.dart';
+import 'package:bookme/features/bookme/data/models/request/service/service_request.dart';
 import 'package:bookme/features/bookme/data/models/response/booking/booking_model.dart';
 import 'package:bookme/features/bookme/data/models/response/category/category_model.dart';
 import 'package:bookme/features/bookme/data/models/response/listpage/listpage.dart';
@@ -60,6 +61,11 @@ class BookmeRepositoryImpl extends Repository implements BookmeRepository {
   @override
   Future<Either<Failure, Service>> updateService({required String serviceId, required ServiceRequest serviceRequest}) {
     return makeRequest(bookmeRemoteDatasource.updateService(serviceId: serviceId, serviceRequest: serviceRequest));
+  }
+
+  @override
+  Future<Either<Failure, Booking>> updateBooking({required String bookingId, required BookingRequest bookingRequest}) {
+   return makeRequest(bookmeRemoteDatasource.updateBooking(bookingId: bookingId, bookingRequest: bookingRequest));
   }
 
 

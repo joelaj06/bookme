@@ -22,7 +22,7 @@ import 'package:permission_handler/permission_handler.dart';
 
 import '../../../../../core/errors/failure.dart';
 import '../../../../authentication/data/models/response/login/login_response.dart';
-import '../../../data/models/request/service_request.dart';
+import '../../../data/models/request/service/service_request.dart';
 import '../../../data/models/response/service/service_model.dart';
 
 class UserProfileController extends GetxController {
@@ -233,7 +233,7 @@ class UserProfileController extends GetxController {
           Base64Convertor().imageToBase64(imageFile.path);
       base64Images.insert(0, base64StringImage);
       // Convert Base64 string to Uint8List
-      Uint8List buffer = base64Decode(base64StringImage.split(',')[1]);
+      final Uint8List buffer = base64Decode(base64StringImage.split(',')[1]);
       print(buffer);
     }
   }

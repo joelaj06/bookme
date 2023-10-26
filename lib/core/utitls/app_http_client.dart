@@ -189,7 +189,7 @@ class AuthInterceptor implements InterceptorContract {
         await _authLocalDataSource.getAuthResponse();
 
     final Map<String, String> headers = <String, String>{
-      'Content-type': 'application/json',
+      HttpHeaders.contentTypeHeader: 'application/json',
       'Authorization': 'Bearer ${response?.user.token}'
     };
     data.headers.addAll(headers);

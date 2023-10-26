@@ -4,8 +4,10 @@ import 'package:bookme/core/presentation/widgets/app_dialog.dart';
 import 'package:bookme/core/presentation/widgets/app_snacks.dart';
 import 'package:bookme/core/usecase/usecase.dart';
 import 'package:bookme/features/authentication/data/models/response/user/user_model.dart';
+import 'package:bookme/features/bookme/data/models/request/booking/booking_request.dart';
 import 'package:bookme/features/bookme/data/models/response/booking/booking_model.dart';
 import 'package:bookme/features/bookme/domain/usecases/booking/fetch_bookings.dart';
+import 'package:bookme/features/bookme/domain/usecases/booking/update_booking.dart';
 import 'package:bookme/features/bookme/presentation/bookings/args/booking_arguments.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
@@ -17,9 +19,13 @@ import '../../../../authentication/data/datasource/auth_local_data_source.dart';
 import '../../../../authentication/data/models/response/login/login_response.dart';
 
 class BookingsController extends GetxController {
-  BookingsController({required this.fetchBookings});
+  BookingsController({
+    required this.fetchBookings,
+    required this.updateBooking,
+  });
 
   final FetchBookings fetchBookings;
+  final UpdateBooking updateBooking;
 
   // reactive variables
   RxInt pageIndex = 0.obs;
@@ -28,6 +34,11 @@ class BookingsController extends GetxController {
     DateTime.now().subtract(const Duration(days: 1)),
     DateTime.now(),
   ].obs;
+
+  final List<DateTime?> initialDates = <DateTime>[
+    DateTime.now().subtract(const Duration(days: 1)),
+    DateTime.now(),
+  ];
 
   Rx<TextEditingController> startTimeTextEditingController =
       TextEditingController().obs;
@@ -44,13 +55,14 @@ class BookingsController extends GetxController {
   RxString startDate = ''.obs;
   RxString endDate = ''.obs;
   RxString location = ''.obs;
-
   RxBool isAuthenticated = false.obs;
   Rx<User> user = User.empty().obs;
 
+  late String bookingId;
+
   //paging controller
   final PagingController<int, Booking> pagingController =
-  PagingController<int, Booking>(firstPageKey: 1);
+      PagingController<int, Booking>(firstPageKey: 1);
 
   PageController pageController = PageController(initialPage: 0);
   final AuthLocalDataSource authLocalDataSource = Get.find();
@@ -71,15 +83,42 @@ class BookingsController extends GetxController {
     super.onClose();
   }
 
-  Future<User?> getUser() async{
+  void updateTheBooking(BookingStatus status) async {
+    final String startingDate = '${startDate.value}T$startTime';
+    final String endingDate = '${endDate.value}T$endTime';
+    final BookingRequest bookingRequest = BookingRequest(
+      id: bookingId,
+      endDate: endingDate,
+      startDate: startingDate,
+      status: status.name,
+    );
+    isLoading(true);
+
+    final Either<Failure, Booking> failureOrBooking =
+        await updateBooking(bookingRequest);
+    failureOrBooking.fold(
+      (Failure failure) {
+        isLoading(false);
+        //todo handle failure
+      },
+      (Booking booking) {
+        isLoading(false);
+        Get.back<dynamic>(result: booking);
+
+      },
+    );
+  }
+
+  Future<User?> getUser() async {
     final LoginResponse? response = authLocalDataSource.authResponse ??
         await authLocalDataSource.getAuthResponse();
     return response?.user;
   }
+
   Future<void> getBookings(String userId) async {
     isLoading(true);
     final Either<Failure, List<Booking>> failureOrBookings =
-        await fetchBookings( PageParams(
+        await fetchBookings(PageParams(
       page: 0,
       size: 0,
       agentId: null,
@@ -97,9 +136,10 @@ class BookingsController extends GetxController {
     );
   }
 
-  void navigateToLogin(){
+  void navigateToLogin() {
     Get.toNamed<dynamic>(AppRoutes.login);
   }
+
   void onBookingCanceled(BuildContext context) {
     AppDialog().showConfirmationDialog(
       context,
@@ -107,6 +147,7 @@ class BookingsController extends GetxController {
       'Are you sure you want to cancel this service?',
       onTapConfirm: () {
         Navigator.pop(context);
+        updateTheBooking(BookingStatus.canceled);
       },
     );
   }
@@ -116,7 +157,7 @@ class BookingsController extends GetxController {
   }
 
   void onTimeSelected(BuildContext context, bool isStartTime) async {
-    TimeOfDay? time = await AppDatePicker().showTimePickerDialog(context);
+    final TimeOfDay? time = await AppDatePicker().showTimePickerDialog(context);
     if (time == null) {
       return;
     }
@@ -132,6 +173,11 @@ class BookingsController extends GetxController {
 
   void onDateDateValueChanged(List<DateTime?>? values) {
     print(values);
+    if(values!.length > 1){
+     startDate(values[0].toString().split(' ')[0]);
+     endDate(values[1].toString().split(' ')[0]);
+     print(startDate);
+    }
   }
 
   void navigateToBookingDetailsScreen(Booking booking) {
@@ -152,4 +198,10 @@ class BookingsController extends GetxController {
   void onPageChanged(int index) {
     pageIndex(index);
   }
+}
+
+enum BookingStatus {
+  completed,
+  pending,
+  canceled,
 }

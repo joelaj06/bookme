@@ -73,7 +73,7 @@ class TasksScreen extends GetView<TasksController> {
                   return const SizedBox.shrink();
                 }
                 return _buildTaskCard(index, width, context,
-                    controller.bookings[index], isPending);
+                    controller.bookings[index], isPending, false);
               }),
     );
   }
@@ -95,9 +95,11 @@ class TasksScreen extends GetView<TasksController> {
               itemBuilder: (BuildContext context, int index) {
                 final bool isPending =
                     controller.bookings[index].status == 'pending';
-                if (isPending) {
+                final bool isCanceled =
+                    controller.bookings[index].status == 'canceled';
+                if (isPending || isCanceled) {
                   return _buildTaskCard(index, width, context,
-                      controller.bookings[index], isPending);
+                      controller.bookings[index], isPending, isCanceled);
                 }
                 return const SizedBox.shrink();
               }),
@@ -105,14 +107,14 @@ class TasksScreen extends GetView<TasksController> {
   }
 
   Padding _buildTaskCard(int index, double width, BuildContext context,
-      Booking booking, bool isPending) {
+      Booking booking, bool isPending, bool isCanceled) {
     final String image = booking.service.coverImage ?? '';
     final String note = booking.notes ?? '';
     return Padding(
       padding: AppPaddings.mA,
       child: GestureDetector(
         onTap: () {
-           controller.navigateToBookingDetailsScreen(index);
+          controller.navigateToBookingDetailsScreen(booking);
         },
         child: Container(
           decoration: BoxDecoration(
@@ -182,10 +184,14 @@ class TasksScreen extends GetView<TasksController> {
                             Icon(
                               isPending
                                   ? Icons.pending_actions_outlined
-                                  : Ionicons.checkmark_circle,
+                                  : isCanceled
+                                      ? Icons.cancel
+                                      : Ionicons.checkmark_circle,
                               color: isPending
                                   ? const Color(0xffbb8833)
-                                  : Colors.green,
+                                  : isCanceled
+                                      ? Colors.red
+                                      : Colors.green,
                             )
                           ],
                         ),

@@ -1,3 +1,4 @@
+import 'package:bookme/features/bookme/presentation/bookings/args/booking_arguments.dart';
 import 'package:bookme/features/bookme/presentation/user_profile/getx/user_profile_controller.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter/cupertino.dart';
@@ -65,11 +66,15 @@ class TasksController extends GetxController{
     return false;
   }
 
-  void navigateToBookingDetailsScreen(int index) {
-    Get.toNamed<dynamic>(
+  void navigateToBookingDetailsScreen(Booking booking) async {
+   final dynamic result = await Get.toNamed<dynamic>(
       AppRoutes.bookingDetails,
-      arguments: index,
+      arguments: BookingArgument(booking),
     );
+   if(result != null){
+     AppSnacks.showSuccess('Booking', 'Booking updated successfully');
+     await getBookings();
+   }
   }
 
   void navigatePages(int index) {

@@ -1,5 +1,6 @@
 import 'package:bookme/core/errors/failure.dart';
-import 'package:bookme/features/bookme/data/models/request/service_request.dart';
+import 'package:bookme/features/bookme/data/models/request/booking/booking_request.dart';
+import 'package:bookme/features/bookme/data/models/request/service/service_request.dart';
 import 'package:bookme/features/bookme/data/models/response/booking/booking_model.dart';
 import 'package:bookme/features/bookme/data/models/response/category/category_model.dart';
 import 'package:bookme/features/bookme/data/models/response/listpage/listpage.dart';
@@ -26,8 +27,15 @@ abstract class BookmeRepository {
   Future<Either<Failure, ListPage<Service>>> fetchPromotedServices(
       {required int size, required int page, String? query});
 
-  Future<Either<Failure, AgentRating>> fetchAgentReviews({required String agentId, String? userId});
-  Future<Either<Failure, List<Booking>>> fetchBookings({ String? agentId, required String? userId});
+  Future<Either<Failure, AgentRating>> fetchAgentReviews(
+      {required String agentId, String? userId});
+
+  Future<Either<Failure, List<Booking>>> fetchBookings(
+      {String? agentId, required String? userId});
+
   Future<Either<Failure, Service>> fetchServiceByUser();
-  Future<Either<Failure, Service>> updateService({required String serviceId, required ServiceRequest serviceRequest});
+
+  Future<Either<Failure, Service>> updateService(
+      {required String serviceId, required ServiceRequest serviceRequest});
+  Future<Either<Failure, Booking>> updateBooking({required String bookingId, required BookingRequest bookingRequest});
 }
