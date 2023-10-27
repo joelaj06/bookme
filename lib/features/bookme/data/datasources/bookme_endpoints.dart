@@ -30,5 +30,9 @@ class BookmeEndpoints{
   static String service(String serviceId) => 'services/$serviceId';
 
   static String booking(String bookingId) => 'bookings/$bookingId';
+  static const String favorites = 'favorites';
+  static String favorite(String serviceId) => 'favorites/$serviceId';
+
+  static String userFavorites(String userId) => 'favorites?user_id=$userId';
 
 }

@@ -79,13 +79,7 @@ class ServicesScreen extends GetView<ServicesController> {
         pagingController: controller.pagingController,
         builderDelegate: PagedChildBuilderDelegate<Service>(
           itemBuilder: (BuildContext context, Service service, int index) {
-            return Dismissible(
-              key: Key(service.id.toString()),
-              onDismissed: (DismissDirection direction) {
-                //  controller.deleteTheService(context, index);
-              },
-              child: _buildServiceCard(service,index, width, context),
-            );
+            return _buildServiceCard(service,index, width, context);
           },
           firstPageErrorIndicatorBuilder: (BuildContext context) =>
               ErrorIndicator(

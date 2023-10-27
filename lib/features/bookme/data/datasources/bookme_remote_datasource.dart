@@ -1,5 +1,7 @@
 import 'package:bookme/features/bookme/data/models/request/booking/booking_request.dart';
+import 'package:bookme/features/bookme/data/models/request/favorite/add_favorite_request.dart';
 import 'package:bookme/features/bookme/data/models/response/category/category_model.dart';
+import 'package:bookme/features/bookme/data/models/response/favorite/favorite_model.dart';
 import 'package:bookme/features/bookme/data/models/response/listpage/listpage.dart';
 import 'package:bookme/features/bookme/data/models/response/review/agent_rating_model.dart';
 import 'package:bookme/features/bookme/data/models/response/review/review_model.dart';
@@ -41,4 +43,10 @@ abstract class BookmeRemoteDatasource {
 
   Future<Booking> updateBooking(
       {required String bookingId, required BookingRequest bookingRequest});
+
+  Future<List<Favorite>> fetchFavorites({required String userId});
+
+  Future<Favorite> addFavorite({required AddFavoriteRequest addFavoriteRequest});
+
+  Future<void> deleteFavorite({required String favoriteId});
 }

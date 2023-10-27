@@ -1,8 +1,10 @@
 import 'package:bookme/core/errors/failure.dart';
 import 'package:bookme/features/bookme/data/models/request/booking/booking_request.dart';
+import 'package:bookme/features/bookme/data/models/request/favorite/add_favorite_request.dart';
 import 'package:bookme/features/bookme/data/models/request/service/service_request.dart';
 import 'package:bookme/features/bookme/data/models/response/booking/booking_model.dart';
 import 'package:bookme/features/bookme/data/models/response/category/category_model.dart';
+import 'package:bookme/features/bookme/data/models/response/favorite/favorite_model.dart';
 import 'package:bookme/features/bookme/data/models/response/listpage/listpage.dart';
 import 'package:bookme/features/bookme/data/models/response/review/agent_rating_model.dart';
 import 'package:bookme/features/bookme/data/models/response/service/service_model.dart';
@@ -38,4 +40,10 @@ abstract class BookmeRepository {
   Future<Either<Failure, Service>> updateService(
       {required String serviceId, required ServiceRequest serviceRequest});
   Future<Either<Failure, Booking>> updateBooking({required String bookingId, required BookingRequest bookingRequest});
+
+  Future<Either<Failure, List<Favorite>>> fetchFavorites({required String userId});
+
+  Future<Either<Failure, Favorite>> addFavorite({required AddFavoriteRequest addFavoriteRequest});
+
+  Future<Either<Failure, void>> deleteFavorite({required String favoriteId});
 }
