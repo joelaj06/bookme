@@ -53,13 +53,14 @@ class FavoritesController extends GetxController{
 
   void deleteFav(String favoriteId) async{
     isLoading(true);
-    final Either<Failure, void> failureOrFav =
+    final Either<Failure, Favorite> failureOrFav =
        await deleteFavorite(favoriteId);
     failureOrFav.fold((Failure failure) {
       isLoading(false);
       AppSnacks.showError('Favorite', failure.message);
-    }, (void f) {
+    }, (Favorite favorite) {
       isLoading(false);
+      AppSnacks.showSuccess('Favorites', 'Service removed from favorites');
     },
     );
   }

@@ -12,8 +12,8 @@ part 'favorite_model.g.dart';
 class Favorite with _$Favorite {
   const factory Favorite({
    @JsonKey(name: '_id') required String id,
-    required Service service,
-    required User user,
+    required Service? service,
+    required User? user,
   }) = _Favorite;
 
   const Favorite._();

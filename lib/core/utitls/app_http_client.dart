@@ -100,7 +100,7 @@ class AppHTTPClient {
 
   //DELETE
 
-  Future<dynamic> delete(String endpoint) async {
+  Future<Map<String, dynamic>> delete(String endpoint) async {
     final Uri uri = Uri.parse(baseUrl + endpoint);
     AppLog.i('============================ ENDPOINT ========================');
     AppLog.i(endpoint);

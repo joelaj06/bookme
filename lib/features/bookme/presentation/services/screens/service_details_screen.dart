@@ -50,129 +50,130 @@ class ServiceDetailsScreen extends GetView<ServicesController> {
           ),
         ),
       ),
-      body: AppLoadingBox(
-        loading: controller.isLoading.value,
-        child: Column(
-          children: <Widget>[
-            SizedBox(
-              width: double.infinity,
-              height: MediaQuery.of(context).size.height * 0.4,
-              child: ClipRRect(
-                borderRadius: const BorderRadius.only(
-                  bottomRight: Radius.circular(30),
-                  bottomLeft: Radius.circular(30),
-                ),
-                child: Hero(
-                  tag: 'service${args?.service.id}',
-                  child: Obx(
-                    () =>Image.memory(
-                      Base64Convertor().base64toImage(
-                        images[controller.imageIndex.value]!,
+      body: Obx(() => AppLoadingBox(
+          loading: controller.isLoading.value,
+          child: Column(
+            children: <Widget>[
+              SizedBox(
+                width: double.infinity,
+                height: MediaQuery.of(context).size.height * 0.4,
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    bottomRight: Radius.circular(30),
+                    bottomLeft: Radius.circular(30),
+                  ),
+                  child: Hero(
+                    tag: 'service${args?.service.id}',
+                    child: Obx(
+                      () =>Image.memory(
+                        Base64Convertor().base64toImage(
+                          images[controller.imageIndex.value]!,
+                        ),
+                        fit: BoxFit.cover,
                       ),
-                      fit: BoxFit.cover,
-                    ),
 
+                    ),
                   ),
                 ),
               ),
-            ),
-            SizedBox(
-              height: 100,
-              child: ListView.builder(
-                shrinkWrap: true,
-                physics: const BouncingScrollPhysics(),
-                scrollDirection: Axis.horizontal,
-                itemCount: images.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return GestureDetector(
-                    onTap: () {
-                      controller.onOtherImagesSelected(index);
-                    },
-                    child: Padding(
-                      padding: AppPaddings.mA,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(20),
-                        child: Container(
-                          width: 120,
-                          color: HintColor.color.shade50,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(15),
-                            child: Image.memory(
-                              fit: BoxFit.cover,
-                              Base64Convertor().base64toImage(
-                                images[index]!,
+              SizedBox(
+                height: 100,
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  physics: const BouncingScrollPhysics(),
+                  scrollDirection: Axis.horizontal,
+                  itemCount: images.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return GestureDetector(
+                      onTap: () {
+                        controller.onOtherImagesSelected(index);
+                      },
+                      child: Padding(
+                        padding: AppPaddings.mA,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(20),
+                          child: Container(
+                            width: 120,
+                            color: HintColor.color.shade50,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(15),
+                              child: Image.memory(
+                                fit: BoxFit.cover,
+                                Base64Convertor().base64toImage(
+                                  images[index]!,
+                                ),
                               ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  );
-                },
-              ),
-            ),
-            Padding(
-              padding: AppPaddings.mA,
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Flexible(
-                          child: Text(
-                            args?.service.title ?? '',
-                            style: context.textTheme.bodyLarge?.copyWith(
-                              color: SecondaryColor.color,
-                              fontSize: 30,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Row(
-                          children: <Widget>[
-                            const Icon(Ionicons.person_circle_outline),
-                            const AppSpacing(
-                              h: 10,
-                            ),
-                            Text(
-                             '${args?.service.user?.firstName} ${args?.service.user?.lastName}',
-                              style: context.textTheme.bodyLarge?.copyWith(
-                                fontSize: 20,
-                              ),
-                            ),
-                          ],
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            controller.navigateToServiceAgentScreen(args!.service);
-                          },
-                          child: const Text('View Profile'),
-                        ),
-                      ],
-                    ),
-                     IconText(
-                      text: args?.service.location ?? '',
-                      textColor: PrimaryColor.color,
-                      iconColor: PrimaryColor.color,
-                    ),
-                    const AppSpacing(
-                      v: 10,
-                    ),
-                    Text(
-                      args?.service.description ?? '',
-                    )
-                  ],
+                    );
+                  },
                 ),
               ),
-            )
-          ],
+              Padding(
+                padding: AppPaddings.mA,
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Flexible(
+                            child: Text(
+                              args?.service.title ?? '',
+                              style: context.textTheme.bodyLarge?.copyWith(
+                                color: SecondaryColor.color,
+                                fontSize: 30,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Row(
+                            children: <Widget>[
+                              const Icon(Ionicons.person_circle_outline),
+                              const AppSpacing(
+                                h: 10,
+                              ),
+                              Text(
+                               '${args?.service.user?.firstName} ${args?.service.user?.lastName}',
+                                style: context.textTheme.bodyLarge?.copyWith(
+                                  fontSize: 20,
+                                ),
+                              ),
+                            ],
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              controller.navigateToServiceAgentScreen(args!.service);
+                            },
+                            child: const Text('View Profile'),
+                          ),
+                        ],
+                      ),
+                       IconText(
+                        text: args?.service.location ?? '',
+                        textColor: PrimaryColor.color,
+                        iconColor: PrimaryColor.color,
+                      ),
+                      const AppSpacing(
+                        v: 10,
+                      ),
+                      Text(
+                        args?.service.description ?? '',
+                      )
+                    ],
+                  ),
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );

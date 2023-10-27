@@ -104,7 +104,7 @@ class BookmeRepositoryImpl extends Repository implements BookmeRepository {
   }
 
   @override
-  Future<Either<Failure, void>> deleteFavorite({required String favoriteId}) {
+  Future<Either<Failure, Favorite>> deleteFavorite({required String favoriteId}) {
     return makeRequest(
         bookmeRemoteDatasource.deleteFavorite(favoriteId: favoriteId));
   }

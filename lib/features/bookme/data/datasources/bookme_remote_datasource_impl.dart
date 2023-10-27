@@ -180,8 +180,8 @@ class BookmeRemoteDatasourceImpl implements BookmeRemoteDatasource {
   }
 
   @override
-  Future<void> deleteFavorite({required String favoriteId}) async{
-    final dynamic result = await _client.delete(BookmeEndpoints.favorites);
-    return result;
+  Future<Favorite> deleteFavorite({required String favoriteId}) async{
+    final Map<String, dynamic> json = await _client.delete(BookmeEndpoints.favorite(favoriteId));
+    return Favorite.fromJson(json);
   }
 }

@@ -48,5 +48,5 @@ abstract class BookmeRemoteDatasource {
 
   Future<Favorite> addFavorite({required AddFavoriteRequest addFavoriteRequest});
 
-  Future<void> deleteFavorite({required String favoriteId});
+  Future<Favorite> deleteFavorite({required String favoriteId});
 }

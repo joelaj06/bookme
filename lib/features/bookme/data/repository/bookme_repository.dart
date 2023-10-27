@@ -45,5 +45,5 @@ abstract class BookmeRepository {
 
   Future<Either<Failure, Favorite>> addFavorite({required AddFavoriteRequest addFavoriteRequest});
 
-  Future<Either<Failure, void>> deleteFavorite({required String favoriteId});
+  Future<Either<Failure, Favorite>> deleteFavorite({required String favoriteId});
 }

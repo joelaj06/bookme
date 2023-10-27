@@ -11,6 +11,7 @@ import '../../../../../core/presentation/widgets/app_loading_box.dart';
 import '../../../../../core/presentation/widgets/location_icon.dart';
 import '../../../../../core/utitls/base_64.dart';
 import '../../../data/models/response/service/service_model.dart';
+
 class FavoriteScreen extends GetView<FavoritesController> {
   const FavoriteScreen({Key? key}) : super(key: key);
 
@@ -20,32 +21,48 @@ class FavoriteScreen extends GetView<FavoritesController> {
       appBar: AppBar(
         title: const Text('Favorites'),
       ),
-      body: Obx(() => AppLoadingBox(
+      body: Obx(
+        () => AppLoadingBox(
           loading: controller.isLoading.value,
-          child: _buildServiceListTile(context,
+          child: _buildServiceListTile(
+            context,
           ),
         ),
       ),
     );
   }
 
-  Widget _buildServiceListTile(BuildContext context){
+  Widget _buildServiceListTile(BuildContext context) {
     final double width = MediaQuery.of(context).size.width;
     return RefreshIndicator(
       onRefresh: () {
         return controller.getFavorites();
       },
-      child:  ListView.builder(
-            itemCount: controller.favorites.length,
-            physics: const BouncingScrollPhysics(),
-            shrinkWrap: true,
-            itemBuilder: (BuildContext context, int index){
-              return _buildServiceCard(controller.favorites[index].service, index, width, context);
-            }),
+      child: ListView.builder(
+          itemCount: controller.favorites.length,
+          physics: const BouncingScrollPhysics(),
+          shrinkWrap: true,
+          itemBuilder: (BuildContext context, int index) {
+            return Dismissible(
+              key: ValueKey<int>(index),
+              onDismissed: (DismissDirection direction){
+                //todo confirm dismissal
+                controller.deleteFav(controller.favorites[index].id);
+                controller.favorites.removeAt(index);
+              },
+              child: _buildServiceCard(
+                controller.favorites[index].service!,
+                index,
+                width,
+                context,
+              ),
+            );
+          }),
     );
   }
 
-  Padding _buildServiceCard(Service service,int index, double width, BuildContext context) {
+  Padding _buildServiceCard(
+      Service service, int index, double width, BuildContext context) {
     final String image = service.coverImage ?? '';
     return Padding(
       padding: AppPaddings.mA,
@@ -78,17 +95,19 @@ class FavoriteScreen extends GetView<FavoritesController> {
                   borderRadius: BorderRadius.circular(15),
                   child: Hero(
                     tag: 'service$index',
-                    child: image.isEmpty ?
-                    Image.asset('assets/images/no_image.png')
-                        :Image.memory(
-                      fit: BoxFit.cover,
-                      Base64Convertor().base64toImage(
-                        image,
-                      ),
-                    ),
+                    child: image.isEmpty
+                        ? Image.asset('assets/images/no_image.png')
+                        : Image.memory(
+                            fit: BoxFit.cover,
+                            Base64Convertor().base64toImage(
+                              image,
+                            ),
+                          ),
                   ),
                 ),
-                const AppSpacing(h: 10,),
+                const AppSpacing(
+                  h: 10,
+                ),
                 Flexible(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -105,8 +124,7 @@ class FavoriteScreen extends GetView<FavoritesController> {
                           overflow: TextOverflow.ellipsis,
                           maxLines: 2,
                           style: TextStyle(
-                              fontSize: 12.sp,
-                              color: HintColor.color.shade400),
+                              fontSize: 12.sp, color: HintColor.color.shade400),
                         ),
                       ),
                     ],
@@ -119,5 +137,4 @@ class FavoriteScreen extends GetView<FavoritesController> {
       ),
     );
   }
-
 }
