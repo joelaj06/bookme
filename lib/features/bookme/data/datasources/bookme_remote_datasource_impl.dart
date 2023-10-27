@@ -175,7 +175,7 @@ class BookmeRemoteDatasourceImpl implements BookmeRemoteDatasource {
   Future<Favorite> addFavorite(
       {required AddFavoriteRequest addFavoriteRequest}) async {
     final Map<String, dynamic> json = await _client
-        .put(BookmeEndpoints.favorites, body: addFavoriteRequest.toJson());
+        .post(BookmeEndpoints.favorites, body: addFavoriteRequest.toJson());
     return Favorite.fromJson(json);
   }
 
