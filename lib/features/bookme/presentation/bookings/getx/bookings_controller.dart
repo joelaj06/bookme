@@ -55,7 +55,6 @@ class BookingsController extends GetxController {
   RxString startDate = ''.obs;
   RxString endDate = ''.obs;
   RxString location = ''.obs;
-  RxBool isAuthenticated = false.obs;
   Rx<User> user = User.empty().obs;
 
   late String bookingId;
@@ -65,12 +64,9 @@ class BookingsController extends GetxController {
       PagingController<int, Booking>(firstPageKey: 1);
 
   PageController pageController = PageController(initialPage: 0);
-  final AuthLocalDataSource authLocalDataSource = Get.find();
+  final AuthLocalDataSource _authLocalDataSource = Get.find();
 
-  void checkAuthentication() async {
-    final bool isAuth = await authLocalDataSource.isAuthenticated();
-    isAuthenticated(isAuth);
-  }
+
 
 
   @override
@@ -78,6 +74,9 @@ class BookingsController extends GetxController {
     pageController.dispose();
     super.onClose();
   }
+
+  Future<bool> get isAuthenticated async =>
+      _authLocalDataSource.isAuthenticated();
 
   void updateTheBooking(BookingStatus status) async {
     final String startingDate = '${startDate.value}T$startTime';
@@ -106,8 +105,8 @@ class BookingsController extends GetxController {
   }
 
   Future<User?> getUser() async {
-    final LoginResponse? response = authLocalDataSource.authResponse ??
-        await authLocalDataSource.getAuthResponse();
+    final LoginResponse? response = _authLocalDataSource.authResponse ??
+        await _authLocalDataSource.getAuthResponse();
     return response?.user;
   }
 

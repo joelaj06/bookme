@@ -2,6 +2,7 @@ import 'package:bookme/core/presentation/theme/hint_color.dart';
 import 'package:bookme/core/presentation/theme/primary_color.dart';
 import 'package:bookme/core/presentation/utitls/app_padding.dart';
 import 'package:bookme/core/presentation/utitls/app_spacing.dart';
+import 'package:bookme/core/presentation/widgets/exception_indicators/auth_navigation.dart';
 import 'package:bookme/features/bookme/presentation/bookings/getx/bookings_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -15,26 +16,19 @@ class BookingsScreen extends GetView<BookingsController> {
 
   @override
   Widget build(BuildContext context) {
-    if (controller.isAuthenticated.value) {
-      return Builder(builder: (BuildContext context) {
-        controller.navigateToLogin();
-        return Container();
-      });
-    }
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Bookings'),
-        actions: const <Widget>[
-         /* IconButton(
-            onPressed: () {},
-            icon: const Icon(
-              Icons.filter_list,
-            ),
-          ),*/
-        ],
       ),
-      body: Padding(
+      body: AuthNavigation(
+        future: controller.isAuthenticated,
+        child: _buildBookingPage(context),
+      ),
+    );
+  }
+
+  Padding _buildBookingPage(BuildContext context) {
+    return Padding(
         padding: AppPaddings.mA,
         child: Column(
           children: <Widget>[
@@ -51,8 +45,7 @@ class BookingsScreen extends GetView<BookingsController> {
             ),
           ],
         ),
-      ),
-    );
+      );
   }
 
   Widget _buildPageView(BuildContext context, String userId) {

@@ -1,3 +1,4 @@
+import 'package:bookme/features/authentication/data/models/response/generic/message_response.dart';
 import 'package:dartz/dartz.dart';
 
 import '../../../../core/errors/failure.dart';
@@ -24,5 +25,7 @@ abstract class AuthRepository {
     List<String>? skills,
     bool? isAgent,
 });
+
+  Future<Either<Failure,MessageResponse>> logout();
 
 }

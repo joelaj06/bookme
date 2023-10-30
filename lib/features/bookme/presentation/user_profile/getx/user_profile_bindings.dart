@@ -1,3 +1,4 @@
+import 'package:bookme/features/authentication/data/domain/usecase/logout.dart';
 import 'package:bookme/features/authentication/data/domain/usecase/user/fetch_user.dart';
 import 'package:bookme/features/authentication/data/domain/usecase/user/update_user.dart';
 import 'package:bookme/features/bookme/domain/usecases/service/fetch_service_by_user.dart';
@@ -15,6 +16,8 @@ class UserProfileBindings extends Bindings{
        bookmeRepository: Get.find(),
      ), updateService: UpdateService(
      bookmeRepository: Get.find(),
+   ), logout: Logout(
+     authRepository: Get.find(),
    ),
    ));
   }

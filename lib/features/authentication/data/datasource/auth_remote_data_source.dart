@@ -1,6 +1,7 @@
 
 
 import 'package:bookme/features/authentication/data/models/request/user/user_request.dart';
+import 'package:bookme/features/authentication/data/models/response/generic/message_response.dart';
 
 import '../models/request/login/login_request.dart';
 import '../models/response/login/login_response.dart';
@@ -10,4 +11,5 @@ abstract class AuthRemoteDataSource {
   Future<LoginResponse> login(LoginRequest request);
   Future<User> fetchUser(String userId);
   Future<User> updateUser({ required String userId,required UserRequest userRequest});
+  Future<MessageResponse> logout();
 }

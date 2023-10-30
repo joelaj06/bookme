@@ -1,5 +1,6 @@
 
 import 'package:bookme/features/authentication/data/models/request/user/user_request.dart';
+import 'package:bookme/features/authentication/data/models/response/generic/message_response.dart';
 import 'package:bookme/features/authentication/data/models/response/user/user_model.dart';
 
 import '../../../../core/utitls/app_http_client.dart';
@@ -32,6 +33,12 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     final Map<String, dynamic> json = await _client.put(AuthEndpoints.user(userId),
         body: userRequest.toJson());
     return User.fromJson(json);
+  }
+
+  @override
+  Future<MessageResponse> logout() async{
+   final Map<String, dynamic> json =  await _client.delete(AuthEndpoints.signOut);
+   return MessageResponse.fromJson(json);
   }
 
 }

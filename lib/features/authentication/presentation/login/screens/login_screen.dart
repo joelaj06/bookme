@@ -1,9 +1,11 @@
 import 'package:bookme/core/presentation/widgets/app_button.dart';
+import 'package:bookme/core/presentation/widgets/app_loading_box.dart';
 import 'package:bookme/features/authentication/presentation/login/getx/login_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../../../core/presentation/utitls/app_spacing.dart';
+import '../../../../../core/presentation/widgets/animated_column.dart';
 import '../../../../../core/presentation/widgets/app_text_input_field.dart';
 
 class LoginScreen extends GetView<LoginController> {
@@ -12,13 +14,17 @@ class LoginScreen extends GetView<LoginController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Column(
-          children: <Widget>[
-            _buildHeaderContainer(context),
-            _buildForm(context),
-          ],
+      body: Obx(() => AppLoadingBox(
+          loading: controller.isLoading.value,
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Column(
+              children: <Widget>[
+                _buildHeaderContainer(context),
+                _buildForm(context),
+              ],
+            ),
+          ),
         ),
       ),
       bottomNavigationBar: SizedBox(
@@ -39,7 +45,7 @@ class LoginScreen extends GetView<LoginController> {
   Widget _buildForm(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10.0),
-      child: Column(
+      child: AppAnimatedColumn(
         children: <Widget>[
           AppTextInputField(
             labelText: 'Email',

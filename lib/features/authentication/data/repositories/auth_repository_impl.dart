@@ -1,4 +1,5 @@
 import 'package:bookme/features/authentication/data/models/request/user/user_request.dart';
+import 'package:bookme/features/authentication/data/models/response/generic/message_response.dart';
 import 'package:dartz/dartz.dart';
 
 import '../../../../core/errors/failure.dart';
@@ -78,6 +79,19 @@ class AuthRepositoryImpl extends Repository implements AuthRepository {
           isAgent: isAgent,
         ),
       ),
+    );
+  }
+
+  @override
+  Future<Either<Failure, MessageResponse>> logout() async {
+    final Either<Failure, MessageResponse> response =
+        await makeRequest(authRemoteDataSource.logout());
+    return response.fold(
+      (Failure failure) => left(failure),
+      (MessageResponse response) async {
+        await authLocalDataSource.deleteAuthResponse();
+        return right(response);
+      },
     );
   }
 }

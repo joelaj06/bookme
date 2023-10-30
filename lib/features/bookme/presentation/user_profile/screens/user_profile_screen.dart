@@ -1,6 +1,7 @@
 import 'package:bookme/core/presentation/routes/app_routes.dart';
+import 'package:bookme/core/presentation/widgets/app_loading_box.dart';
 import 'package:bookme/core/presentation/widgets/custom_tile.dart';
-import 'package:bookme/core/presentation/widgets/exception_indicators/unauthorized_indicator.dart';
+import 'package:bookme/core/presentation/widgets/exception_indicators/auth_navigation.dart';
 import 'package:bookme/core/utitls/string_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -8,6 +9,7 @@ import 'package:get/get.dart';
 import '../../../../../core/presentation/utitls/app_padding.dart';
 import '../../../../../core/presentation/utitls/app_spacing.dart';
 import '../../../../../core/presentation/widgets/animated_column.dart';
+import '../../../../../core/presentation/widgets/app_dialog.dart';
 import '../../../../../core/utitls/base_64.dart';
 import '../../../../authentication/data/models/response/user/user_model.dart';
 import '../getx/user_profile_controller.dart';
@@ -19,19 +21,14 @@ class UserProfileScreen extends GetView<UserProfileController> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: FutureBuilder<bool>(
-            future: controller.isAuthenticated,
-            builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
-              if (snapshot.data == true) {
-                return _buildProfileList(context);
-              }
-              return UnauthorizedIndicator(
-                onPressed: () {
-                  Get.toNamed<dynamic>(AppRoutes.login);
-                },
-              );
-            }),
-      ),
+        child: Obx(() => AppLoadingBox(
+            loading: controller.isLoading.value,
+            child: AuthNavigation(
+              future: controller.isAuthenticated,
+              child:  _buildProfileList(context)),
+          ),
+        ),
+        ),
     );
   }
 
@@ -39,76 +36,93 @@ class UserProfileScreen extends GetView<UserProfileController> {
     return Column(
       children: <Widget>[
         FutureBuilder<void>(
-          future: controller.getUser(),
-          builder: (BuildContext context,_) {
-            //Todo implement loading skeleton before widget builds
-            return Padding(
-              padding: AppPaddings.mA,
-              child: Obx(() => _buildUserProfile(
-                  context,
-                  controller.user.value
+            future: controller.getUser(),
+            builder: (BuildContext context, _) {
+              //Todo implement loading skeleton before widget builds
+              return Padding(
+                padding: AppPaddings.mA,
+                child: Obx(
+                  () => _buildUserProfile(context, controller.user.value),
                 ),
-              ),
-            );
-          }
-        ),
+              );
+            }),
         const Divider(
           height: 0,
         ),
         const AppSpacing(
           v: 10,
         ),
-        AppAnimatedColumn(
-          children: <Widget>[
-            CustomTile(
-              text: 'Update Profile',
-              onPressed: () {
-                controller.navigateToUpdateProfileScreen();
-              },
-              showDivider: true,
-              hideMoreIcon: true,
-            ),
-            CustomTile(
-              text: 'Update Job',
-              onPressed: () {
-                Get.toNamed<dynamic>(AppRoutes.updateJob);
-              },
-              showDivider: true,
-              hideMoreIcon: true,
-            ),
-            CustomTile(
-              text: 'Tasks',
-              onPressed: () {
-                Get.toNamed<dynamic>(AppRoutes.tasks);
-              },
-              showDivider: true,
-              hideMoreIcon: true,
-            ),
-            CustomTile(
-              text: 'Favorites',
-              onPressed: () {
-                Get.toNamed<dynamic>(AppRoutes.favorites);
-              },
-              showDivider: true,
-              hideMoreIcon: true,
-            ),
-            CustomTile(
-              text: 'Reviews',
-              onPressed: () {
-                Get.toNamed<dynamic>(AppRoutes.userReview);
-              },
-              showDivider: true,
-              hideMoreIcon: true,
-            ),
-            CustomTile(
-              text: 'Logout',
-              textColor: Colors.redAccent,
-              onPressed: () {},
-              showDivider: true,
-              hideMoreIcon: true,
-            ),
-          ],
-        )
+        FutureBuilder<bool>(
+            future: controller.isAgent(),
+            builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+              final bool isAgent = snapshot.data ?? false;
+              return AppAnimatedColumn(
+                children: <Widget>[
+                  CustomTile(
+                    text: 'Update Profile',
+                    onPressed: () {
+                      controller.navigateToUpdateProfileScreen();
+                    },
+                    showDivider: true,
+                    hideMoreIcon: true,
+                  ),
+                  if (isAgent)
+                    AppAnimatedColumn(children: <Widget>[
+                      CustomTile(
+                        text: 'Update Job',
+                        onPressed: () {
+                          Get.toNamed<dynamic>(AppRoutes.updateJob);
+                        },
+                        showDivider: true,
+                        hideMoreIcon: true,
+                      ),
+                      CustomTile(
+                        text: 'Tasks',
+                        onPressed: () {
+                          Get.toNamed<dynamic>(AppRoutes.tasks);
+                        },
+                        showDivider: true,
+                        hideMoreIcon: true,
+                      ),
+                      CustomTile(
+                        text: 'Favorites',
+                        onPressed: () {
+                          Get.toNamed<dynamic>(AppRoutes.favorites);
+                        },
+                        showDivider: true,
+                        hideMoreIcon: true,
+                      ),
+                      CustomTile(
+                        text: 'Reviews',
+                        onPressed: () {
+                          Get.toNamed<dynamic>(AppRoutes.userReview);
+                        },
+                        showDivider: true,
+                        hideMoreIcon: true,
+                      ),
+                    ])
+                  else
+                    const SizedBox.shrink(),
+                  CustomTile(
+                    text: 'Logout',
+                    textColor: Colors.redAccent,
+                    onPressed: () {
+                      AppDialog().showConfirmationDialog(
+                        context,
+                        'Logout',
+                        'Are you sure you want to logout?',
+                        onTapConfirm: () {
+                          Navigator.pop(context);
+                          controller.userLogout();
+                        },
+                      );
+                    },
+                    showDivider: true,
+                    hideMoreIcon: true,
+                  ),
+                ],
+              );
+            })
       ],
     );
   }
@@ -137,7 +151,7 @@ class UserProfileScreen extends GetView<UserProfileController> {
         ),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children:  <Widget>[
+          children: <Widget>[
             Text(
               '${user.firstName} ${user.lastName}'.toTitleCase(),
               style: const TextStyle(

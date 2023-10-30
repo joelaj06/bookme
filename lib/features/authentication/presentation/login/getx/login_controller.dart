@@ -1,3 +1,4 @@
+import 'package:bookme/core/presentation/routes/app_routes.dart';
 import 'package:bookme/features/authentication/data/domain/usecase/login_user.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter/cupertino.dart';
@@ -40,8 +41,8 @@ class LoginController extends GetxController{
       },
           (User user) {
         isLoading(false);
-       Get.back<dynamic>();
         AppSnacks.showSuccess('Login', 'You signed in successfully');
+       Get.toNamed<dynamic>(AppRoutes.base);
       },
     );
   }

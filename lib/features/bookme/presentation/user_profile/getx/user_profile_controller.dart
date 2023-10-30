@@ -2,12 +2,14 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:bookme/core/presentation/routes/app_routes.dart';
+import 'package:bookme/core/presentation/widgets/app_snacks.dart';
 import 'package:bookme/core/usecase/usecase.dart';
 import 'package:bookme/core/utitls/base_64.dart';
 import 'package:bookme/features/authentication/data/datasource/auth_local_data_source.dart';
 import 'package:bookme/features/authentication/data/domain/usecase/user/fetch_user.dart';
 import 'package:bookme/features/authentication/data/domain/usecase/user/update_user.dart';
 import 'package:bookme/features/authentication/data/models/request/user/user_request.dart';
+import 'package:bookme/features/authentication/data/models/response/generic/message_response.dart';
 import 'package:bookme/features/authentication/data/models/response/user/user_model.dart';
 import 'package:bookme/features/bookme/data/models/response/category/category_model.dart';
 import 'package:bookme/features/bookme/data/models/response/discount/discount_model.dart';
@@ -21,6 +23,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../../../../../core/errors/failure.dart';
+import '../../../../authentication/data/domain/usecase/logout.dart';
 import '../../../../authentication/data/models/response/login/login_response.dart';
 import '../../../data/models/request/service/service_request.dart';
 import '../../../data/models/response/service/service_model.dart';
@@ -31,12 +34,14 @@ class UserProfileController extends GetxController {
     required this.updateUser,
     required this.fetchServiceByUser,
     required this.updateService,
+    required this.logout,
   });
 
   final FetchUser fetchUser;
   final UpdateUser updateUser;
   final FetchServiceByUser fetchServiceByUser;
   final UpdateService updateService;
+  final Logout logout;
 
   //reactive variables
   RxInt pageIndex = 0.obs;
@@ -78,9 +83,34 @@ class UserProfileController extends GetxController {
     super.dispose();
   }
 
+  Future<bool> isAgent() async{
+    final LoginResponse? response = await _authLocalDataSource.getAuthResponse();
+    if(response!=null && response.user.isAgent){
+      return true;
+    }
+    return false;
+  }
+
+  void userLogout() async {
+    isLoading(true);
+    final Either<Failure, MessageResponse> failureOrResponse =
+        await logout(NoParams());
+    failureOrResponse.fold(
+      (Failure failure) {
+        isLoading(false);
+        AppSnacks.showError('Profile', failure.message);
+      },
+      (MessageResponse response) {
+        isLoading(false);
+        AppSnacks.showSuccess('Profile', 'User Logged Out Successfully');
+        Get.toNamed<dynamic>(AppRoutes.base);
+      },
+    );
+  }
+
   void updateTheService() async {
     if (base64Images.isEmpty || selectedCategories.isEmpty) {
-      //Todo empty image alert
+      AppSnacks.showInfo('Profile', 'Please select at least one image');
       return;
     }
 
