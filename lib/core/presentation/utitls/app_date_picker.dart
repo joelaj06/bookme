@@ -1,10 +1,9 @@
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class AppDatePicker{
 
-  final List<DateTime?> _dialogCalendarPickerValue = [
+  final List<DateTime?> _dialogCalendarPickerValue = <DateTime>[
     DateTime.now().subtract(const Duration(days: 1)),
     DateTime.now(),
   ];

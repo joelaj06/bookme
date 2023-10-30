@@ -15,17 +15,17 @@ const String _env =
 String.fromEnvironment('env.mode', defaultValue: 'dev');
 
 Environment get environment {
-  const Map<String, Environment> _envs = <String, Environment>{
+  const Map<String, Environment> envs = <String, Environment>{
     'dev': Environment.development,
     'prod': Environment.production,
   };
 
-  if (!_envs.containsKey(_env)) {
+  if (!envs.containsKey(_env)) {
     throw Exception(
-        "Invalid runtime environment: '$_env'. Available environments: ${_envs.keys.join(', ')}");
+        "Invalid runtime environment: '$_env'. Available environments: ${envs.keys.join(', ')}");
   }
 
-  return _envs[_env]!;
+  return envs[_env]!;
 }
 
 extension EnvironmentX on Environment {

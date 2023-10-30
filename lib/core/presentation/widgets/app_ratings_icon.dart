@@ -5,17 +5,18 @@ class AppRatingsIcon extends StatelessWidget {
     this.iconSize,
     Key? key, required this.ratings}) : super(key: key);
 
-  final int ratings;
+  final double ratings;
   final double? iconSize;
   @override
   Widget build(BuildContext context) {
+    final int ratingValue = ratings.round();
     return  Row(
       children: List<Widget>.generate(
         5,
             (int index) =>  Icon(
           Icons.star,
           size: iconSize ?? 14,
-          color: index < ratings ? Colors.orange: HintColor.color.shade100,
+          color: index < ratingValue ? Colors.orange: HintColor.color.shade100,
         ),
       ),
     );

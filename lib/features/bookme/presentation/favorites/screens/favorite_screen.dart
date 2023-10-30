@@ -40,7 +40,9 @@ class FavoriteScreen extends GetView<FavoritesController> {
       },
       child: ListView.builder(
           itemCount: controller.favorites.length,
-          physics: const BouncingScrollPhysics(),
+          physics: const BouncingScrollPhysics(
+            parent: AlwaysScrollableScrollPhysics(),
+          ),
           shrinkWrap: true,
           itemBuilder: (BuildContext context, int index) {
             return Dismissible(

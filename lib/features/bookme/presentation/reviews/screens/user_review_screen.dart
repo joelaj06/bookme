@@ -1,3 +1,6 @@
+import 'package:bookme/core/presentation/widgets/app_loading_box.dart';
+import 'package:bookme/features/bookme/data/models/response/review/agent_rating_model.dart';
+import 'package:bookme/features/bookme/data/models/response/review/review_model.dart';
 import 'package:bookme/features/bookme/presentation/reviews/getx/user_review_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -5,63 +8,77 @@ import 'package:get/get.dart';
 import '../../../../../core/presentation/utitls/app_padding.dart';
 import '../../../../../core/presentation/utitls/app_spacing.dart';
 import '../../../../../core/presentation/widgets/app_ratings_icon.dart';
+import '../../../../../core/utitls/base_64.dart';
+
 class UserReviewScreen extends GetView<UserReviewController> {
   const UserReviewScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Reviews')
+      appBar: AppBar(title: const Text('Reviews')),
+      body: Obx(() => AppLoadingBox(
+          loading: controller.isLoading.value,
+          child: _buildJobsReviewPage(context),
+        ),
       ),
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-          child: _buildJobsReviewPage(context)),
     );
   }
-
-
 
   Widget _buildJobsReviewPage(BuildContext context) {
     return Padding(
       padding: AppPaddings.mA,
       child: Column(
         children: <Widget>[
-          _buildTotalRatingCard(context),
-          _buildUserReviewsTile(context),
+          SizedBox(
+            height: 100,
+              child: _buildTotalRatingCard(context)),
+          Expanded(
+            child: Obx(() =>
+                _buildUserReviewsTile(context, controller.agentRating.value)),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildUserReviewsTile(BuildContext context) {
+  Widget _buildUserReviewsTile(BuildContext context, AgentRating rating) {
     return Container(
       padding: AppPaddings.mA,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(15),
       ),
-      child: ListView.builder(
-          physics: const NeverScrollableScrollPhysics(),
-          shrinkWrap: true,
-          itemCount: 10,
-          itemBuilder: (BuildContext context, int index) {
-            return Column(
-              children: <Widget>[
-                Padding(
-                  padding: AppPaddings.mA,
-                  child: _buildUserReviewCard(context),
-                ),
-                const Divider(
-                  height: 1,
-                ),
-              ],
-            );
-          }),
+      child: RefreshIndicator(
+        onRefresh: () {
+          return controller.checkAgent();
+        },
+        child: ListView.builder(
+            physics: const BouncingScrollPhysics(
+              parent: AlwaysScrollableScrollPhysics(),
+            ),
+            shrinkWrap: true,
+            itemCount: controller.reviews.length,
+            itemBuilder: (BuildContext context, int index) {
+              return Column(
+                children: <Widget>[
+                  Padding(
+                    padding: AppPaddings.mA,
+                    child: _buildUserReviewCard(
+                        context, controller.reviews[index]),
+                  ),
+                  const Divider(
+                    height: 1,
+                  ),
+                ],
+              );
+            }),
+      ),
     );
   }
 
-  Widget _buildUserReviewCard(BuildContext context) {
+  Widget _buildUserReviewCard(BuildContext context, Review review) {
+    final String image = review.user?.image ?? '';
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -70,7 +87,14 @@ class UserReviewScreen extends GetView<UserReviewController> {
             ClipRRect(
               borderRadius: BorderRadius.circular(50),
               child: CircleAvatar(
-                child: Image.asset('assets/images/user2.jpg'),
+                child: image.isEmpty
+                    ? Image.asset('assets/images/user2.jpg')
+                    : Image.memory(
+                        fit: BoxFit.cover,
+                        Base64Convertor().base64toImage(
+                          image,
+                        ),
+                      ),
               ),
             ),
             const AppSpacing(
@@ -78,9 +102,10 @@ class UserReviewScreen extends GetView<UserReviewController> {
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const <Widget>[
-                Text('Efya Adepa'),
-                AppRatingsIcon(ratings: 4),
+              children: <Widget>[
+                Text('${review.user?.firstName} ${review.user?.lastName}'),
+                AppRatingsIcon(
+                    ratings: controller.agentRating.value.averageRating),
               ],
             )
           ],
@@ -88,8 +113,7 @@ class UserReviewScreen extends GetView<UserReviewController> {
         const AppSpacing(
           v: 10,
         ),
-        const Text('Wow such an amazing guy, he is always on time and '
-            'serious when working. Thanks John 😊😊')
+        Text(review.comment)
       ],
     );
   }
@@ -103,19 +127,23 @@ class UserReviewScreen extends GetView<UserReviewController> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Row(
-            children: const <Widget>[
-              Text(
-                '4.7',
-                style: TextStyle(
-                  fontSize: 30,
-                  fontWeight: FontWeight.w500,
+          Obx(
+            () => Row(
+              children: <Widget>[
+                Text(
+                  controller.agentRating.value.averageRating.toStringAsFixed(1),
+                  style: const TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
-              ),
-              AppRatingsIcon(ratings: 5),
-            ],
+                AppRatingsIcon(
+                    ratings: controller.agentRating.value.averageRating),
+              ],
+            ),
           ),
-          const Text('(223) Reviews'),
+          Obx(() => Text('(${controller.reviews.length}) Review(s)')),
+          const Divider(),
         ],
       ),
     );

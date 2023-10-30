@@ -3,7 +3,6 @@ import 'package:bookme/core/presentation/widgets/custom_tile.dart';
 import 'package:bookme/core/presentation/widgets/exception_indicators/unauthorized_indicator.dart';
 import 'package:bookme/core/utitls/string_utils.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 import '../../../../../core/presentation/utitls/app_padding.dart';

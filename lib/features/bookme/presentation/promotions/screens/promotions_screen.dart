@@ -20,7 +20,7 @@ class PromotionsScreen extends GetView<PromotionsController> {
 
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
+    final double width = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Promotions'),

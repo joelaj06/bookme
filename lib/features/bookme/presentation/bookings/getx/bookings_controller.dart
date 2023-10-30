@@ -72,10 +72,6 @@ class BookingsController extends GetxController {
     isAuthenticated(isAuth);
   }
 
-  @override
-  void onInit() {
-    super.onInit();
-  }
 
   @override
   void onClose() {
@@ -172,11 +168,9 @@ class BookingsController extends GetxController {
   }
 
   void onDateDateValueChanged(List<DateTime?>? values) {
-    print(values);
     if(values!.length > 1){
      startDate(values[0].toString().split(' ')[0]);
      endDate(values[1].toString().split(' ')[0]);
-     print(startDate);
     }
   }
 

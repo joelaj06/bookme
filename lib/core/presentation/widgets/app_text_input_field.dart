@@ -202,14 +202,14 @@ class _AppTextInputFieldState extends State<AppTextInputField> {
         if (_errorText != null)
           AnimatedOpacity(
             opacity: _showError ? 1.0 : 0.0,
-            duration: Duration(milliseconds: 300),
+            duration: const Duration(milliseconds: 300),
             curve: Curves.easeInOut,
             child: Padding(
               padding: const EdgeInsets.only(left: 12.0, top: 4.0),
               child: Text(
                 _errorText ?? '',
                 style: widget.errorStyle ??
-                    TextStyle(
+                    const TextStyle(
                       color: Colors.red,
                       fontSize: 12,
                     ),

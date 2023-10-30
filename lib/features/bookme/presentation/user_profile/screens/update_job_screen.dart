@@ -108,7 +108,7 @@ class UpdateJobScreen extends GetView<UserProfileController> {
             () => AppTextInputField(
               labelText: 'Discount',
               initialValue:
-                  controller.discountValue.value.toStringAsFixed(2) ?? '0.0',
+                  controller.discountValue.value.toStringAsFixed(2),
               enabled: controller.applyDiscount.value,
               readOnly: !controller.applyDiscount.value,
               onChanged: controller.onDiscountValueInputChanged,

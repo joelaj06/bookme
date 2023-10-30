@@ -187,7 +187,7 @@ class ServiceAgentScreen extends GetView<ServiceAgentController> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(review.user?.firstName ?? ''),
-                AppRatingsIcon(ratings: (review.rating.round())),
+                AppRatingsIcon(ratings: (review.rating)),
               ],
             )
           ],
@@ -223,7 +223,7 @@ class ServiceAgentScreen extends GetView<ServiceAgentController> {
                   ),
                   AppRatingsIcon(
                       ratings:
-                          (controller.agentReview.value.averageRating.round())),
+                          (controller.agentReview.value.averageRating)),
                 ],
               ),
             ),

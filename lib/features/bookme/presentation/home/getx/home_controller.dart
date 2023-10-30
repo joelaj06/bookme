@@ -105,7 +105,7 @@ class HomeController extends GetxController {
       description: review.serviceData!.description,
       location: review.serviceData!.location,
       user: review.agentData,
-      categories: [],
+      categories: <Category>[],
     );
 
     await Get.toNamed<dynamic>(AppRoutes.serviceDetails,

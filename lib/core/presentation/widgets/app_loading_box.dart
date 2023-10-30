@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 class AppLoadingBox extends StatelessWidget {
 
-  const AppLoadingBox({
+  const AppLoadingBox({super.key,
     required this.loading,
     this.duration = const Duration(milliseconds: 300),
     this.size = 50.0,
