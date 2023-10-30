@@ -15,7 +15,6 @@ import 'package:ionicons/ionicons.dart';
 import '../../../../../core/utitls/base_64.dart';
 import '../../../data/models/response/service/service_model.dart';
 
-
 class ServiceDetailsScreen extends GetView<ServicesController> {
   const ServiceDetailsScreen({Key? key}) : super(key: key);
 
@@ -26,14 +25,16 @@ class ServiceDetailsScreen extends GetView<ServicesController> {
 
     final String coverImage = args?.service.coverImage ?? '';
 
-    final List<String?> images = <String?>[coverImage, ...args?.service.images ?? <String>[]];
-
+    final List<String?> images = <String?>[
+      coverImage,
+      ...args?.service.images ?? <String>[]
+    ];
 
     return Scaffold(
       extendBodyBehindAppBar: true, // Extend the body behind the AppBar
       bottomNavigationBar: _buildBottomNavigationItems(args?.service),
       appBar: AppBar(
-        leading:  Padding(
+        leading: Padding(
           padding: const EdgeInsets.only(left: 8.0),
           child: CircleAvatar(
             backgroundColor: HintColor.color.shade300.withOpacity(0.5),
@@ -50,7 +51,8 @@ class ServiceDetailsScreen extends GetView<ServicesController> {
           ),
         ),
       ),
-      body: Obx(() => AppLoadingBox(
+      body: Obx(
+        () => AppLoadingBox(
           loading: controller.isLoading.value,
           child: Column(
             children: <Widget>[
@@ -63,17 +65,19 @@ class ServiceDetailsScreen extends GetView<ServicesController> {
                     bottomLeft: Radius.circular(30),
                   ),
                   child: Hero(
-                    tag: 'service${args?.service.id}',
-                    child: Obx(
-                      () =>Image.memory(
-                        Base64Convertor().base64toImage(
-                          images[controller.imageIndex.value]!,
-                        ),
-                        fit: BoxFit.cover,
-                      ),
-
-                    ),
-                  ),
+                      tag: 'service${args?.service.id}',
+                      child: Obx(() {
+                        final String image =
+                            images[controller.imageIndex.value] ?? '';
+                        return image.isEmpty
+                            ? Image.asset('assets/images/no_image.png')
+                            : Image.memory(
+                                fit: BoxFit.cover,
+                                Base64Convertor().base64toImage(
+                                  images[controller.imageIndex.value]!,
+                                ),
+                              );
+                      })),
                 ),
               ),
               SizedBox(
@@ -84,6 +88,7 @@ class ServiceDetailsScreen extends GetView<ServicesController> {
                   scrollDirection: Axis.horizontal,
                   itemCount: images.length,
                   itemBuilder: (BuildContext context, int index) {
+                    final String image = images[index] ?? '';
                     return GestureDetector(
                       onTap: () {
                         controller.onOtherImagesSelected(index);
@@ -96,14 +101,15 @@ class ServiceDetailsScreen extends GetView<ServicesController> {
                             width: 120,
                             color: HintColor.color.shade50,
                             child: ClipRRect(
-                              borderRadius: BorderRadius.circular(15),
-                              child: Image.memory(
-                                fit: BoxFit.cover,
-                                Base64Convertor().base64toImage(
-                                  images[index]!,
-                                ),
-                              ),
-                            ),
+                                borderRadius: BorderRadius.circular(15),
+                                child: image.isEmpty
+                                    ? Image.asset('assets/images/no_image.png')
+                                    : Image.memory(
+                                        fit: BoxFit.cover,
+                                        Base64Convertor().base64toImage(
+                                          images[index]!,
+                                        ),
+                                      )),
                           ),
                         ),
                       ),
@@ -142,7 +148,7 @@ class ServiceDetailsScreen extends GetView<ServicesController> {
                                 h: 10,
                               ),
                               Text(
-                               '${args?.service.user?.firstName} ${args?.service.user?.lastName}',
+                                '${args?.service.user?.firstName ?? ''} ${args?.service.user?.lastName ?? ''}',
                                 style: context.textTheme.bodyLarge?.copyWith(
                                   fontSize: 20,
                                 ),
@@ -151,13 +157,14 @@ class ServiceDetailsScreen extends GetView<ServicesController> {
                           ),
                           TextButton(
                             onPressed: () {
-                              controller.navigateToServiceAgentScreen(args!.service);
+                              controller
+                                  .navigateToServiceAgentScreen(args!.service);
                             },
                             child: const Text('View Profile'),
                           ),
                         ],
                       ),
-                       IconText(
+                      IconText(
                         text: args?.service.location ?? '',
                         textColor: PrimaryColor.color,
                         iconColor: PrimaryColor.color,
@@ -206,8 +213,7 @@ class ServiceDetailsScreen extends GetView<ServicesController> {
           ),
           Flexible(
             child: AppButton(
-              onPressed: () {
-              },
+              onPressed: () {},
               text: 'Book Now',
             ),
           ),

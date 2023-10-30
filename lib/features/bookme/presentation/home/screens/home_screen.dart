@@ -262,9 +262,9 @@ class HomeScreen extends GetView<HomeController> {
   }
 
   Widget _buildPopularServiceCard(
-      BuildContext context, int index, Review service) {
+      BuildContext context, int index, Review review) {
     return GestureDetector(
-      onTap: () => controller.navigateToServiceDetailsScreenReview(service),
+      onTap: () => controller.navigateToServiceDetailsScreenReview(review),
       child: Padding(
         padding: AppPaddings.mA,
         child: Container(
@@ -324,25 +324,25 @@ class HomeScreen extends GetView<HomeController> {
                     children: <Widget>[
                       Expanded(
                         child: Text(
-                          service.serviceData!.title.toTitleCase(),
+                          review.serviceData!.title.toTitleCase(),
                           style: context.textTheme.bodyMedium?.copyWith(
                               fontSize: 15, fontWeight: FontWeight.w500),
                         ),
                       ),
-                      AppRating(value: service.rating.toString()),
+                      AppRating(value: review.rating.toString()),
                     ],
                   ),
                 ),
                 const AppSpacing(
                   v: 5,
                 ),
-                IconText(text: service.serviceData!.location!.toTitleCase()),
+                IconText(text: review.serviceData!.location!.toTitleCase()),
                 const AppSpacing(
                   v: 8,
                 ),
                 Expanded(
                   child: Text(
-                    service.serviceData!.description.toTitleCase(),
+                    review.serviceData!.description.toTitleCase(),
                     overflow: TextOverflow.fade,
                     maxLines: 3,
                     style: TextStyle(color: HintColor.color.shade400),

@@ -105,6 +105,8 @@ class HomeController extends GetxController {
       description: review.serviceData!.description,
       location: review.serviceData!.location,
       user: review.agentData,
+      images: review.serviceData!.images,
+      coverImage: review.serviceData!.coverImage,
       categories: <Category>[],
     );
 
