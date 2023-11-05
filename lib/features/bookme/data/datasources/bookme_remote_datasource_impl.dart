@@ -2,12 +2,17 @@ import 'package:bookme/core/utitls/app_http_client.dart';
 import 'package:bookme/features/bookme/data/datasources/bookme_endpoints.dart';
 import 'package:bookme/features/bookme/data/datasources/bookme_remote_datasource.dart';
 import 'package:bookme/features/bookme/data/models/request/booking/booking_request.dart';
+import 'package:bookme/features/bookme/data/models/request/chat/chat_request.dart';
 import 'package:bookme/features/bookme/data/models/request/favorite/add_favorite_request.dart';
+import 'package:bookme/features/bookme/data/models/request/message/message_request.dart';
 import 'package:bookme/features/bookme/data/models/request/service/service_request.dart';
 import 'package:bookme/features/bookme/data/models/response/booking/booking_model.dart';
 import 'package:bookme/features/bookme/data/models/response/category/category_model.dart';
+import 'package:bookme/features/bookme/data/models/response/chat/chat_model.dart';
+import 'package:bookme/features/bookme/data/models/response/chat/initiate_chat_model.dart';
 import 'package:bookme/features/bookme/data/models/response/favorite/favorite_model.dart';
 import 'package:bookme/features/bookme/data/models/response/listpage/listpage.dart';
+import 'package:bookme/features/bookme/data/models/response/message/message_model.dart';
 import 'package:bookme/features/bookme/data/models/response/review/agent_rating_model.dart';
 import 'package:bookme/features/bookme/data/models/response/review/review_model.dart';
 import 'package:bookme/features/bookme/data/models/response/service/service_model.dart';
@@ -180,8 +185,57 @@ class BookmeRemoteDatasourceImpl implements BookmeRemoteDatasource {
   }
 
   @override
-  Future<Favorite> deleteFavorite({required String favoriteId}) async{
-    final Map<String, dynamic> json = await _client.delete(BookmeEndpoints.favorite(favoriteId));
+  Future<Favorite> deleteFavorite({required String favoriteId}) async {
+    final Map<String, dynamic> json =
+        await _client.delete(BookmeEndpoints.favorite(favoriteId));
     return Favorite.fromJson(json);
+  }
+
+  @override
+  Future<ListPage<Chat>> fetchUserChats() async {
+    final Map<String, dynamic> json = await _client.get(BookmeEndpoints.chats);
+    final List<dynamic> items = json['items'] as List<dynamic>;
+    final List<Chat> chats = List<Chat>.from(
+      items.map<Chat>(
+        (dynamic json) => Chat.fromJson(json as Map<String, dynamic>),
+      ),
+    );
+    return ListPage<Chat>(
+      grandTotalCount: int.parse(json['total_count'] as String),
+      itemList: chats,
+    );
+  }
+
+  @override
+  Future<InitiateChat> initiateChat({required ChatRequest chatRequest}) async {
+    final Map<String, dynamic> json = await _client.post(
+      BookmeEndpoints.initiateChat,
+      body: chatRequest.toJson(),
+    );
+    return InitiateChat.fromJson(json);
+  }
+
+  @override
+  Future<ListPage<Message>> fetchMessages({required String chatId}) async {
+    final Map<String, dynamic> json =
+        await _client.get(BookmeEndpoints.messages(chatId));
+    final List<dynamic> items = json['items'] as List<dynamic>;
+    final List<Message> messages = List<Message>.from(
+      items.map<Message>(
+        (dynamic json) => Message.fromJson(json as Map<String, dynamic>),
+      ),
+    );
+    return ListPage<Message>(
+      grandTotalCount: int.parse(json['total_count'] as String),
+      itemList: messages,
+    );
+  }
+
+  @override
+  Future<Message> sendMessage(
+      {required String chatId, required MessageRequest messageRequest}) async {
+    final Map<String, dynamic> json = await _client
+        .post(BookmeEndpoints.message(chatId), body: messageRequest.toJson());
+    return Message.fromJson(json);
   }
 }

@@ -17,6 +17,7 @@ class PageParams {
     this.categoryId,
     this.userId,
     this.agentId,
+    this.chatId,
   });
 
   final int page;
@@ -27,4 +28,5 @@ class PageParams {
   final String? endDate;
   final String? userId;
   final String? agentId;
+  final String? chatId;
 }

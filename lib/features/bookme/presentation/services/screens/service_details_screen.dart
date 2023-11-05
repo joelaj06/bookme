@@ -213,7 +213,9 @@ class ServiceDetailsScreen extends GetView<ServicesController> {
           ),
           Flexible(
             child: AppButton(
-              onPressed: () {},
+              onPressed: () {
+                controller.navigateToChatsScreen();
+              },
               text: 'Book Now',
             ),
           ),

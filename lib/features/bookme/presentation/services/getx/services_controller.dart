@@ -63,6 +63,10 @@ class ServicesController extends GetxController {
     super.dispose();
   }
 
+  void navigateToChatsScreen(){
+    Get.toNamed<dynamic>(AppRoutes.chats);
+  }
+
   void checkAuth(String serviceId) async {
     final LoginResponse? response =
         await _authLocalDataSource.getAuthResponse();

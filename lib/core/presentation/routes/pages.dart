@@ -1,7 +1,11 @@
 import 'package:bookme/core/presentation/routes/app_routes.dart';
 import 'package:bookme/features/authentication/presentation/login/getx/login_bindings.dart';
 import 'package:bookme/features/authentication/presentation/login/screens/login_screen.dart';
+import 'package:bookme/features/bookme/presentation/chat/getx/chat_bindings.dart';
+import 'package:bookme/features/bookme/presentation/chat/screens/chat_screens.dart';
 import 'package:bookme/features/bookme/presentation/favorites/getx/favorites_bindings.dart';
+import 'package:bookme/features/bookme/presentation/message/getx/message_bindings.dart';
+import 'package:bookme/features/bookme/presentation/message/screens/message_screen.dart';
 import 'package:bookme/features/bookme/presentation/reviews/getx/user_review_bindings.dart';
 import 'package:bookme/features/bookme/presentation/reviews/screens/user_review_screen.dart';
 import 'package:bookme/features/bookme/presentation/service_agent/getx/service_agent_bindings.dart';
@@ -101,6 +105,15 @@ class Pages {
       name: AppRoutes.userReview,
       page: () => const UserReviewScreen(),
       binding: UserReviewBindings(),
+    ),
+    GetPage<AppRoutes>(
+      name: AppRoutes.chats,
+      page: () => const ChatScreen(),
+      binding: ChatBindings(),
+    ),  GetPage<AppRoutes>(
+      name: AppRoutes.messages,
+      page: () => const MessageScreen(),
+      binding: MessageBindings(),
     ),
   ];
 }
