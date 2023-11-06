@@ -53,47 +53,52 @@ class ChatScreen extends GetView<ChatController> {
 
   Widget _buildChatCard(BuildContext context, Chat chat) {
     final String image = chat.user.image ?? '';
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Row(
-            children: <Widget>[
-              ClipRRect(
-                borderRadius: BorderRadius.circular(50),
-                child: CircleAvatar(
-                  child: image.isEmpty
-                      ? Image.asset('assets/images/user2.jpg')
-                      : Image.memory(
-                    fit: BoxFit.cover,
-                    Base64Convertor().base64toImage(
-                      image,
+    return GestureDetector(
+      onTap: (){
+        controller.navigateToMessages(chat);
+      },
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Row(
+              children: <Widget>[
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(50),
+                  child: CircleAvatar(
+                    child: image.isEmpty
+                        ? Image.asset('assets/images/user2.jpg')
+                        : Image.memory(
+                      fit: BoxFit.cover,
+                      Base64Convertor().base64toImage(
+                        image,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const AppSpacing(
-                h: 10,
-              ),
-              Flexible(
-                child : Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children:  <Widget>[
-                    Text('${chat.user.firstName} ${chat.user.lastName}',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w500,
-                    ),),
-                    Text(chat.lastMessage ?? '...',
-                    overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+                const AppSpacing(
+                  h: 10,
                 ),
-              )
-            ],
-          ),
-          const Divider(),
-        ],
+                Flexible(
+                  child : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children:  <Widget>[
+                      Text('${chat.user.firstName} ${chat.user.lastName}',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w500,
+                      ),),
+                      Text(chat.lastMessage ?? '...',
+                      overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            ),
+            const Divider(),
+          ],
+        ),
       ),
     );
   }

@@ -15,7 +15,7 @@ class ServicesBindings extends Bindings{
    ), addFavorite: AddFavorite(
      bookmeRepository: Get.find(),
    ),
-   ));
+   ),);
   }
 
 }

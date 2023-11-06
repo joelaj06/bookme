@@ -1,3 +1,4 @@
+import 'package:bookme/core/presentation/routes/app_routes.dart';
 import 'package:bookme/core/usecase/usecase.dart';
 import 'package:bookme/features/bookme/data/models/request/chat/chat_request.dart';
 import 'package:bookme/features/bookme/data/models/response/chat/chat_model.dart';
@@ -5,6 +6,7 @@ import 'package:bookme/features/bookme/data/models/response/chat/initiate_chat_m
 import 'package:bookme/features/bookme/data/models/response/listpage/listpage.dart';
 import 'package:bookme/features/bookme/domain/usecases/chat/fetch_user_chats.dart';
 import 'package:bookme/features/bookme/domain/usecases/chat/initiate_chat.dart';
+import 'package:bookme/features/bookme/presentation/chat/arguments/chat_argument.dart';
 import 'package:dartz/dartz.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
@@ -33,6 +35,11 @@ class ChatController extends GetxController {
       getUserChats(pageKey);
     });
     super.onInit();
+  }
+
+  void navigateToMessages(Chat chat) {
+     Get.toNamed<dynamic>(AppRoutes.messages,
+     arguments: ChatArgument(chat));
   }
 
   void getUserChats(int pageKey) async {

@@ -12,12 +12,12 @@ part 'message_model.g.dart';
 class Message with _$Message {
   const factory Message({
    @JsonKey(name: '_id') required String id,
-    required User receiver,
+    @JsonKey(name: 'recipient')required User? receiver,
     String? chat,
     String? createdAt,
     String? updatedAt,
     String? type,
-    required  MessageContent message,
+    @JsonKey(name: 'content')required  MessageContent message,
   }) = _Message;
 
   const Message._();

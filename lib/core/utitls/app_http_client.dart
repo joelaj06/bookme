@@ -60,8 +60,17 @@ class AppHTTPClient {
     AppLog.i('====================== BODY SENT =========================');
     AppLog.i(body);
     try {
+      // Filter out null values from the body
+      final Map<String, dynamic> filteredBody = (body)
+          .entries
+          .where((MapEntry<String, dynamic> entry) => entry.value != null)
+          .fold<Map<String, dynamic>>(
+        <String, dynamic>{},
+            (Map<String, dynamic> map, MapEntry<String, dynamic> entry) =>
+        map..[entry.key] = entry.value,
+      );
       final http.Response response =
-          await _client.post(uri, body: jsonEncode(body));
+          await _client.post(uri, body: jsonEncode(filteredBody));
       return _processResponse(response, endpoint);
     } on SocketException {
       throw FetchDataException('Connection problem ', uri.toString());
