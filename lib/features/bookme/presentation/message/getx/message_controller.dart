@@ -1,4 +1,6 @@
 import 'package:bookme/core/usecase/usecase.dart';
+import 'package:bookme/core/utitls/app_socket_client.dart';
+import 'package:bookme/core/utitls/app_socket_client.dart';
 import 'package:bookme/features/authentication/data/datasource/auth_local_data_source.dart';
 import 'package:bookme/features/authentication/data/models/response/login/login_response.dart';
 import 'package:bookme/features/bookme/data/models/request/message/message_request.dart';
@@ -15,6 +17,7 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import '../../../../../core/errors/failure.dart';
 import '../../../../authentication/data/models/response/user/user_model.dart';
 import '../../../data/models/response/chat/chat_model.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class MessageController extends GetxController {
   MessageController({
@@ -44,10 +47,14 @@ class MessageController extends GetxController {
       TextEditingController> messageTextEditingController = TextEditingController()
       .obs;
   final ScrollController scrollController = ScrollController();
+  late IO.Socket socket;
+  final AppSocketClient _socketClient = AppSocketClient();
+
 
 
   @override
   void onInit() {
+    connectSocket();
     getUser();
     /* pagingController.addPageRequestListener((int pageKey) {
       getMessages(pageKey);
@@ -56,9 +63,28 @@ class MessageController extends GetxController {
   }
 
   @override
-  void dispose() {
+  void onClose() {
+    _socketClient.disconnect();
     pagingController.dispose();
-    super.dispose();
+    super.onClose();
+  }
+
+
+  void connectSocket(){
+    //establish socket connection
+    final IO.Socket socketIO = _socketClient.init(
+         onSocketConnected: onSocketConnected,
+        onSocketDisconnected:  onSocketDisconnected
+    );
+
+    socketIO.emit('new-user-add',user.value.id);
+  }
+
+  void onSocketConnected(IO.Socket socket){
+
+  }
+  void onSocketDisconnected(IO.Socket socket){
+
   }
 
 

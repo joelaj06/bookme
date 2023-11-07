@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 
+const String socketUrlLocal = 'http://10.0.2.2:3000/';
 const String baseUrlLocal = 'http://10.0.2.2:3000/api/';
 const String baseUrl = 'https://bookme-vfk0.onrender.com/api/';
 

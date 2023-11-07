@@ -5,12 +5,8 @@ import 'package:bookme/features/bookme/presentation/message/getx/message_control
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
-import '../../../../../core/errors/failure.dart';
 import '../../../../../core/presentation/theme/primary_color.dart';
-import '../../../../../core/presentation/widgets/exception_indicators/empty_list_indicator.dart';
-import '../../../../../core/presentation/widgets/exception_indicators/error_indicator.dart';
 import '../../../data/models/response/message/message_model.dart';
 
 class MessageScreen extends GetView<MessageController> {
