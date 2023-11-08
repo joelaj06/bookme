@@ -11,7 +11,7 @@ class Chat with _$Chat {
   const factory Chat({
   @JsonKey(name: '_id') required String id,
     required User user,
-    String? initiator,
+    User? initiator,
     @JsonKey(name: 'last_message') String? lastMessage,
     String? createdAt,
     String? updatedAt,

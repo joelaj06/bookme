@@ -12,6 +12,9 @@ import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
 import '../../../../../core/errors/failure.dart';
+import '../../../../authentication/data/datasource/auth_local_data_source.dart';
+import '../../../../authentication/data/models/response/login/login_response.dart';
+import '../../../../authentication/data/models/response/user/user_model.dart';
 
 class ChatController extends GetxController {
   ChatController({
@@ -25,16 +28,28 @@ class ChatController extends GetxController {
   //reactive variables
   RxString chatId = ''.obs;
   RxList<Chat> chats = <Chat>[].obs;
+  Rx<User> user = User
+      .empty()
+      .obs;
 
   final PagingController<int, Chat> pagingController =
       PagingController<int, Chat>(firstPageKey: 1);
+  final AuthLocalDataSource _authLocalDataSource = Get.find();
+
 
   @override
   void onInit() {
     pagingController.addPageRequestListener((int pageKey) {
       getUserChats(pageKey);
     });
+    getUser();
     super.onInit();
+  }
+
+  void getUser() async {
+    final LoginResponse? response = await _authLocalDataSource
+        .getAuthResponse();
+    user(response?.user);
   }
 
   void navigateToMessages(Chat chat) {
@@ -77,4 +92,15 @@ class ChatController extends GetxController {
       },
     );
   }
+
+  User getRecipient(Chat chat){
+    final List<User> users = <User>[];
+    users.add(chat.user);
+    users.add(chat.initiator!);
+    final User recipient = users.firstWhere(
+            (User el) => el.id != user.value.id,
+        orElse: () => User.empty());
+    return recipient;
+  }
+
 }

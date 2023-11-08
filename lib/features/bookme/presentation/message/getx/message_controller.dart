@@ -1,6 +1,5 @@
 import 'package:bookme/core/usecase/usecase.dart';
 import 'package:bookme/core/utitls/app_socket_client.dart';
-import 'package:bookme/core/utitls/app_socket_client.dart';
 import 'package:bookme/features/authentication/data/datasource/auth_local_data_source.dart';
 import 'package:bookme/features/authentication/data/models/response/login/login_response.dart';
 import 'package:bookme/features/bookme/data/models/request/message/message_request.dart';
@@ -9,15 +8,16 @@ import 'package:bookme/features/bookme/data/models/response/message/message_cont
 import 'package:bookme/features/bookme/data/models/response/message/message_model.dart';
 import 'package:bookme/features/bookme/domain/usecases/message/fetch_messages.dart';
 import 'package:bookme/features/bookme/domain/usecases/message/post_message.dart';
+import 'package:bookme/features/bookme/presentation/chat/getx/chat_controller.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 import '../../../../../core/errors/failure.dart';
 import '../../../../authentication/data/models/response/user/user_model.dart';
 import '../../../data/models/response/chat/chat_model.dart';
-import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class MessageController extends GetxController {
   MessageController({
@@ -47,15 +47,16 @@ class MessageController extends GetxController {
       TextEditingController> messageTextEditingController = TextEditingController()
       .obs;
   final ScrollController scrollController = ScrollController();
-  late IO.Socket socket;
+  late IO.Socket socketIO;
   final AppSocketClient _socketClient = AppSocketClient();
+  final ChatController _chatController = Get.find();
 
 
 
   @override
   void onInit() {
-    connectSocket();
     getUser();
+    connectSocket();
     /* pagingController.addPageRequestListener((int pageKey) {
       getMessages(pageKey);
     });*/
@@ -72,12 +73,33 @@ class MessageController extends GetxController {
 
   void connectSocket(){
     //establish socket connection
-    final IO.Socket socketIO = _socketClient.init(
+   socketIO = _socketClient.init(
          onSocketConnected: onSocketConnected,
         onSocketDisconnected:  onSocketDisconnected
     );
+    socketIO.emit('register',_chatController.user.value.id);
+    socketIO.on('registered-users', (dynamic data)  {});
+   socketIO.on('receive-message', (dynamic data) {
+     final Map<String, dynamic> json = data as Map<String, dynamic>;
+     final MessageContent messageContent = MessageContent(text: (json['message']['message_text']).toString());
+     final Message message = Message(
+       id: '',
+       message: messageContent,
+       receiver: User(id: json['recipient'] as String,
+       firstName: '',
+       lastName: '', email: '', isAgent: false,
+         createdAt: DateTime.now().toIso8601String(),
+       ),
+     );
+     messages.insert(0, message);
+     getMessages(1);
+   });
+  }
 
-    socketIO.emit('new-user-add',user.value.id);
+  void emitMessageToRecipient(MessageRequest request){
+    //send realtime message to receiver
+    socketIO.emit('send-message',request.toJson());
+
   }
 
   void onSocketConnected(IO.Socket socket){
@@ -89,6 +111,9 @@ class MessageController extends GetxController {
 
 
   Future<void> onFieldSubmitted() async {
+    if(messageTextEditingController.value.text.isEmpty){
+      return;
+    }
     message(messageTextEditingController.value.text);
     messageTextEditingController.value.text = '';
 
@@ -103,7 +128,7 @@ class MessageController extends GetxController {
 
   void getChat(Chat chat) {
     chatId = chat.id;
-    recipient = chat.user.id;
+    recipient = _chatController.getRecipient(chat).id;
     getMessages(1);
   }
 
@@ -121,6 +146,7 @@ class MessageController extends GetxController {
       message: messageContent,
       chatId: chatId,
     );
+    emitMessageToRecipient(messageRequest);
     final Message tempMessage = Message(
       id: '',
       receiver: const User(id: '',

@@ -136,14 +136,15 @@ class MessageScreen extends GetView<MessageController> {
             ),
           ),
           Row(
+            mainAxisAlignment: isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
             children: <Widget>[
               Text(
                 DataFormatter.getVerboseDateTimeRepresentation(
-                  DateTime.parse(message.createdAt!),
+                  DateTime.parse(message.createdAt ?? DateTime.now().toIso8601String()),
                 ),
                 style: TextStyle(
                   fontSize: 12,
-                  color: HintColor.color.shade200,
+                 color: HintColor.color.shade200,
                 ),
               ),
                 Builder(builder: (BuildContext context) {
@@ -161,7 +162,7 @@ class MessageScreen extends GetView<MessageController> {
     return Obx(
       () => Container(
         height: 80,
-        margin: const EdgeInsets.only(top: 30),
+        margin:  EdgeInsets.zero,
         decoration: BoxDecoration(
           boxShadow: <BoxShadow>[
             BoxShadow(
