@@ -7,6 +7,10 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 import '../../../../../core/presentation/theme/primary_color.dart';
+import '../../../../../core/presentation/utitls/app_spacing.dart';
+import '../../../../../core/utitls/base_64.dart';
+import '../../../../authentication/data/models/response/user/user_model.dart';
+import '../../../data/models/response/chat/chat_model.dart';
 import '../../../data/models/response/message/message_model.dart';
 
 class MessageScreen extends GetView<MessageController> {
@@ -20,7 +24,9 @@ class MessageScreen extends GetView<MessageController> {
       controller.getChat(args.chat);
     }
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: _buildMessageChatTitle(context, args!.chat),
+      ),
       body: GestureDetector(
         onTap: () {
           FocusScope.of(context).requestFocus(FocusNode());
@@ -90,10 +96,7 @@ class MessageScreen extends GetView<MessageController> {
 
   Container _buildMessageBubble(
       BuildContext context, Message message, bool isUser) {
-    //todo Implement message time
     return Container(
-      // alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
-      // Adjust alignment based on isUser
       margin: const EdgeInsets.all(8.0),
       child: Column(
         crossAxisAlignment:
@@ -136,21 +139,23 @@ class MessageScreen extends GetView<MessageController> {
             ),
           ),
           Row(
-            mainAxisAlignment: isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+            mainAxisAlignment:
+                isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
             children: <Widget>[
               Text(
                 DataFormatter.getVerboseDateTimeRepresentation(
-                  DateTime.parse(message.createdAt ?? DateTime.now().toIso8601String()),
+                  DateTime.parse(
+                      message.createdAt ?? DateTime.now().toIso8601String()),
                 ),
                 style: TextStyle(
                   fontSize: 12,
-                 color: HintColor.color.shade200,
+                  color: HintColor.color.shade200,
                 ),
               ),
-                Builder(builder: (BuildContext context) {
-                  //Todo message status
-                  return const SizedBox.shrink();
-                })
+              Builder(builder: (BuildContext context) {
+                //Todo message status
+                return const SizedBox.shrink();
+              })
             ],
           )
         ],
@@ -162,7 +167,7 @@ class MessageScreen extends GetView<MessageController> {
     return Obx(
       () => Container(
         height: 80,
-        margin:  EdgeInsets.zero,
+        margin: EdgeInsets.zero,
         decoration: BoxDecoration(
           boxShadow: <BoxShadow>[
             BoxShadow(
@@ -237,6 +242,50 @@ class MessageScreen extends GetView<MessageController> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildMessageChatTitle(BuildContext context, Chat chat) {
+    final User user = controller.chatController.getRecipient(chat);
+    final String image = user.image ?? '';
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: <Widget>[
+        ClipRRect(
+          borderRadius: BorderRadius.circular(50),
+          child: CircleAvatar(
+            child: image.isEmpty
+                ? Image.asset('assets/images/user2.jpg')
+                : Image.memory(
+                    fit: BoxFit.cover,
+                    Base64Convertor().base64toImage(
+                      image,
+                    ),
+                  ),
+          ),
+        ),
+        const AppSpacing(
+          h: 10,
+        ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              '${user.firstName} ${user.lastName}',
+              style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
+            ),
+            Obx(() {
+              final RxBool isOnline = controller.checkUserStatus(controller.activeUsers, user);
+              return Text(
+                isOnline.value ? 'Online' : 'Offline',
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                    fontSize: 12, fontWeight: FontWeight.normal),
+              );
+            })
+          ],
+        )
+      ],
     );
   }
 }

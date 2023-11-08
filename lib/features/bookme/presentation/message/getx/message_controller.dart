@@ -34,24 +34,20 @@ class MessageController extends GetxController {
   String chatId = '';
   String recipient = '';
   RxString message = ''.obs;
-  Rx<User> user = User
-      .empty()
-      .obs;
+  Rx<User> user = User.empty().obs;
   RxBool isMessageSuccess = false.obs;
+  RxList<OnlineUser> activeUsers = <OnlineUser>[].obs;
 
   final PagingController<int, Message> pagingController =
-  PagingController<int, Message>(firstPageKey: 1);
+      PagingController<int, Message>(firstPageKey: 1);
 
   final AuthLocalDataSource _authLocalDataSource = Get.find();
-  final Rx<
-      TextEditingController> messageTextEditingController = TextEditingController()
-      .obs;
+  final Rx<TextEditingController> messageTextEditingController =
+      TextEditingController().obs;
   final ScrollController scrollController = ScrollController();
   late IO.Socket socketIO;
   final AppSocketClient _socketClient = AppSocketClient();
-  final ChatController _chatController = Get.find();
-
-
+  final ChatController chatController = Get.find();
 
   @override
   void onInit() {
@@ -70,48 +66,68 @@ class MessageController extends GetxController {
     super.onClose();
   }
 
-
-  void connectSocket(){
+  void connectSocket() {
     //establish socket connection
-   socketIO = _socketClient.init(
-         onSocketConnected: onSocketConnected,
-        onSocketDisconnected:  onSocketDisconnected
-    );
-    socketIO.emit('register',_chatController.user.value.id);
-    socketIO.on('registered-users', (dynamic data)  {});
-   socketIO.on('receive-message', (dynamic data) {
-     final Map<String, dynamic> json = data as Map<String, dynamic>;
-     final MessageContent messageContent = MessageContent(text: (json['message']['message_text']).toString());
-     final Message message = Message(
-       id: '',
-       message: messageContent,
-       receiver: User(id: json['recipient'] as String,
-       firstName: '',
-       lastName: '', email: '', isAgent: false,
-         createdAt: DateTime.now().toIso8601String(),
-       ),
-     );
-     messages.insert(0, message);
-     getMessages(1);
-   });
+    socketIO = _socketClient.init(
+        onSocketConnected: onSocketConnected,
+        onSocketDisconnected: onSocketDisconnected);
+    socketIO.emit('register', chatController.user.value.id);
+    socketIO.on('registered-users', (dynamic data) {
+      if (data is List) {
+        final List<OnlineUser> onlineUsers =
+            (data)
+                .map(( dynamic user) {
+          return OnlineUser(
+              userId: user['userId'] as String,
+              socketId: user['socketId'] as String);
+        }).toList();
+        activeUsers(onlineUsers);
+      }
+    });
+    socketIO.on('receive-message', (dynamic data) {
+      final Map<String, dynamic> json = data as Map<String, dynamic>;
+      final MessageContent messageContent =
+          MessageContent(text: (json['message']['message_text']).toString());
+      final Message message = Message(
+        id: '',
+        message: messageContent,
+        receiver: User(
+          id: json['recipient'] as String,
+          firstName: '',
+          lastName: '',
+          email: '',
+          isAgent: false,
+          createdAt: DateTime.now().toIso8601String(),
+        ),
+      );
+      messages.insert(0, message);
+      Future<dynamic>.delayed(const Duration(seconds: 5),() {
+       getMessages(1);
+      });
+    });
   }
 
-  void emitMessageToRecipient(MessageRequest request){
+  RxBool checkUserStatus(RxList<OnlineUser> activeUsers,User user){
+    final OnlineUser activeUser = activeUsers.firstWhere(
+            (OnlineUser onlineUser) => onlineUser.userId == user.id,
+        orElse: () => OnlineUser(userId: '', socketId: ''));
+    if(activeUser.userId.isEmpty){
+      return false.obs;
+    }
+    return true.obs;
+  }
+
+  void emitMessageToRecipient(MessageRequest request) {
     //send realtime message to receiver
-    socketIO.emit('send-message',request.toJson());
-
+    socketIO.emit('send-message', request.toJson());
   }
 
-  void onSocketConnected(IO.Socket socket){
+  void onSocketConnected(IO.Socket socket) {}
 
-  }
-  void onSocketDisconnected(IO.Socket socket){
-
-  }
-
+  void onSocketDisconnected(IO.Socket socket) {}
 
   Future<void> onFieldSubmitted() async {
-    if(messageTextEditingController.value.text.isEmpty){
+    if (messageTextEditingController.value.text.isEmpty) {
       return;
     }
     message(messageTextEditingController.value.text);
@@ -128,13 +144,13 @@ class MessageController extends GetxController {
 
   void getChat(Chat chat) {
     chatId = chat.id;
-    recipient = _chatController.getRecipient(chat).id;
+    recipient = chatController.getRecipient(chat).id;
     getMessages(1);
   }
 
   void getUser() async {
-    final LoginResponse? response = await _authLocalDataSource
-        .getAuthResponse();
+    final LoginResponse? response =
+        await _authLocalDataSource.getAuthResponse();
     user(response?.user);
   }
 
@@ -149,25 +165,26 @@ class MessageController extends GetxController {
     emitMessageToRecipient(messageRequest);
     final Message tempMessage = Message(
       id: '',
-      receiver: const User(id: '',
+      receiver: const User(
+        id: '',
         firstName: '',
         lastName: '',
         email: '',
-        isAgent: false,),
+        isAgent: false,
+      ),
       message: messageContent,
       createdAt: DateTime.now().toIso8601String(),
     );
-    messages.insert(0,tempMessage);
-    final Either<Failure, Message> failureOrMessage = await postMessage(
-        messageRequest
-    );
+    messages.insert(0, tempMessage);
+    final Either<Failure, Message> failureOrMessage =
+        await postMessage(messageRequest);
     message('');
     failureOrMessage.fold(
-          (Failure failure) {
+      (Failure failure) {
         isLoading(false);
         pagingController.error = failure;
       },
-          (Message message) {
+      (Message message) {
         isLoading(false);
         getMessages(1);
       },
@@ -176,10 +193,10 @@ class MessageController extends GetxController {
 
   void getMessages(int pageKey) async {
     final Either<Failure, ListPage<Message>> failureOrMessages =
-    await fetchMessages(PageParams(page: 0, size: 0, chatId: chatId));
+        await fetchMessages(PageParams(page: 0, size: 0, chatId: chatId));
     failureOrMessages.fold(
-          (Failure failure) {},
-          (ListPage<Message> newPage) {
+      (Failure failure) {},
+      (ListPage<Message> newPage) {
         final int previouslyFetchedItemsCount =
             pagingController.itemList?.length ?? 0;
 
@@ -195,4 +212,11 @@ class MessageController extends GetxController {
       },
     );
   }
+}
+
+class OnlineUser {
+  OnlineUser({required this.userId, required this.socketId});
+
+  final String userId;
+  final String socketId;
 }
