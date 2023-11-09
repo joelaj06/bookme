@@ -1,13 +1,16 @@
+import 'package:bookme/core/presentation/utitls/app_padding.dart';
 import 'package:bookme/features/bookme/presentation/chat/getx/chat_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
 import '../../../../../core/errors/failure.dart';
+import '../../../../../core/presentation/theme/primary_color.dart';
 import '../../../../../core/presentation/utitls/app_spacing.dart';
 import '../../../../../core/presentation/widgets/exception_indicators/empty_list_indicator.dart';
 import '../../../../../core/presentation/widgets/exception_indicators/error_indicator.dart';
 import '../../../../../core/utitls/base_64.dart';
+import '../../../../../core/utitls/date_formatter.dart';
 import '../../../../authentication/data/models/response/user/user_model.dart';
 import '../../../data/models/response/chat/chat_model.dart';
 
@@ -25,7 +28,13 @@ class ChatScreen extends GetView<ChatController> {
   }
 
   Widget _buildChatList(BuildContext context) {
-    return PagedListView<int, Chat>.separated(
+    return Obx(() =>ListView.builder(
+          itemCount: controller.chats.length,
+          itemBuilder: (BuildContext context, int index) {
+           return _buildChatCard(context, controller.chats[index]);
+      }),
+    );
+    /*return PagedListView<int, Chat>.separated(
       pagingController: controller.pagingController,
       builderDelegate: PagedChildBuilderDelegate<Chat>(
         itemBuilder: (BuildContext context, Chat chat, int index) {
@@ -49,7 +58,7 @@ class ChatScreen extends GetView<ChatController> {
       //padding: AppPaddings.lA,
       separatorBuilder: (BuildContext context, int index) =>
           const SizedBox.shrink(),
-    );
+    );*/
   }
 
   Widget _buildChatCard(BuildContext context, Chat chat) {
@@ -65,39 +74,65 @@ class ChatScreen extends GetView<ChatController> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(50),
-                  child: CircleAvatar(
-                    child: image.isEmpty
-                        ? Image.asset('assets/images/user2.jpg')
-                        : Image.memory(
-                            fit: BoxFit.cover,
-                            Base64Convertor().base64toImage(
-                              image,
-                            ),
-                          ),
-                  ),
-                ),
-                const AppSpacing(
-                  h: 10,
-                ),
-                Flexible(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                        '${user.firstName} ${user.lastName}',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w500,
-                        ),
+               Row(
+                 children: <Widget>[
+                   ClipRRect(
+                     borderRadius: BorderRadius.circular(50),
+                     child: CircleAvatar(
+                       child: image.isEmpty
+                           ? Image.asset('assets/images/user2.jpg')
+                           : Image.memory(
+                         fit: BoxFit.cover,
+                         Base64Convertor().base64toImage(
+                           image,
+                         ),
+                       ),
+                     ),
+                   ),
+                   const AppSpacing(
+                     h: 10,
+                   ),
+                   Column(
+                     crossAxisAlignment: CrossAxisAlignment.start,
+                     children: <Widget>[
+                       Text(
+                         '${user.firstName} ${user.lastName}',
+                         style: const TextStyle(
+                           fontWeight: FontWeight.w500,
+                         ),
+                       ),
+                       Text(
+                         chat.lastMessage ?? '...',
+                         overflow: TextOverflow.ellipsis,
+                       ),
+                     ],
+                   ),
+                 ],
+               ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: <Widget>[
+                    Text(
+                      DataFormatter.getVerboseDateTimeRepresentation(
+                        DateTime.parse(
+                            chat.updatedAt ?? DateTime.now().toIso8601String()),
                       ),
-                      Text(
-                        chat.lastMessage ?? '...',
-                        overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 12,
                       ),
-                    ],
-                  ),
+                    ),
+                    const CircleAvatar(
+                      radius: 10,
+                      child: Text('1',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 10,
+                        color: Colors.white,
+                      ),),
+                    )
+                  ],
                 )
               ],
             ),

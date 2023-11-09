@@ -163,7 +163,7 @@ class AppHTTPClient {
           response.request!.url.toString(),
         );
       case 401:
-        throw FetchDataException(
+        throw UnauthorizedException(
           utf8.decode(response.bodyBytes),
           response.request!.url.toString(),
         );

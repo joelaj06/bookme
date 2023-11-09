@@ -17,6 +17,7 @@ class Message with _$Message {
     String? createdAt,
     String? updatedAt,
     String? type,
+    String? status,
     @JsonKey(name: 'content')required  MessageContent message,
   }) = _Message;
 

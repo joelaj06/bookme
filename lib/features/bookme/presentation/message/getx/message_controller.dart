@@ -36,7 +36,7 @@ class MessageController extends GetxController {
   RxString message = ''.obs;
   Rx<User> user = User.empty().obs;
   RxBool isMessageSuccess = false.obs;
-  RxList<OnlineUser> activeUsers = <OnlineUser>[].obs;
+  RxBool isLastMessageRead = false.obs;
 
   final PagingController<int, Message> pagingController =
       PagingController<int, Message>(firstPageKey: 1);
@@ -46,7 +46,7 @@ class MessageController extends GetxController {
       TextEditingController().obs;
   final ScrollController scrollController = ScrollController();
   late IO.Socket socketIO;
-  final AppSocketClient _socketClient = AppSocketClient();
+
   final ChatController chatController = Get.find();
 
   @override
@@ -61,29 +61,12 @@ class MessageController extends GetxController {
 
   @override
   void onClose() {
-    _socketClient.disconnect();
     pagingController.dispose();
     super.onClose();
   }
 
   void connectSocket() {
-    //establish socket connection
-    socketIO = _socketClient.init(
-        onSocketConnected: onSocketConnected,
-        onSocketDisconnected: onSocketDisconnected);
-    socketIO.emit('register', chatController.user.value.id);
-    socketIO.on('registered-users', (dynamic data) {
-      if (data is List) {
-        final List<OnlineUser> onlineUsers =
-            (data)
-                .map(( dynamic user) {
-          return OnlineUser(
-              userId: user['userId'] as String,
-              socketId: user['socketId'] as String);
-        }).toList();
-        activeUsers(onlineUsers);
-      }
-    });
+    socketIO = chatController.socketIO;
     socketIO.on('receive-message', (dynamic data) {
       final Map<String, dynamic> json = data as Map<String, dynamic>;
       final MessageContent messageContent =
@@ -101,6 +84,7 @@ class MessageController extends GetxController {
         ),
       );
       messages.insert(0, message);
+      chatController.pagingController.refresh();
       Future<dynamic>.delayed(const Duration(seconds: 5),() {
        getMessages(1);
       });
@@ -187,6 +171,7 @@ class MessageController extends GetxController {
       (Message message) {
         isLoading(false);
         getMessages(1);
+
       },
     );
   }

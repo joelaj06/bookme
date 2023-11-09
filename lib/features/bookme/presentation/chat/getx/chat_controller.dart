@@ -10,12 +10,14 @@ import 'package:bookme/features/bookme/presentation/chat/arguments/chat_argument
 import 'package:dartz/dartz.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 import '../../../../../core/errors/failure.dart';
+import '../../../../../core/utitls/app_socket_client.dart';
 import '../../../../authentication/data/datasource/auth_local_data_source.dart';
 import '../../../../authentication/data/models/response/login/login_response.dart';
 import '../../../../authentication/data/models/response/user/user_model.dart';
-
+import '../../message/getx/message_controller.dart';
 class ChatController extends GetxController {
   ChatController({
     required this.fetchUserChats,
@@ -31,22 +33,57 @@ class ChatController extends GetxController {
   Rx<User> user = User
       .empty()
       .obs;
+  RxList<OnlineUser> activeUsers = <OnlineUser>[].obs;
+
 
   final PagingController<int, Chat> pagingController =
       PagingController<int, Chat>(firstPageKey: 1);
   final AuthLocalDataSource _authLocalDataSource = Get.find();
-
+  final AppSocketClient _socketClient = AppSocketClient();
+  late IO.Socket socketIO;
 
   @override
   void onInit() {
+
+    connectToSocket();
+    getUserChats(1);
     pagingController.addPageRequestListener((int pageKey) {
       getUserChats(pageKey);
     });
-    getUser();
     super.onInit();
   }
 
-  void getUser() async {
+  @override
+  void onClose() {
+    _socketClient.disconnect();
+    super.onClose();
+  }
+
+  void connectToSocket() async{
+    await getUser();
+    //establish socket connection
+    socketIO = _socketClient.init(
+        onSocketConnected: (IO.Socket socket){},
+        onSocketDisconnected: (IO.Socket socket){});
+    socketIO.emit('register', user.value.id);
+    socketIO.on('registered-users', (dynamic data) {
+      if (data is List) {
+        final List<OnlineUser> onlineUsers =
+        (data)
+            .map(( dynamic user) {
+          return OnlineUser(
+              userId: user['userId'] as String,
+              socketId: user['socketId'] as String);
+        }).toList();
+        activeUsers(onlineUsers);
+      }
+    });
+
+
+  }
+
+
+  Future<void> getUser() async {
     final LoginResponse? response = await _authLocalDataSource
         .getAuthResponse();
     user(response?.user);
