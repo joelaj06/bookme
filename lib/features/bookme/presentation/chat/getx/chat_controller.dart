@@ -51,16 +51,16 @@ class ChatController extends GetxController {
     connectToSocket();
     getUserChats(1);
     retrieveNotificationPersistedData();
-    pagingController.addPageRequestListener((int pageKey) {
+    /* pagingController.addPageRequestListener((int pageKey) {
       getUserChats(pageKey);
-    });
+    });*/
     super.onInit();
   }
 
   @override
   void onClose() {
     _socketClient.disconnect();
-    //clearUnreadNotifications();
+    // clearUnreadNotifications();
     super.onClose();
   }
 
@@ -75,9 +75,10 @@ class ChatController extends GetxController {
     unreadNotifications(res);
   }
 
-  void clearUnreadNotifications() async{
+  void clearUnreadNotifications() async {
     await _sharedPreferencesWrapper.remove(SharedPrefsKeys.messageNotification);
   }
+
   void persistUnreadMessageNotification() async {
     final List<Map<String, dynamic>> data = unreadNotifications
         .map((MessageRequest messageRequest) => messageRequest.toJson())
@@ -114,8 +115,8 @@ class ChatController extends GetxController {
       } else {
         notifications.add(message);
       }
-
       getUnreadNotifications();
+      getUserChats(1);
     });
   }
 
@@ -129,19 +130,18 @@ class ChatController extends GetxController {
   }
 
   void getUnreadNotifications() {
+    unreadNotifications.clear();
     final List<MessageRequest> results =
         notifications.where((MessageRequest n) => n.isRead == false).toList();
-    if(unreadNotifications.isEmpty){
-       unreadNotifications(results);
-    }else{
-      unreadNotifications.addAll(results);
-    }
+    unreadNotifications.addAll(results);
     // Sort the messages based on the date in descending order
     unreadNotifications.sort(
       (MessageRequest a, MessageRequest b) => DateTime.parse(b.date!).compareTo(
         DateTime.parse(a.date!),
       ),
     );
+
+    print(unreadNotifications);
     persistUnreadMessageNotification();
   }
 
@@ -151,8 +151,22 @@ class ChatController extends GetxController {
     user(response?.user);
   }
 
-  void navigateToMessages(Chat chat) {
-
+  void navigateToMessages(Chat chat, int index) {
+    final String senderId = getRecipient(chat).id;
+    if(getUserNotifications(chat).value.isNotEmpty){
+    chats[index] = chat.copyWith(
+        lastMessage: getUserNotifications(chat).value.first.message.text);
+    }
+    if (getUserNotifications(chat).value.isNotEmpty) {
+      for (int i = 0; i < notifications.length; i++) {
+        if (notifications[i].senderId == senderId) {
+          notifications[i] = notifications[i].copyWith(isRead: true);
+        }
+      }
+      getUnreadNotifications();
+    }
+    print("================================");
+    print(notifications);
     Get.toNamed<dynamic>(AppRoutes.messages, arguments: ChatArgument(chat));
   }
 
@@ -161,21 +175,22 @@ class ChatController extends GetxController {
         await fetchUserChats(NoParams());
     failureOrChats.fold(
       (Failure failure) {
-        pagingController.error = failure;
+        //  pagingController.error = failure;
       },
       (ListPage<Chat> newPage) {
         final int previouslyFetchedItemsCount =
             pagingController.itemList?.length ?? 0;
 
-        final bool isLastPage = newPage.isLastPage(previouslyFetchedItemsCount);
+        // final bool isLastPage = newPage.isLastPage(previouslyFetchedItemsCount);
         final List<Chat> newItems = newPage.itemList;
         chats(newItems);
-        if (isLastPage) {
-          pagingController.appendLastPage(newItems);
+        print(chats[0].lastMessage);
+        /*  if (isLastPage) {
+         // pagingController.appendLastPage(newItems);
         } else {
           final int nextPageKey = pageKey + 1;
-          pagingController.appendPage(newItems, nextPageKey);
-        }
+       //   pagingController.appendPage(newItems, nextPageKey);
+        }*/
       },
     );
   }

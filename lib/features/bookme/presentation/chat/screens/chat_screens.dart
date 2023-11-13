@@ -32,7 +32,7 @@ class ChatScreen extends GetView<ChatController> {
       () => ListView.builder(
           itemCount: controller.chats.length,
           itemBuilder: (BuildContext context, int index) {
-            return _buildChatCard(context, controller.chats[index]);
+            return _buildChatCard(context, controller.chats[index],index);
           }),
     );
     /*return PagedListView<int, Chat>.separated(
@@ -62,12 +62,12 @@ class ChatScreen extends GetView<ChatController> {
     );*/
   }
 
-  Widget _buildChatCard(BuildContext context, Chat chat) {
+  Widget _buildChatCard(BuildContext context, Chat chat, int index) {
     final User user = controller.getRecipient(chat);
     final String image = user.image ?? '';
     return GestureDetector(
       onTap: () {
-        controller.navigateToMessages(chat);
+        controller.navigateToMessages(chat,index);
       },
       child: Container(
         color: Colors.transparent,
@@ -143,22 +143,21 @@ class ChatScreen extends GetView<ChatController> {
                           ),
                         ),
                       ),
-                      if (controller.getUserNotifications(chat).value.isEmpty)
-                        const SizedBox.shrink()
-                      else
-                        CircleAvatar(
-                          radius: 10,
-                          child: Obx(
-                            () => Text(
-                              controller
-                                  .getUserNotifications(chat)
-                                  .value
-                                  .length
-                                  .toString(),
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                fontSize: 10,
-                                color: Colors.white,
+                        Obx(() => controller.getUserNotifications(chat).value.isEmpty?
+                        const SizedBox.shrink() :CircleAvatar(
+                            radius: 10,
+                            child: Obx(
+                              () => Text(
+                                controller
+                                    .getUserNotifications(chat)
+                                    .value
+                                    .length
+                                    .toString(),
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  fontSize: 10,
+                                  color: Colors.white,
+                                ),
                               ),
                             ),
                           ),
