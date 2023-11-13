@@ -143,6 +143,7 @@ class MessageController extends GetxController {
     final MessageContent messageContent = MessageContent(text: message.value);
     final MessageRequest messageRequest = MessageRequest(
       recipient: recipient,
+      senderId: user.value.id,
       message: messageContent,
       chatId: chatId,
     );

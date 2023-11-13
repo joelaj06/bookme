@@ -11,7 +11,10 @@ class MessageRequest with _$MessageRequest {
   const factory MessageRequest({
     String? chatId,
     required String recipient,
+    String? senderId,
     required MessageContent message,
+    bool? isRead,
+    String? date,
   }) = _MessageRequest;
 
   const MessageRequest._();

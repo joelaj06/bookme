@@ -28,11 +28,12 @@ class ChatScreen extends GetView<ChatController> {
   }
 
   Widget _buildChatList(BuildContext context) {
-    return Obx(() =>ListView.builder(
+    return Obx(
+      () => ListView.builder(
           itemCount: controller.chats.length,
           itemBuilder: (BuildContext context, int index) {
-           return _buildChatCard(context, controller.chats[index]);
-      }),
+            return _buildChatCard(context, controller.chats[index]);
+          }),
     );
     /*return PagedListView<int, Chat>.separated(
       pagingController: controller.pagingController,
@@ -76,61 +77,86 @@ class ChatScreen extends GetView<ChatController> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-               Row(
-                 children: <Widget>[
-                   ClipRRect(
-                     borderRadius: BorderRadius.circular(50),
-                     child: CircleAvatar(
-                       child: image.isEmpty
-                           ? Image.asset('assets/images/user2.jpg')
-                           : Image.memory(
-                         fit: BoxFit.cover,
-                         Base64Convertor().base64toImage(
-                           image,
-                         ),
-                       ),
-                     ),
-                   ),
-                   const AppSpacing(
-                     h: 10,
-                   ),
-                   Column(
-                     crossAxisAlignment: CrossAxisAlignment.start,
-                     children: <Widget>[
-                       Text(
-                         '${user.firstName} ${user.lastName}',
-                         style: const TextStyle(
-                           fontWeight: FontWeight.w500,
-                         ),
-                       ),
-                       Text(
-                         chat.lastMessage ?? '...',
-                         overflow: TextOverflow.ellipsis,
-                       ),
-                     ],
-                   ),
-                 ],
-               ),
+                Row(
+                  children: <Widget>[
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(50),
+                      child: CircleAvatar(
+                        child: image.isEmpty
+                            ? Image.asset('assets/images/user2.jpg')
+                            : Image.memory(
+                                fit: BoxFit.cover,
+                                Base64Convertor().base64toImage(
+                                  image,
+                                ),
+                              ),
+                      ),
+                    ),
+                    const AppSpacing(
+                      h: 10,
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          '${user.firstName} ${user.lastName}',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        Obx(
+                          () => Text(
+                            controller.getUserNotifications(chat).value.isEmpty
+                                ? chat.lastMessage.toString()
+                                : controller
+                                    .getUserNotifications(chat)
+                                    .value
+                                    .first
+                                    .message
+                                    .text,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: <Widget>[
-                    Text(
-                      DataFormatter.getVerboseDateTimeRepresentation(
-                        DateTime.parse(
-                            chat.updatedAt ?? DateTime.now().toIso8601String()),
-                      ),
-                      style: const TextStyle(
-                        fontSize: 12,
+                    Obx(
+                      () => Text(
+                        controller.getUserNotifications(chat).value.isEmpty
+                            ? ''
+                            : DataFormatter.getVerboseDateTimeRepresentation(
+                                DateTime.parse(controller
+                                        .getUserNotifications(chat)
+                                        .value
+                                        .first
+                                        .date ??
+                                    DateTime.now().toIso8601String()),
+                              ),
+                        style: const TextStyle(
+                          fontSize: 12,
+                        ),
                       ),
                     ),
-                    const CircleAvatar(
+                    CircleAvatar(
                       radius: 10,
-                      child: Text('1',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 10,
-                        color: Colors.white,
-                      ),),
+                      child: Obx(
+                        () => Text(
+                          controller
+                              .getUserNotifications(chat)
+                              .value
+                              .length
+                              .toString(),
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 10,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
                     )
                   ],
                 )
