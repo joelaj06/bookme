@@ -1,11 +1,12 @@
 import 'package:bookme/core/presentation/routes/app_routes.dart';
 import 'package:bookme/core/usecase/usecase.dart';
+import 'package:bookme/core/utitls/shared_preferences_wrapper.dart';
+import 'package:bookme/core/utitls/shared_prefs_keys.dart';
 import 'package:bookme/features/bookme/data/models/request/chat/chat_request.dart';
 import 'package:bookme/features/bookme/data/models/request/message/message_request.dart';
 import 'package:bookme/features/bookme/data/models/response/chat/chat_model.dart';
 import 'package:bookme/features/bookme/data/models/response/chat/initiate_chat_model.dart';
 import 'package:bookme/features/bookme/data/models/response/listpage/listpage.dart';
-import 'package:bookme/features/bookme/data/models/response/message/message_model.dart';
 import 'package:bookme/features/bookme/domain/usecases/chat/fetch_user_chats.dart';
 import 'package:bookme/features/bookme/domain/usecases/chat/initiate_chat.dart';
 import 'package:bookme/features/bookme/presentation/chat/arguments/chat_argument.dart';
@@ -43,11 +44,13 @@ class ChatController extends GetxController {
   final AuthLocalDataSource _authLocalDataSource = Get.find();
   final AppSocketClient _socketClient = AppSocketClient();
   late IO.Socket socketIO;
+  final SharedPreferencesWrapper _sharedPreferencesWrapper = Get.find();
 
   @override
   void onInit() {
     connectToSocket();
     getUserChats(1);
+    retrieveNotificationPersistedData();
     pagingController.addPageRequestListener((int pageKey) {
       getUserChats(pageKey);
     });
@@ -57,10 +60,34 @@ class ChatController extends GetxController {
   @override
   void onClose() {
     _socketClient.disconnect();
+    //clearUnreadNotifications();
     super.onClose();
   }
 
+  void retrieveNotificationPersistedData() async {
+    final List<Map<String, dynamic>>? results = await _sharedPreferencesWrapper
+        .getList(SharedPrefsKeys.messageNotification);
+    final List<MessageRequest> res = List<MessageRequest>.from(
+      results!.map<MessageRequest>(
+        (dynamic json) => MessageRequest.fromJson(json as Map<String, dynamic>),
+      ),
+    );
+    unreadNotifications(res);
+  }
+
+  void clearUnreadNotifications() async{
+    await _sharedPreferencesWrapper.remove(SharedPrefsKeys.messageNotification);
+  }
+  void persistUnreadMessageNotification() async {
+    final List<Map<String, dynamic>> data = unreadNotifications
+        .map((MessageRequest messageRequest) => messageRequest.toJson())
+        .toList();
+    await _sharedPreferencesWrapper.setList(
+        SharedPrefsKeys.messageNotification, data);
+  }
+
   void connectToSocket() async {
+    //todo socket event refactoring
     await getUser();
     //establish socket connection
     socketIO = _socketClient.init(
@@ -87,6 +114,7 @@ class ChatController extends GetxController {
       } else {
         notifications.add(message);
       }
+
       getUnreadNotifications();
     });
   }
@@ -103,14 +131,18 @@ class ChatController extends GetxController {
   void getUnreadNotifications() {
     final List<MessageRequest> results =
         notifications.where((MessageRequest n) => n.isRead == false).toList();
-    unreadNotifications(results);
+    if(unreadNotifications.isEmpty){
+       unreadNotifications(results);
+    }else{
+      unreadNotifications.addAll(results);
+    }
     // Sort the messages based on the date in descending order
     unreadNotifications.sort(
       (MessageRequest a, MessageRequest b) => DateTime.parse(b.date!).compareTo(
         DateTime.parse(a.date!),
       ),
     );
-    print(unreadNotifications);
+    persistUnreadMessageNotification();
   }
 
   Future<void> getUser() async {
@@ -120,6 +152,7 @@ class ChatController extends GetxController {
   }
 
   void navigateToMessages(Chat chat) {
+
     Get.toNamed<dynamic>(AppRoutes.messages, arguments: ChatArgument(chat));
   }
 

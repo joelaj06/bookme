@@ -8,9 +8,9 @@ abstract class DataFormatter{
     final DateTime justNow = DateTime.now().subtract(const Duration(minutes: 1));
     final DateTime localDateTime = dateTime.toLocal();
 
-    if (!localDateTime.difference(justNow).isNegative) {
+    /*if (!localDateTime.difference(justNow).isNegative) {
       return 'Just now';
-    }
+    }*/
 
     final String roughTimeString = DateFormat('jm').format(dateTime);
     if (localDateTime.day == now.day && localDateTime.month == now.month && localDateTime.year == now.year) {

@@ -6,7 +6,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'app_log.dart';
 
 class SharedPreferencesWrapper {
-
   Future<String> getString(String key) async {
     final SharedPreferences sharedPreferences =
         await SharedPreferences.getInstance();
@@ -35,6 +34,28 @@ class SharedPreferencesWrapper {
     AppLog.i('Storing values');
     AppLog.i(json.encode(value));
     await setString(key, json.encode(value));
+    return value;
+  }
+
+  Future<List<Map<String, dynamic>>?> getList(String key) async {
+    try {
+      final String jsonString = await getString(key);
+      final List<Map<String, dynamic>> data = List<Map<String, dynamic>>.from(
+          (json.decode(jsonString) as List<dynamic>)
+              .cast<Map<String, dynamic>>());
+      return data;
+    } catch (e, st) {
+      AppLog.e(e, st);
+      return null;
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> setList(
+      String key, List<Map<String, dynamic>> value) async {
+    // Encode the list of maps to JSON
+    final String data = json.encode(value);
+    // Save the JSON string to shared preferences
+    await setString(key, data);
     return value;
   }
 

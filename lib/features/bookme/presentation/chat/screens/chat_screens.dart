@@ -69,101 +69,107 @@ class ChatScreen extends GetView<ChatController> {
       onTap: () {
         controller.navigateToMessages(chat);
       },
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(50),
-                      child: CircleAvatar(
-                        child: image.isEmpty
-                            ? Image.asset('assets/images/user2.jpg')
-                            : Image.memory(
-                                fit: BoxFit.cover,
-                                Base64Convertor().base64toImage(
-                                  image,
+      child: Container(
+        color: Colors.transparent,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Row(
+                    children: <Widget>[
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(50),
+                        child: CircleAvatar(
+                          child: image.isEmpty
+                              ? Image.asset('assets/images/user2.jpg')
+                              : Image.memory(
+                                  fit: BoxFit.cover,
+                                  Base64Convertor().base64toImage(
+                                    image,
+                                  ),
                                 ),
-                              ),
-                      ),
-                    ),
-                    const AppSpacing(
-                      h: 10,
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          '${user.firstName} ${user.lastName}',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        Obx(
-                          () => Text(
-                            controller.getUserNotifications(chat).value.isEmpty
-                                ? chat.lastMessage.toString()
-                                : controller
-                                    .getUserNotifications(chat)
-                                    .value
-                                    .first
-                                    .message
-                                    .text,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: <Widget>[
-                    Obx(
-                      () => Text(
-                        controller.getUserNotifications(chat).value.isEmpty
-                            ? ''
-                            : DataFormatter.getVerboseDateTimeRepresentation(
-                                DateTime.parse(controller
-                                        .getUserNotifications(chat)
-                                        .value
-                                        .first
-                                        .date ??
-                                    DateTime.now().toIso8601String()),
-                              ),
-                        style: const TextStyle(
-                          fontSize: 12,
                         ),
                       ),
-                    ),
-                    CircleAvatar(
-                      radius: 10,
-                      child: Obx(
+                      const AppSpacing(
+                        h: 10,
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            '${user.firstName} ${user.lastName}',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          Obx(
+                            () => Text(
+                              controller.getUserNotifications(chat).value.isEmpty
+                                  ? chat.lastMessage ?? ''
+                                  : controller
+                                      .getUserNotifications(chat)
+                                      .value
+                                      .first
+                                      .message
+                                      .text,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: <Widget>[
+                      Obx(
                         () => Text(
-                          controller
-                              .getUserNotifications(chat)
-                              .value
-                              .length
-                              .toString(),
-                          textAlign: TextAlign.center,
+                          controller.getUserNotifications(chat).value.isEmpty
+                              ? ''
+                              : DataFormatter.getVerboseDateTimeRepresentation(
+                                  DateTime.parse(controller
+                                          .getUserNotifications(chat)
+                                          .value
+                                          .first
+                                          .date ??
+                                      DateTime.now().toIso8601String()),
+                                ),
                           style: const TextStyle(
-                            fontSize: 10,
-                            color: Colors.white,
+                            fontSize: 12,
                           ),
                         ),
                       ),
-                    )
-                  ],
-                )
-              ],
-            ),
-            const Divider(),
-          ],
+                      if (controller.getUserNotifications(chat).value.isEmpty)
+                        const SizedBox.shrink()
+                      else
+                        CircleAvatar(
+                          radius: 10,
+                          child: Obx(
+                            () => Text(
+                              controller
+                                  .getUserNotifications(chat)
+                                  .value
+                                  .length
+                                  .toString(),
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontSize: 10,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        )
+                    ],
+                  )
+                ],
+              ),
+              const Divider(),
+            ],
+          ),
         ),
       ),
     );
