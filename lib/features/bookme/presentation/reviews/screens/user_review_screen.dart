@@ -1,3 +1,6 @@
+import 'package:bookme/core/presentation/theme/primary_color.dart';
+import 'package:bookme/core/presentation/theme/secondary_color.dart';
+import 'package:bookme/core/presentation/utitls/app_assets.dart';
 import 'package:bookme/core/presentation/widgets/app_loading_box.dart';
 import 'package:bookme/features/bookme/data/models/response/review/agent_rating_model.dart';
 import 'package:bookme/features/bookme/data/models/response/review/review_model.dart';
@@ -7,7 +10,10 @@ import 'package:get/get.dart';
 
 import '../../../../../core/presentation/utitls/app_padding.dart';
 import '../../../../../core/presentation/utitls/app_spacing.dart';
+import '../../../../../core/presentation/widgets/app_custom_listview.dart';
 import '../../../../../core/presentation/widgets/app_ratings_icon.dart';
+import '../../../../../core/presentation/widgets/exception_indicators/empty_list_indicator.dart';
+import '../../../../../core/presentation/widgets/exception_indicators/error_indicator.dart';
 import '../../../../../core/utitls/base_64.dart';
 
 class UserReviewScreen extends GetView<UserReviewController> {
@@ -17,7 +23,8 @@ class UserReviewScreen extends GetView<UserReviewController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Reviews')),
-      body: Obx(() => AppLoadingBox(
+      body: Obx(
+        () => AppLoadingBox(
           loading: controller.isLoading.value,
           child: _buildJobsReviewPage(context),
         ),
@@ -30,9 +37,7 @@ class UserReviewScreen extends GetView<UserReviewController> {
       padding: AppPaddings.mA,
       child: Column(
         children: <Widget>[
-          SizedBox(
-            height: 100,
-              child: _buildTotalRatingCard(context)),
+          SizedBox(height: 100, child: _buildTotalRatingCard(context)),
           Expanded(
             child: Obx(() =>
                 _buildUserReviewsTile(context, controller.agentRating.value)),
@@ -44,12 +49,38 @@ class UserReviewScreen extends GetView<UserReviewController> {
 
   Widget _buildUserReviewsTile(BuildContext context, AgentRating rating) {
     return Container(
-      padding: AppPaddings.mA,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: RefreshIndicator(
+        padding: AppPaddings.mA,
+        decoration: BoxDecoration(
+          color: SecondaryColor.color.shade200.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: Obx(
+          () => AppCustomListView<Review>(
+            items: controller.reviews,
+            onRefresh: () => controller.checkAgent(),
+            errorIndicatorBuilder: ErrorIndicator(
+              error: controller.error.value,
+              onTryAgain: () => controller.checkAgent(),
+            ),
+            failure: controller.error.value,
+            itemBuilder: (BuildContext context, int index) {
+              return Column(
+                children: <Widget>[
+                  Padding(
+                    padding: AppPaddings.mA,
+                    child: _buildUserReviewCard(
+                        context, controller.reviews[index]),
+                  ),
+                  const Divider(
+                    height: 1,
+                  ),
+                ],
+              );
+            },
+            emptyListIndicatorBuilder: const EmptyListIndicator(),
+          ),
+        )
+        /* RefreshIndicator(
         onRefresh: () {
           return controller.checkAgent();
         },
@@ -73,8 +104,8 @@ class UserReviewScreen extends GetView<UserReviewController> {
                 ],
               );
             }),
-      ),
-    );
+      ),*/
+        );
   }
 
   Widget _buildUserReviewCard(BuildContext context, Review review) {
@@ -88,7 +119,7 @@ class UserReviewScreen extends GetView<UserReviewController> {
               borderRadius: BorderRadius.circular(50),
               child: CircleAvatar(
                 child: image.isEmpty
-                    ? Image.asset('assets/images/user2.jpg')
+                    ? Image.asset(AppImageAssets.blankProfilePicture)
                     : Image.memory(
                         fit: BoxFit.cover,
                         Base64Convertor().base64toImage(

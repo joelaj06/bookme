@@ -19,6 +19,7 @@ class UserReviewController extends GetxController{
   Rx<AgentRating> agentRating = AgentRating.empty().obs;
   RxList<Review> reviews = <Review>[].obs;
   RxBool isLoading = false.obs;
+  Rx<Failure> error = Failure.empty().obs;
 
 
   final AuthLocalDataSource _authLocalDataSource = Get.find();
@@ -38,11 +39,13 @@ class UserReviewController extends GetxController{
     }
   }
   Future<void> getAgentReviews(String agentId, String? userId) async {
+    error(Failure.empty());
     isLoading(true);
     final Either<Failure, AgentRating> failureOrReview = await fetchAgentReview(
         PageParams(page: 0, size: 0, agentId: agentId, userId: userId));
     failureOrReview.fold(
           (Failure failure) {
+            error(failure);
             isLoading(false);
           },
           (AgentRating rating) {

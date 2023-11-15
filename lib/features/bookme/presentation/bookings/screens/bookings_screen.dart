@@ -3,6 +3,7 @@ import 'package:bookme/core/presentation/theme/primary_color.dart';
 import 'package:bookme/core/presentation/utitls/app_assets.dart';
 import 'package:bookme/core/presentation/utitls/app_padding.dart';
 import 'package:bookme/core/presentation/utitls/app_spacing.dart';
+import 'package:bookme/core/presentation/widgets/app_custom_listview.dart';
 import 'package:bookme/core/presentation/widgets/app_loading_box.dart';
 import 'package:bookme/core/presentation/widgets/exception_indicators/auth_navigation.dart';
 import 'package:bookme/core/presentation/widgets/exception_indicators/empty_list_indicator.dart';
@@ -78,41 +79,26 @@ class BookingsScreen extends GetView<BookingsController> {
   ) {
     final double width = MediaQuery.of(context).size.width;
     return Obx(
-      () => controller.error.value.message.isNotEmpty
-          ? ErrorIndicator(
-              error: controller.error.value,
-              onTryAgain: () => controller.getBookings(userId),
-            )
-          : RefreshIndicator(
-              onRefresh: () {
-                return controller.getBookings(userId);
-              },
-              notificationPredicate: (_) => true,
-              child: controller.bookings.isEmpty
-                  ? ListView(
-                      children: const <Widget>[
-                        EmptyListIndicator(),
-                      ],
-                    )
-                  : ListView.builder(
-                      itemCount: controller.bookings.length,
-                      physics: const BouncingScrollPhysics(
-                        parent: AlwaysScrollableScrollPhysics(),
-                      ),
-                      // shrinkWrap: true,
-                      itemBuilder: (BuildContext context, int index) {
-                        final bool isPending =
-                            controller.bookings[index].status == 'pending';
-                        return _buildPendingJobCard(
-                          index,
-                          controller.bookings[index],
-                          width,
-                          context,
-                          isPending,
-                        );
-                      },
-                    ),
-            ),
+      () => AppCustomListView<Booking>(
+        items: controller.bookings,
+        onRefresh: () => controller.getBookings(userId),
+        errorIndicatorBuilder: ErrorIndicator(
+          error: controller.error.value,
+          onTryAgain: () => controller.getBookings(userId),
+        ),
+        failure: controller.error.value,
+        itemBuilder: (BuildContext context, int index) {
+          final bool isPending = controller.bookings[index].status == 'pending';
+          return _buildPendingJobCard(
+            index,
+            controller.bookings[index],
+            width,
+            context,
+            isPending,
+          );
+        },
+        emptyListIndicatorBuilder: const EmptyListIndicator(),
+      ),
     );
   }
 

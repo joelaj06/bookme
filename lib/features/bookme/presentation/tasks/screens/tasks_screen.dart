@@ -10,6 +10,9 @@ import '../../../../../core/presentation/theme/hint_color.dart';
 import '../../../../../core/presentation/theme/primary_color.dart';
 import '../../../../../core/presentation/utitls/app_padding.dart';
 import '../../../../../core/presentation/utitls/app_spacing.dart';
+import '../../../../../core/presentation/widgets/app_custom_listview.dart';
+import '../../../../../core/presentation/widgets/exception_indicators/empty_list_indicator.dart';
+import '../../../../../core/presentation/widgets/exception_indicators/error_indicator.dart';
 import '../../../../../core/utitls/base_64.dart';
 
 class TasksScreen extends GetView<TasksController> {
@@ -53,56 +56,53 @@ class TasksScreen extends GetView<TasksController> {
 
   Widget _buildCompletedContainer(BuildContext context) {
     final double width = MediaQuery.of(context).size.width;
-
-    return RefreshIndicator(
-      onRefresh: () {
-        return controller.getBookings();
-      },
-      child: controller.isBookingStatusEmpty('completed')
-          ? const Text('No result')
-          : ListView.builder(
-              itemCount: controller.bookings.length,
-              physics: const BouncingScrollPhysics(
-                parent: AlwaysScrollableScrollPhysics(),
-              ),
-              // shrinkWrap: true,
-              itemBuilder: (BuildContext context, int index) {
-                final bool isPending =
-                    controller.bookings[index].status == 'pending';
-                if (isPending) {
-                  return const SizedBox.shrink();
-                }
-                return _buildTaskCard(index, width, context,
-                    controller.bookings[index], isPending, false);
-              }),
+    return Obx(
+      () => AppCustomListView<Booking>(
+        items: controller.bookings,
+        optionalEmptyListChecker: controller.isBookingStatusEmpty('completed'),
+        onRefresh: () => controller.getBookings(),
+        errorIndicatorBuilder: ErrorIndicator(
+          error: controller.error.value,
+          onTryAgain: () => controller.getBookings(),
+        ),
+        failure: controller.error.value,
+        itemBuilder: (BuildContext context, int index) {
+          final bool isPending = controller.bookings[index].status == 'pending';
+          if (isPending) {
+            return const SizedBox.shrink();
+          }
+          return _buildTaskCard(index, width, context,
+              controller.bookings[index], isPending, false);
+        },
+        emptyListIndicatorBuilder: const EmptyListIndicator(),
+      ),
     );
   }
 
   Widget _buildPendingContainer(BuildContext context) {
     final double width = MediaQuery.of(context).size.width;
-    return RefreshIndicator(
-      onRefresh: () {
-        return controller.getBookings();
-      },
-      child: controller.isBookingStatusEmpty('pending')
-          ? const Text('No result')
-          : ListView.builder(
-              itemCount: controller.bookings.length,
-              physics: const BouncingScrollPhysics(
-                parent: AlwaysScrollableScrollPhysics(),
-              ),
-              // shrinkWrap: true,
-              itemBuilder: (BuildContext context, int index) {
-                final bool isPending =
-                    controller.bookings[index].status == 'pending';
-                final bool isCanceled =
-                    controller.bookings[index].status == 'canceled';
-                if (isPending || isCanceled) {
-                  return _buildTaskCard(index, width, context,
-                      controller.bookings[index], isPending, isCanceled);
-                }
-                return const SizedBox.shrink();
-              }),
+    return Obx(
+      () => AppCustomListView<Booking>(
+        items: controller.bookings,
+        optionalEmptyListChecker: controller.isBookingStatusEmpty('pending'),
+        onRefresh: () => controller.getBookings(),
+        errorIndicatorBuilder: ErrorIndicator(
+          error: controller.error.value,
+          onTryAgain: () => controller.getBookings(),
+        ),
+        failure: controller.error.value,
+        itemBuilder: (BuildContext context, int index) {
+          final bool isPending = controller.bookings[index].status == 'pending';
+          final bool isCanceled =
+              controller.bookings[index].status == 'canceled';
+          if (isPending || isCanceled) {
+            return _buildTaskCard(index, width, context,
+                controller.bookings[index], isPending, isCanceled);
+          }
+          return const SizedBox.shrink();
+        },
+        emptyListIndicatorBuilder: const EmptyListIndicator(),
+      ),
     );
   }
 

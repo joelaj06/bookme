@@ -1,3 +1,5 @@
+import 'package:bookme/core/presentation/utitls/app_assets.dart';
+import 'package:bookme/features/bookme/data/models/response/favorite/favorite_model.dart';
 import 'package:bookme/features/bookme/presentation/favorites/getx/favorites_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -7,7 +9,10 @@ import '../../../../../core/presentation/theme/hint_color.dart';
 import '../../../../../core/presentation/theme/primary_color.dart';
 import '../../../../../core/presentation/utitls/app_padding.dart';
 import '../../../../../core/presentation/utitls/app_spacing.dart';
+import '../../../../../core/presentation/widgets/app_custom_listview.dart';
 import '../../../../../core/presentation/widgets/app_loading_box.dart';
+import '../../../../../core/presentation/widgets/exception_indicators/empty_list_indicator.dart';
+import '../../../../../core/presentation/widgets/exception_indicators/error_indicator.dart';
 import '../../../../../core/presentation/widgets/location_icon.dart';
 import '../../../../../core/utitls/base_64.dart';
 import '../../../data/models/response/service/service_model.dart';
@@ -21,33 +26,33 @@ class FavoriteScreen extends GetView<FavoritesController> {
       appBar: AppBar(
         title: const Text('Favorites'),
       ),
-      body: Obx(
-        () => AppLoadingBox(
+      body:  AppLoadingBox(
           loading: controller.isLoading.value,
           child: _buildServiceListTile(
             context,
           ),
         ),
-      ),
+
     );
   }
 
   Widget _buildServiceListTile(BuildContext context) {
     final double width = MediaQuery.of(context).size.width;
-    return RefreshIndicator(
-      onRefresh: () {
-        return controller.getFavorites();
-      },
-      child: ListView.builder(
-          itemCount: controller.favorites.length,
-          physics: const BouncingScrollPhysics(
-            parent: AlwaysScrollableScrollPhysics(),
+    return Obx(
+      () => AppLoadingBox(
+        loading: controller.isLoading.value,
+        child: AppCustomListView<Favorite>(
+          items: controller.favorites,
+          onRefresh: () => controller.getFavorites(),
+          errorIndicatorBuilder: ErrorIndicator(
+            error: controller.error.value,
+            onTryAgain: () => controller.getFavorites(),
           ),
-          shrinkWrap: true,
+          failure: controller.error.value,
           itemBuilder: (BuildContext context, int index) {
             return Dismissible(
               key: ValueKey<int>(index),
-              onDismissed: (DismissDirection direction){
+              onDismissed: (DismissDirection direction) {
                 //todo confirm dismissal
                 controller.deleteFav(controller.favorites[index].id);
                 controller.favorites.removeAt(index);
@@ -59,7 +64,10 @@ class FavoriteScreen extends GetView<FavoritesController> {
                 context,
               ),
             );
-          }),
+          },
+          emptyListIndicatorBuilder: const EmptyListIndicator(),
+        ),
+      ),
     );
   }
 
@@ -96,9 +104,9 @@ class FavoriteScreen extends GetView<FavoritesController> {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(15),
                   child: Hero(
-                    tag: 'service$index',
+                    tag: 'service${service.id}',
                     child: image.isEmpty
-                        ? Image.asset('assets/images/no_image.png')
+                        ? Image.asset(AppImageAssets.noImage)
                         : Image.memory(
                             fit: BoxFit.cover,
                             Base64Convertor().base64toImage(

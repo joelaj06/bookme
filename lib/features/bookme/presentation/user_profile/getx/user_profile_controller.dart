@@ -215,8 +215,11 @@ class UserProfileController extends GetxController {
     final Either<Failure, User> failureOrUser =
         await fetchUser(response?.user.id ?? '');
     failureOrUser.fold(
-      (Failure failure) {},
+      (Failure failure) {
+        isLoading(false);
+      },
       (User userRes) {
+        isLoading(false);
         user(userRes);
         skills.clear();
         // Check if userRes.skills is not null before adding

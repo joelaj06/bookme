@@ -19,6 +19,7 @@ class TasksController extends GetxController{
   RxInt pageIndex = 0.obs;
   RxBool isLoading= false.obs;
   RxList<Booking> bookings = <Booking>[].obs;
+  Rx<Failure> error = Failure.empty().obs;
   PageController pageController = PageController(initialPage: 0);
   final UserProfileController _userProfileController = Get.find();
 
@@ -37,6 +38,7 @@ class TasksController extends GetxController{
 
 
   Future<void> getBookings() async {
+    error(Failure.empty());
     isLoading(true);
     final Either<Failure, List<Booking>> failureOrBookings =
     await fetchBookings( PageParams(
@@ -47,6 +49,7 @@ class TasksController extends GetxController{
     ));
     failureOrBookings.fold(
           (Failure failure) {
+            error(failure);
         AppSnacks.showError('Bookings', 'Failed to load bookings');
         isLoading(false);
       },

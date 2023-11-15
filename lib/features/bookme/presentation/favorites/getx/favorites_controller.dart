@@ -23,13 +23,11 @@ class FavoritesController extends GetxController{
   // reactive variables
   RxBool isLoading = false.obs;
   RxList<Favorite> favorites = <Favorite>[].obs;
+  Rx<Failure> error = Failure.empty().obs;
 
 
   final UserProfileController userProfileController = Get.find();
-  final String company = 'Hermeland Studios';
-  final String description =  'Book for all your creative photos, videos and '
-      'studio shoots. I do door to door service. I do '
-      'Birthday parties, engagements, funerals, picnics';
+
 
   @override
   void onInit() {
@@ -38,11 +36,13 @@ class FavoritesController extends GetxController{
   }
 
   Future<void> getFavorites() async{
+    error(Failure.empty());
     isLoading(true);
     final Either<Failure, List<Favorite>> failureOrFavorites =
         await fetchFavorites(userProfileController.user.value.id);
     failureOrFavorites.fold((Failure failure) {
       isLoading(false);
+      error(failure);
       AppSnacks.showError('Favorite', failure.message);
       }, (List<Favorite> fav) {
       isLoading(false);
