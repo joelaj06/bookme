@@ -21,6 +21,7 @@ abstract class Repository {
         if (onTimeOut != null) {
           return onTimeOut();
         }
+
         throw TimeoutException(null, duration);
       });
       return right(response);

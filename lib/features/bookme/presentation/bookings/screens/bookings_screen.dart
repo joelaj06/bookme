@@ -1,13 +1,18 @@
 import 'package:bookme/core/presentation/theme/hint_color.dart';
 import 'package:bookme/core/presentation/theme/primary_color.dart';
+import 'package:bookme/core/presentation/utitls/app_assets.dart';
 import 'package:bookme/core/presentation/utitls/app_padding.dart';
 import 'package:bookme/core/presentation/utitls/app_spacing.dart';
+import 'package:bookme/core/presentation/widgets/app_loading_box.dart';
 import 'package:bookme/core/presentation/widgets/exception_indicators/auth_navigation.dart';
+import 'package:bookme/core/presentation/widgets/exception_indicators/empty_list_indicator.dart';
+import 'package:bookme/core/presentation/widgets/exception_indicators/error_indicator.dart';
 import 'package:bookme/features/bookme/presentation/bookings/getx/bookings_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ionicons/ionicons.dart';
 
+import '../../../../../core/utitls/base_64.dart';
 import '../../../../authentication/data/models/response/user/user_model.dart';
 import '../../../data/models/response/booking/booking_model.dart';
 
@@ -29,35 +34,39 @@ class BookingsScreen extends GetView<BookingsController> {
 
   Padding _buildBookingPage(BuildContext context) {
     return Padding(
-        padding: AppPaddings.mA,
-        child: Column(
-          children: <Widget>[
-            _buildTabHeader(context),
-            Expanded(
-              child: FutureBuilder<User?>(
-                  future: controller.getUser(),
-                  builder:
-                      (BuildContext context, AsyncSnapshot<User?> snapshot) {
-                    final User user = snapshot.data ?? User.empty();
-                    controller.getBookings(user.id);
-                    return _buildPageView(context, user.id);
-                  }),
-            ),
-          ],
-        ),
-      );
+      padding: AppPaddings.mA,
+      child: Column(
+        children: <Widget>[
+          _buildTabHeader(context),
+          Expanded(
+            child: FutureBuilder<User?>(
+                future: controller.getUser(),
+                builder: (BuildContext context, AsyncSnapshot<User?> snapshot) {
+                  final User user = snapshot.data ?? User.empty();
+                  controller.getBookings(user.id);
+                  return _buildPageView(context, user.id);
+                }),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildPageView(BuildContext context, String userId) {
-    return PageView(
-      controller: controller.pageController,
-      onPageChanged: controller.onPageChanged,
-      children: <Widget>[
-        _buildJobHistoryContainer(
-            userId, context, 'pending', 'Fri 30th June, 2023'),
-        _buildJobHistoryContainer(
-            userId, context, 'completed', 'Sun 28th May, 2023')
-      ],
+    return Obx(
+      () => AppLoadingBox(
+        loading: controller.isLoading.value,
+        child: PageView(
+          controller: controller.pageController,
+          onPageChanged: controller.onPageChanged,
+          children: <Widget>[
+            _buildJobHistoryContainer(
+                userId, context, 'pending', 'Fri 30th June, 2023'),
+            _buildJobHistoryContainer(
+                userId, context, 'completed', 'Sun 28th May, 2023')
+          ],
+        ),
+      ),
     );
   }
 
@@ -68,27 +77,48 @@ class BookingsScreen extends GetView<BookingsController> {
     String date,
   ) {
     final double width = MediaQuery.of(context).size.width;
-    return RefreshIndicator(
-      onRefresh: () {
-        return controller.getBookings(userId);
-      },
-      child: ListView.builder(
-          itemCount: controller.bookings.length,
-          physics: const BouncingScrollPhysics(
-            parent: AlwaysScrollableScrollPhysics(),
-          ),
-        // shrinkWrap: true,
-          itemBuilder: (BuildContext context, int index) {
-            final bool isPending =
-                controller.bookings[index].status == 'pending';
-            return _buildPendingJobCard(
-                index, controller.bookings[index], width, context, isPending);
-          }),
+    return Obx(
+      () => controller.error.value.message.isNotEmpty
+          ? ErrorIndicator(
+              error: controller.error.value,
+              onTryAgain: () => controller.getBookings(userId),
+            )
+          : RefreshIndicator(
+              onRefresh: () {
+                return controller.getBookings(userId);
+              },
+              notificationPredicate: (_) => true,
+              child: controller.bookings.isEmpty
+                  ? ListView(
+                      children: const <Widget>[
+                        EmptyListIndicator(),
+                      ],
+                    )
+                  : ListView.builder(
+                      itemCount: controller.bookings.length,
+                      physics: const BouncingScrollPhysics(
+                        parent: AlwaysScrollableScrollPhysics(),
+                      ),
+                      // shrinkWrap: true,
+                      itemBuilder: (BuildContext context, int index) {
+                        final bool isPending =
+                            controller.bookings[index].status == 'pending';
+                        return _buildPendingJobCard(
+                          index,
+                          controller.bookings[index],
+                          width,
+                          context,
+                          isPending,
+                        );
+                      },
+                    ),
+            ),
     );
   }
 
   Padding _buildPendingJobCard(int index, Booking booking, double width,
       BuildContext context, bool isPending) {
+    final String image = booking.agent.image ?? '';
     return Padding(
       padding: AppPaddings.mA,
       child: GestureDetector(
@@ -120,7 +150,14 @@ class BookingsScreen extends GetView<BookingsController> {
                   borderRadius: BorderRadius.circular(15),
                   child: Hero(
                     tag: 'service$index',
-                    child: Image.asset('assets/images/photographer.png'),
+                    child: image.isEmpty
+                        ? Image.asset(AppImageAssets.blankProfilePicture)
+                        : Image.memory(
+                            fit: BoxFit.cover,
+                            Base64Convertor().base64toImage(
+                              image,
+                            ),
+                          ),
                   ),
                 ),
                 const AppSpacing(
@@ -131,7 +168,7 @@ class BookingsScreen extends GetView<BookingsController> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Text(
-                        booking.agent.firstName,
+                        '${booking.agent.firstName} ${booking.agent.lastName}',
                         style: context.textTheme.bodyMedium?.copyWith(
                             fontSize: 15, fontWeight: FontWeight.w500),
                       ),

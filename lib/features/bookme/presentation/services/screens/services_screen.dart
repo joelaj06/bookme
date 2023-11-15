@@ -1,6 +1,7 @@
 import 'package:bookme/core/errors/failure.dart';
 import 'package:bookme/core/presentation/routes/app_routes.dart';
 import 'package:bookme/core/presentation/theme/hint_color.dart';
+import 'package:bookme/core/presentation/utitls/app_assets.dart';
 import 'package:bookme/core/presentation/utitls/app_padding.dart';
 import 'package:bookme/core/presentation/utitls/app_spacing.dart';
 import 'package:bookme/core/presentation/widgets/location_icon.dart';
@@ -9,8 +10,8 @@ import 'package:bookme/features/bookme/presentation/services/getx/services_contr
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:iconly/iconly.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:ionicons/ionicons.dart';
 
 import '../../../../../core/presentation/theme/primary_color.dart';
 import '../../../../../core/presentation/widgets/exception_indicators/empty_list_indicator.dart';
@@ -27,14 +28,6 @@ class ServicesScreen extends GetView<ServicesController> {
       appBar: AppBar(
         title: const Text('Services'),
         automaticallyImplyLeading: Get.previousRoute == AppRoutes.base,
-        actions: <Widget>[
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(
-              Icons.filter_list,
-            ),
-          ),
-        ],
       ),
       body: Padding(
         padding: AppPaddings.mA,
@@ -138,9 +131,9 @@ class ServicesScreen extends GetView<ServicesController> {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(15),
                   child: Hero(
-                    tag: 'service$index',
+                    tag: 'service${service.id}',
                       child: image.isEmpty ?
-                          Image.asset('assets/images/no_image.png')
+                          Image.asset(AppImageAssets.noServiceImage)
                       :Image.memory(
                         fit: BoxFit.cover,
                         Base64Convertor().base64toImage(
@@ -207,7 +200,7 @@ class ServicesScreen extends GetView<ServicesController> {
             icon: const Icon(Icons.cancel_outlined),
           ),
           prefixIcon: Icon(
-            Ionicons.search_outline,
+            IconlyBroken.search,
             color: prefixIconColor,
           ),
           hintText: 'Search...',

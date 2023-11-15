@@ -1,3 +1,4 @@
+import 'package:bookme/core/presentation/utitls/app_padding.dart';
 import 'package:flutter/material.dart';
 
 import '../../utitls/app_spacing.dart';
@@ -29,8 +30,9 @@ class ExceptionIndicator extends StatelessWidget {
             children: <Widget>[
               Image.asset(
                 assetName,
-                height: 100,
-                width: 100,
+                height: 200,
+                width: 200,
+                scale: 1,
               ),
               const AppSpacing(v: 32),
               Text(
@@ -40,7 +42,7 @@ class ExceptionIndicator extends StatelessWidget {
               ),
               if (message != null)
                 const SizedBox(
-                  height: 16,
+                  height: 10,
                 ),
               if (message != null)
                 Text(
@@ -51,9 +53,10 @@ class ExceptionIndicator extends StatelessWidget {
               if (onTryAgain != null) const Spacer(),
               if (onTryAgain != null)
                 AppButton(
+                  padding: AppPaddings.mA,
                   key: const Key('tryAgain'),
                   enabled: true,
-                 // backgroundColor: context.colors.primary,
+                  // backgroundColor: context.colors.primary,
                   onPressed: onTryAgain!,
                   text: 'Try Again',
                 ),

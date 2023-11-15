@@ -1,4 +1,5 @@
 import 'package:bookme/features/bookme/domain/usecases/service/fetch_promoted_services.dart';
+import 'package:bookme/features/bookme/presentation/services/arguments/service_arguments.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
@@ -55,9 +56,9 @@ class PromotionsController extends GetxController{
     );
   }
 
-  void navigateToServiceDetailsScreen(int index) async{
+  void navigateToServiceDetailsScreen(Service service) async{
     await Get.toNamed<dynamic>(AppRoutes.serviceDetails,
-        arguments: index);
+        arguments: ServiceArgument(service));
   }
 
   void clearSearchField(){

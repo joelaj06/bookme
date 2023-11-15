@@ -1,4 +1,5 @@
 import 'package:bookme/core/presentation/theme/primary_color.dart';
+import 'package:bookme/core/presentation/utitls/app_assets.dart';
 import 'package:bookme/core/presentation/utitls/app_padding.dart';
 import 'package:bookme/core/utitls/date_formatter.dart';
 import 'package:bookme/core/utitls/string_utils.dart';
@@ -13,6 +14,7 @@ import '../../../../../core/errors/failure.dart';
 import '../../../../../core/presentation/utitls/app_spacing.dart';
 import '../../../../../core/presentation/widgets/exception_indicators/empty_list_indicator.dart';
 import '../../../../../core/presentation/widgets/exception_indicators/error_indicator.dart';
+import '../../../../../core/utitls/base_64.dart';
 import '../../../data/models/response/service/service_model.dart';
 
 class PromotionsScreen extends GetView<PromotionsController> {
@@ -24,14 +26,6 @@ class PromotionsScreen extends GetView<PromotionsController> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Promotions'),
-        actions: <Widget>[
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(
-              Icons.filter_list,
-            ),
-          ),
-        ],
       ),
       body: Padding(
         padding: AppPaddings.mA,
@@ -96,7 +90,7 @@ class PromotionsScreen extends GetView<PromotionsController> {
                     bottom: -60,
                     left: width * 0.25, // Adjust this value to position the image
                    // width: width * 0.5,
-                    child: Image.asset('assets/images/new-year.png',
+                    child: Image.asset(AppImageAssets.newYear,
                       scale: 5,
                     fit: BoxFit.cover,),
                   ),
@@ -105,7 +99,7 @@ class PromotionsScreen extends GetView<PromotionsController> {
                     bottom: 0,
                     top: 0,
                     width: width*0.3,
-                    child: Image.asset('assets/images/megaphone.png',
+                    child: Image.asset(AppImageAssets.megaphone,
                     scale: 5,),
                   ),
                 ],
@@ -167,8 +161,9 @@ class PromotionsScreen extends GetView<PromotionsController> {
 
   GestureDetector _buildPromotionServiceCard(BuildContext context,int index, Service service) {
    final String title = service.discount!.title ?? service.title;
+   final String image = service.coverImage ?? '';
     return GestureDetector(
-      onTap: () => controller.navigateToServiceDetailsScreen(index,),
+      onTap: () => controller.navigateToServiceDetailsScreen(service),
       child: Padding(
         padding: AppPaddings.mV,
         child: Container(
@@ -195,7 +190,14 @@ class PromotionsScreen extends GetView<PromotionsController> {
                   children: <Widget>[
                     ClipRRect(
                       borderRadius: BorderRadius.circular(15),
-                      child: Image.asset('assets/images/cake.png'),
+                      child: image.isEmpty ?
+                      Image.asset(AppImageAssets.noServiceImage)
+                          :Image.memory(
+                        fit: BoxFit.cover,
+                        Base64Convertor().base64toImage(
+                          image,
+                        ),
+                      ),
                     ),
                     const AppSpacing(
                       h: 10,

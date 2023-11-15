@@ -116,7 +116,9 @@ class ServicesController extends GetxController {
         : await fetchServicesByCategory(
             PageParams(page: pageKey, size: 10, categoryId: categoryId.value));
     failureOrServices.fold(
-      (Failure failure) {},
+      (Failure failure) {
+        pagingController.error = failure;
+      },
       (ListPage<Service> newPage) {
         final int previouslyFetchedItemsCount =
             pagingController.itemList?.length ?? 0;

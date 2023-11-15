@@ -5,7 +5,7 @@ abstract class DataFormatter{
 
   static String getVerboseDateTimeRepresentation(DateTime dateTime) {
     final DateTime now = DateTime.now();
-    final DateTime justNow = DateTime.now().subtract(const Duration(minutes: 1));
+   // final DateTime justNow = DateTime.now().subtract(const Duration(minutes: 1));
     final DateTime localDateTime = dateTime.toLocal();
 
     /*if (!localDateTime.difference(justNow).isNegative) {

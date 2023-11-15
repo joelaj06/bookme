@@ -1,3 +1,4 @@
+import 'package:bookme/core/presentation/utitls/app_assets.dart';
 import 'package:flutter/cupertino.dart';
 
 import 'exception_indicator.dart';
@@ -15,7 +16,7 @@ class NoConnectionIndicator extends StatelessWidget {
   Widget build(BuildContext context) => ExceptionIndicator(
         title: 'No connection',
         message: 'Please check internet connection and try again.',
-        assetName: 'assets/images/frustrated-face.png',
+        assetName: AppImageAssets.noConnection,
         onTryAgain: onTryAgain,
       );
 }

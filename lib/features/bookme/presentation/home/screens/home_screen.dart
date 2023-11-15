@@ -1,6 +1,5 @@
 import 'package:bookme/core/presentation/theme/hint_color.dart';
 import 'package:bookme/core/presentation/theme/primary_color.dart';
-import 'package:bookme/core/presentation/theme/secondary_color.dart';
 import 'package:bookme/core/presentation/utitls/app_padding.dart';
 import 'package:bookme/core/presentation/utitls/app_spacing.dart';
 import 'package:bookme/core/presentation/widgets/app_rating_widget.dart';
@@ -8,8 +7,10 @@ import 'package:bookme/core/presentation/widgets/location_icon.dart';
 import 'package:bookme/core/utitls/string_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:ionicons/ionicons.dart';
+import 'package:iconly/iconly.dart';
 
+import '../../../../../core/presentation/utitls/app_assets.dart';
+import '../../../../../core/utitls/base_64.dart';
 import '../../../data/models/response/category/category_model.dart';
 import '../../../data/models/response/review/review_model.dart';
 import '../../../data/models/response/service/service_model.dart';
@@ -36,9 +37,11 @@ class HomeScreen extends GetView<HomeController> {
                         color: HintColor.color.shade800, fontSize: 40),
                   ),
                   IconButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      controller.loadDependencies();
+                    },
                     icon: const Icon(
-                      Ionicons.search_outline,
+                      IconlyBroken.search,
                     ),
                   )
                 ],
@@ -143,6 +146,7 @@ class HomeScreen extends GetView<HomeController> {
     final String title = service.discount!.title ?? service.title;
     final String discountType = service.discount!.type;
     final double value = service.discount!.value;
+    final String image = service.coverImage ?? '';
     return GestureDetector(
       onTap: () => controller.navigateToServiceDetailsScreen(service),
       child: Padding(
@@ -164,19 +168,28 @@ class HomeScreen extends GetView<HomeController> {
           height: 100,
           child: Padding(
             padding: AppPaddings.mA,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(15),
-                      child: Image.asset('assets/images/cake.png'),
+            child: SizedBox(
+              width: MediaQuery.of(context).size.width,
+              child: Row(
+                //mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(15),
+                    child: image.isEmpty ?
+                    Image.asset(AppImageAssets.noServiceImage)
+                        :Image.memory(
+                      fit: BoxFit.cover,
+                      Base64Convertor().base64toImage(
+                        image,
+                      ),
                     ),
-                    const AppSpacing(
-                      h: 10,
-                    ),
-                    Column(
+                  ),
+                  const AppSpacing(
+                    h: 10,
+                  ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         Text(
                           title,
@@ -184,50 +197,39 @@ class HomeScreen extends GetView<HomeController> {
                               fontSize: 15, fontWeight: FontWeight.w500),
                         ),
                         Text(service.title.toTitleCase()),
+                        Expanded(
+                          child: Align(
+                            alignment: Alignment.bottomRight,
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: <Widget>[
+                                FittedBox(
+                                  fit: BoxFit.fill,
+                                  child: Text(
+                                    discountType == 'amount' ? 'GHS $value' : '$value%',
+                                    style: context.textTheme.bodyLarge?.copyWith(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.red),
+                                  ),
+                                ),
+                                Text(
+                                  'Off',
+                                  style: context.textTheme.bodyMedium?.copyWith(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.red),
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
                       ],
                     ),
-                  ],
-                ),
-                Container(
-                  width: 80,
-                  padding: AppPaddings.mA,
-                  decoration: BoxDecoration(
-                    color: SecondaryColor.color,
-                    borderRadius: BorderRadius.circular(15),
-                    boxShadow: const <BoxShadow>[
-                      BoxShadow(
-                        offset: Offset(3, 3),
-                        spreadRadius: -8,
-                        blurRadius: 10,
-                        color: Color.fromRGBO(137, 137, 137, 1),
-                      ),
-                    ],
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      FittedBox(
-                        fit: BoxFit.fill,
-                        child: Text(
-                          discountType == 'amount' ? 'GHS $value' : '$value%',
-                          style: context.textTheme.bodyLarge?.copyWith(
-                              fontSize: 30,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.white),
-                        ),
-                      ),
-                      Text(
-                        'Off',
-                        style: context.textTheme.bodyMedium?.copyWith(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white),
-                      ),
-                    ],
-                  ),
-                )
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -263,6 +265,7 @@ class HomeScreen extends GetView<HomeController> {
 
   Widget _buildPopularServiceCard(
       BuildContext context, int index, Review review) {
+    final String image = review.serviceData?.coverImage ?? '';
     return GestureDetector(
       onTap: () => controller.navigateToServiceDetailsScreenReview(review),
       child: Padding(
@@ -285,37 +288,19 @@ class HomeScreen extends GetView<HomeController> {
             padding: AppPaddings.mA,
             child: Column(
               children: <Widget>[
-                Stack(
-                  children: <Widget>[
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(15),
-                      child: Hero(
-                        tag: 'service$index',
-                        child: Image.asset(
-                          'assets/images/photographer.png',
-                        ),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(15),
+                  child: Hero(
+                    tag: 'service$index',
+                    child: image.isEmpty ?
+                    Image.asset(AppImageAssets.noServiceImage)
+                        :Image.memory(
+                      fit: BoxFit.cover,
+                      Base64Convertor().base64toImage(
+                        image,
                       ),
                     ),
-                    Positioned(
-                      right: 4,
-                      top: 4,
-                      child: CircleAvatar(
-                        radius: 17,
-                        backgroundColor:
-                            HintColor.color.shade300.withOpacity(0.5),
-                        child: IconButton(
-                          onPressed: () {},
-                          icon: const Icon(
-                            Ionicons.heart,
-                            // Ionicons.heart_outline,
-                            color: SecondaryColor.secondaryAccent,
-                            // Colors.white,
-                            size: 17,
-                          ),
-                        ),
-                      ),
-                    )
-                  ],
+                  ),
                 ),
                 Padding(
                   padding: AppPaddings.mV,

@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:ionicons/ionicons.dart';
+import 'package:iconly/iconly.dart';
 
 final List<IconData> navIconList = <IconData>[
-  Ionicons.home_outline,
-  Ionicons.list_circle_outline,
-  Ionicons.pricetags_outline,
-  Ionicons.person_outline,
+  IconlyLight.home,
+  IconlyLight.document,
+  IconlyLight.ticket,
+  IconlyLight.profile,
 ];
 
 
 final List<IconData> navIconSolidList = <IconData>[
-  Ionicons.home,
-  Ionicons.list_circle,
-  Ionicons.pricetags,
-  Ionicons.person,
+  IconlyBold.home,
+  IconlyBold.document,
+  IconlyBold.ticket,
+  IconlyBold.profile,
 ];
 
 

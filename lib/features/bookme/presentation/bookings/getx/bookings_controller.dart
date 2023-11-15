@@ -56,6 +56,8 @@ class BookingsController extends GetxController {
   RxString endDate = ''.obs;
   RxString location = ''.obs;
   Rx<User> user = User.empty().obs;
+  Rx<Failure> error = Failure.empty().obs;
+
 
   late String bookingId;
 
@@ -65,9 +67,6 @@ class BookingsController extends GetxController {
 
   PageController pageController = PageController(initialPage: 0);
   final AuthLocalDataSource _authLocalDataSource = Get.find();
-
-
-
 
   @override
   void onClose() {
@@ -111,6 +110,7 @@ class BookingsController extends GetxController {
   }
 
   Future<void> getBookings(String userId) async {
+    error(Failure.empty());
     isLoading(true);
     final Either<Failure, List<Booking>> failureOrBookings =
         await fetchBookings(PageParams(
@@ -121,6 +121,7 @@ class BookingsController extends GetxController {
     ));
     failureOrBookings.fold(
       (Failure failure) {
+        error(failure);
         AppSnacks.showError('Bookings', 'Failed to load bookings');
         isLoading(false);
       },

@@ -1,3 +1,4 @@
+import 'package:bookme/core/presentation/utitls/app_assets.dart';
 import 'package:flutter/cupertino.dart';
 import 'exception_indicator.dart';
 
@@ -8,7 +9,7 @@ class EmptyListIndicator extends StatelessWidget {
     return const ExceptionIndicator(
       title: 'Sorry!',
       message: 'No result found.',
-      assetName: 'assets/images/empty-box.png',
+      assetName: AppImageAssets.noResult,
     );
   }
 }

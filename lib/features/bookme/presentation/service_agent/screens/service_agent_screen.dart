@@ -1,5 +1,6 @@
 import 'package:bookme/core/presentation/theme/hint_color.dart';
 import 'package:bookme/core/presentation/theme/primary_color.dart';
+import 'package:bookme/core/presentation/utitls/app_assets.dart';
 import 'package:bookme/core/presentation/utitls/app_padding.dart';
 import 'package:bookme/core/presentation/utitls/app_spacing.dart';
 import 'package:bookme/core/presentation/widgets/app_ratings_icon.dart';
@@ -9,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:full_screen_image/full_screen_image.dart';
 import 'package:get/get.dart';
 
+import '../../../../../core/utitls/base_64.dart';
 import '../../services/arguments/service_arguments.dart';
 
 class ServiceAgentScreen extends GetView<ServiceAgentController> {
@@ -35,65 +37,7 @@ class ServiceAgentScreen extends GetView<ServiceAgentController> {
         physics: const BouncingScrollPhysics(),
         child: Column(
           children: <Widget>[
-            Container(
-              color: PrimaryColor.primaryAccent.withOpacity(0.2),
-              child: Padding(
-                padding: AppPaddings.mA,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(15),
-                      child: Image.asset('assets/images/user.jpg'),
-                    ),
-                    Obx(
-                      () => Text(
-                        '${controller.agent.value.firstName} ${controller.agent.value.lastName}',
-                        style: const TextStyle(
-                          fontSize: 30,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                    Obx(
-                      () => RichText(
-                        text: TextSpan(
-                          children: <InlineSpan>[
-                            TextSpan(
-                              text: controller.agent.value.jobTitle ?? '',
-                              style: const TextStyle(
-                                color: Colors.black,
-                              ),
-                            ),
-                            const TextSpan(
-                              text: ' @ ',
-                              style: TextStyle(
-                                color: Colors.black,
-                              ),
-                            ),
-                            TextSpan(
-                              text: controller.agent.value.company,
-                              style: const TextStyle(
-                                color: Colors.black,
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                    Obx(
-                      () => Text(
-                        controller.agent.value.jobDescription ?? '',
-                      ),
-                    ),
-                    const AppSpacing(
-                      v: 10,
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            _buildProfile(context),
             const AppSpacing(
               v: 10,
             ),
@@ -102,7 +46,8 @@ class ServiceAgentScreen extends GetView<ServiceAgentController> {
               child: Column(
                 children: <Widget>[
                   _buildSkillsList(context),
-                  _buildJobImages(context),
+                 const AppSpacing(v: 10,),
+                 // _buildJobImages(context),
                   _buildAgentReview(
                     context,
                   ),
@@ -113,6 +58,81 @@ class ServiceAgentScreen extends GetView<ServiceAgentController> {
         ),
       ),
     );
+  }
+
+  Container _buildProfile(BuildContext context) {
+    final String image = controller.agent.value.image ?? '';
+    return Container(
+            width: MediaQuery.of(context).size.width,
+            color: PrimaryColor.primaryAccent.withOpacity(0.2),
+            child: Padding(
+              padding: AppPaddings.mA,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  SizedBox(
+                    height: 100,
+                    width: 100,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(15),
+                      child: image.isEmpty ?
+                      Image.asset(AppImageAssets.blankProfilePicture)
+                          :Image.memory(
+                        fit: BoxFit.cover,
+                        Base64Convertor().base64toImage(
+                          image,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Obx(
+                    () => Text(
+                      '${controller.agent.value.firstName} ${controller.agent.value.lastName}',
+                      style: const TextStyle(
+                        fontSize: 30,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  Obx(
+                    () => RichText(
+                      text: TextSpan(
+                        children: <InlineSpan>[
+                          TextSpan(
+                            text: controller.agent.value.jobTitle ?? '',
+                            style: const TextStyle(
+                              color: Colors.black,
+                            ),
+                          ),
+                          const TextSpan(
+                            text: ' @ ',
+                            style: TextStyle(
+                              color: Colors.black,
+                            ),
+                          ),
+                          TextSpan(
+                            text: controller.agent.value.company,
+                            style: const TextStyle(
+                              color: Colors.black,
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                  Obx(
+                    () => Text(
+                      controller.agent.value.jobDescription ?? '',
+                    ),
+                  ),
+                  const AppSpacing(
+                    v: 10,
+                  ),
+                ],
+              ),
+            ),
+          );
   }
 
   Widget _buildAgentReview(BuildContext context) {

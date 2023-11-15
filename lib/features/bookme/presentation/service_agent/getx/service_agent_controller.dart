@@ -18,8 +18,6 @@ class ServiceAgentController extends GetxController{
   Rx<AgentRating> agentReview = AgentRating.empty().obs;
   Rx<User> agent  = User.empty().obs;
   RxList<Review> reviews = <Review>[].obs;
-
-
   RxList<String> skills = <String>[].obs;
 
 

@@ -1,6 +1,7 @@
 import 'package:bookme/core/presentation/theme/hint_color.dart';
 import 'package:bookme/core/presentation/theme/primary_color.dart';
 import 'package:bookme/core/presentation/theme/secondary_color.dart';
+import 'package:bookme/core/presentation/utitls/app_assets.dart';
 import 'package:bookme/core/presentation/utitls/app_padding.dart';
 import 'package:bookme/core/presentation/utitls/app_spacing.dart';
 import 'package:bookme/core/presentation/widgets/app_button.dart';
@@ -70,14 +71,14 @@ class ServiceDetailsScreen extends GetView<ServicesController> {
                         final String image =
                             images[controller.imageIndex.value] ?? '';
                         return image.isEmpty
-                            ? Image.asset('assets/images/no_image.png')
+                            ? Image.asset(AppImageAssets.noServiceImage)
                             : Image.memory(
                                 fit: BoxFit.cover,
                                 Base64Convertor().base64toImage(
                                   images[controller.imageIndex.value]!,
                                 ),
                               );
-                      })),
+                      }),),
                 ),
               ),
               SizedBox(

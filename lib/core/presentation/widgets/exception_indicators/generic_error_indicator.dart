@@ -1,3 +1,4 @@
+import 'package:bookme/core/presentation/utitls/app_assets.dart';
 import 'package:flutter/cupertino.dart';
 
 import 'exception_indicator.dart';
@@ -15,7 +16,7 @@ class GenericErrorIndicator extends StatelessWidget {
         title: 'Something went wrong',
         message: 'The application has encountered an unknown error.\n'
             'Please try again later.',
-        assetName: 'assets/images/confused-face.png',
+        assetName: AppImageAssets.brokenRobot,
         onTryAgain: onTryAgain,
       );
 }

@@ -1,5 +1,4 @@
 import 'package:bookme/core/usecase/usecase.dart';
-import 'package:bookme/core/utitls/app_socket_client.dart';
 import 'package:bookme/features/authentication/data/datasource/auth_local_data_source.dart';
 import 'package:bookme/features/authentication/data/models/response/login/login_response.dart';
 import 'package:bookme/features/bookme/data/models/request/message/message_request.dart';
@@ -53,9 +52,6 @@ class MessageController extends GetxController {
   void onInit() {
     getUser();
     connectSocket();
-    /* pagingController.addPageRequestListener((int pageKey) {
-      getMessages(pageKey);
-    });*/
     super.onInit();
   }
 

@@ -1,4 +1,5 @@
 import 'package:bookme/core/presentation/routes/app_routes.dart';
+import 'package:bookme/core/presentation/utitls/app_assets.dart';
 import 'package:bookme/core/presentation/widgets/app_loading_box.dart';
 import 'package:bookme/core/presentation/widgets/custom_tile.dart';
 import 'package:bookme/core/presentation/widgets/exception_indicators/auth_navigation.dart';
@@ -137,7 +138,7 @@ class UserProfileScreen extends GetView<UserProfileController> {
           child: ClipRRect(
             borderRadius: BorderRadius.circular(15),
             child: image.isEmpty
-                ? Image.asset('assets/images/user.jpg')
+                ? Image.asset(AppImageAssets.blankProfilePicture)
                 : Image.memory(
                     fit: BoxFit.cover,
                     Base64Convertor().base64toImage(
