@@ -1,5 +1,3 @@
-import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:bookme/core/presentation/routes/app_routes.dart';
 import 'package:bookme/core/presentation/widgets/app_snacks.dart';
@@ -71,6 +69,10 @@ class UserProfileController extends GetxController {
   RxDouble discountValue = 0.0.obs;
   RxList<String> selectedCategories = <String>[].obs;
   RxList<Category> categories = <Category>[].obs;
+  Rx<TextEditingController> discountTitleTextEditingController =
+      TextEditingController().obs;
+  RxString userProfileImage = ''.obs;
+  RxString currentProfileImage = ''.obs;
 
   final HomeController homeController = Get.find();
   PageController pageController = PageController(initialPage: 0);
@@ -83,9 +85,10 @@ class UserProfileController extends GetxController {
     super.dispose();
   }
 
-  Future<bool> isAgent() async{
-    final LoginResponse? response = await _authLocalDataSource.getAuthResponse();
-    if(response!=null && response.user.isAgent){
+  Future<bool> isAgent() async {
+    final LoginResponse? response =
+        await _authLocalDataSource.getAuthResponse();
+    if (response != null && response.user.isAgent) {
       return true;
     }
     return false;
@@ -103,7 +106,7 @@ class UserProfileController extends GetxController {
       (MessageResponse response) {
         isLoading(false);
         AppSnacks.showSuccess('Profile', 'User Logged Out Successfully');
-        Get.toNamed<dynamic>(AppRoutes.base);
+        Get.toNamed<dynamic>(AppRoutes.login);
       },
     );
   }
@@ -118,6 +121,7 @@ class UserProfileController extends GetxController {
     final Discount discount = Discount(
       type: discountType.value == '%' ? 'percentage' : 'amount',
       value: discountValue.value,
+      title: discountTitleTextEditingController.value.text,
     );
     final ServiceRequest serviceRequest = ServiceRequest(
       id: service.value.id,
@@ -132,7 +136,6 @@ class UserProfileController extends GetxController {
     );
     final Either<Failure, Service> failureOrService =
         await updateService(serviceRequest);
-
     failureOrService.fold(
       (Failure failure) {
         isLoading(false);
@@ -151,6 +154,7 @@ class UserProfileController extends GetxController {
     }
     applyDiscount(discountApplied);
     discountValue(discount.value);
+    discountTitleTextEditingController.value.text = discount.title ?? '';
     if (discount.type == 'amount') {
       discountType('Gh¢');
     } else {
@@ -159,7 +163,7 @@ class UserProfileController extends GetxController {
   }
 
   Future<void> getUserService() async {
-    isLoading(true);
+    //  isLoading(true);
     final Either<Failure, Service> failureOrService =
         await fetchServiceByUser(NoParams());
     failureOrService.fold(
@@ -186,6 +190,8 @@ class UserProfileController extends GetxController {
   void updateTheUser() async {
     final UserRequest userRequest = UserRequest(
       id: user.value.id,
+      image: userProfileImage.value.isEmpty ? currentProfileImage.value :
+      userProfileImage.value,
       firstName: firstName.value.isEmpty ? null : firstName.value,
       lastName: lastName.value.isEmpty ? null : lastName.value,
       email: email.value.isEmpty ? null : email.value,
@@ -237,6 +243,15 @@ class UserProfileController extends GetxController {
     Get.toNamed<dynamic>(AppRoutes.tasks);
   }
 
+  void loadProfileImage(){
+    currentProfileImage(user.value.image);
+    userProfileImage(user.value.image);
+  }
+
+  void removeProfileImage(){
+    userProfileImage('');
+  }
+
   void navigateToFavoritesScreen() {
     Get.toNamed<dynamic>(AppRoutes.favorites);
   }
@@ -250,7 +265,7 @@ class UserProfileController extends GetxController {
         statuses[Permission.camera]!.isGranted) {
       showImagePicker();
     } else {
-      debugPrint('no permission provided');
+      AppSnacks.showInfo('Image Upload', 'Permission not granted');
     }
   }
 
@@ -264,10 +279,14 @@ class UserProfileController extends GetxController {
     if (imageFile != null) {
       final String base64StringImage =
           Base64Convertor().imageToBase64(imageFile.path);
-      base64Images.insert(0, base64StringImage);
+      if (Get.currentRoute == AppRoutes.updateUser) {
+        userProfileImage(base64StringImage);
+      } else {
+        base64Images.insert(0, base64StringImage);
+      }
       // Convert Base64 string to Uint8List
-      final Uint8List buffer = base64Decode(base64StringImage.split(',')[1]);
-      print(buffer);
+      /*final Uint8List buffer = base64Decode(base64StringImage.split(',')[1]);
+      print(buffer);*/
     }
   }
 

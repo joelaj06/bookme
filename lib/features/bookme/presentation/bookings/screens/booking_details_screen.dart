@@ -14,6 +14,7 @@ import 'package:ionicons/ionicons.dart';
 import '../../../../../core/presentation/routes/app_routes.dart';
 import '../../../../../core/presentation/theme/hint_color.dart';
 import '../../../../../core/presentation/widgets/app_button.dart';
+import '../../../../authentication/data/models/response/user/user_model.dart';
 
 class BookingDetailsScreen extends GetView<BookingsController> {
   const BookingDetailsScreen({Key? key}) : super(key: key);
@@ -101,7 +102,7 @@ class BookingDetailsScreen extends GetView<BookingsController> {
                   const AppSpacing(
                     v: 10,
                   ),
-                  SizedBox(
+                  /*SizedBox(
                     width: MediaQuery.of(context).size.width,
                     child: Row(
                       children: <Widget>[
@@ -142,47 +143,23 @@ class BookingDetailsScreen extends GetView<BookingsController> {
                         ),
                       ],
                     ),
-                  ),
+                  ),*/
                   AppTextInputField(
                     labelText: 'Location',
                     initialValue: args?.booking.location,
                     readOnly: true,
                     onChanged: controller.onLocationInputChanged,
                   ),
+                  const AppSpacing(
+                    v: 10,
+                  ),
                   if (Get.previousRoute == AppRoutes.tasks)
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Row(
-                          children: <Widget>[
-                            const Icon(Ionicons.person_circle_outline),
-                            const AppSpacing(
-                              h: 10,
-                            ),
-                            Text(
-                              '${args?.booking.user.firstName} ${args?.booking.user.lastName}',
-                              style: context.textTheme.bodyLarge?.copyWith(
-                                fontSize: 20,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: <Widget>[
-                            IconButton(
-                              onPressed: () {},
-                              icon: const Icon(
-                                Ionicons.chatbubbles,
-                                color: Colors.blue,
-                                size: 30,
-                              ),
-                            ),
-                          ],
-                        )
-                      ],
-                    )
+                    _buildUserInfo(args?.booking.user ?? User.empty(), context)
                   else
-                    _buildAgentInfo(args, context),
+                    _buildUserInfo(args?.booking.agent ?? User.empty(), context),
+                  const AppSpacing(
+                    v: 10,
+                  ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
@@ -231,31 +208,50 @@ class BookingDetailsScreen extends GetView<BookingsController> {
     );
   }
 
-  Row _buildAgentInfo(BookingArgument? args, BuildContext context) {
+  Row _buildUserInfo(User user, BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
         Row(
           children: <Widget>[
-            const Icon(Ionicons.person_circle_outline),
+            const Icon(
+              Ionicons.person_circle_outline,
+              size: 40,
+            ),
             const AppSpacing(
               h: 10,
             ),
             Text(
-              '${args?.booking.agent.firstName} ${args?.booking.agent.lastName}',
+              '${user.firstName} ${user.lastName}',
               style: context.textTheme.bodyLarge?.copyWith(
                 fontSize: 20,
               ),
             ),
           ],
         ),
-        TextButton(
-          onPressed: () {},
-          child: const Text('View Profile'),
-        ),
+        Row(
+          children: <Widget>[
+            Container(
+              decoration: BoxDecoration(
+                  color: PrimaryColor.color,
+                  borderRadius: BorderRadius.circular(15)),
+              child: IconButton(
+                onPressed: () {
+                  controller.navigateToChatMessageScreen(user);
+                },
+                icon: const Icon(
+                  Ionicons.chatbox_ellipses_outline,
+                  color: Colors.white,
+                  //  size: 30,
+                ),
+              ),
+            ),
+          ],
+        )
       ],
     );
   }
+
 
   Widget _buildBottomNavigationItems(BuildContext context) {
     return Container(

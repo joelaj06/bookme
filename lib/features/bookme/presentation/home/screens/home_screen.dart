@@ -77,7 +77,7 @@ class HomeScreen extends GetView<HomeController> {
                       ),
                       _buildRowHeader(
                         context,
-                        text: 'Promotions',
+                        text: 'Special Offers',
                         onPressed: () {
                           controller.navigateToPromotionsPage();
                         },

@@ -1,4 +1,5 @@
 import 'package:bookme/core/presentation/theme/hint_color.dart';
+import 'package:bookme/core/presentation/utitls/app_assets.dart';
 import 'package:bookme/core/utitls/date_formatter.dart';
 import 'package:bookme/features/bookme/presentation/chat/arguments/chat_argument.dart';
 import 'package:bookme/features/bookme/presentation/message/getx/message_controller.dart';
@@ -57,33 +58,6 @@ class MessageScreen extends GetView<MessageController> {
             return _buildMessageCard(controller.messages[index], context);
           },
         )
-        /*PagedListView<int, Message>.separated(
-          pagingController: controller.pagingController,
-          reverse: true,
-          builderDelegate: PagedChildBuilderDelegate<Message>(
-            itemBuilder: (BuildContext context, Message message, int index) {
-              return _buildMessageCard(message, context);
-            },
-            firstPageErrorIndicatorBuilder: (BuildContext context) =>
-                ErrorIndicator(
-              error: controller.pagingController.value.error as Failure,
-              onTryAgain: () => controller.pagingController.refresh(),
-            ),
-            noItemsFoundIndicatorBuilder: (BuildContext context) =>
-                const EmptyListIndicator(),
-            newPageProgressIndicatorBuilder: (BuildContext context) =>
-                const Center(
-              child: SizedBox.shrink(),
-            ),
-            firstPageProgressIndicatorBuilder: (BuildContext context) =>
-                const Center(
-              child: SizedBox.shrink(),
-            ),
-          ),
-          //padding: AppPaddings.lA,
-          separatorBuilder: (BuildContext context, int index) =>
-              const SizedBox.shrink(),
-        )*/
         ,
       ),
     );
@@ -255,7 +229,7 @@ class MessageScreen extends GetView<MessageController> {
           borderRadius: BorderRadius.circular(50),
           child: CircleAvatar(
             child: image.isEmpty
-                ? Image.asset('assets/images/user2.jpg')
+                ? Image.asset(AppImageAssets.blankProfilePicture)
                 : Image.memory(
                     fit: BoxFit.cover,
                     Base64Convertor().base64toImage(

@@ -1,4 +1,3 @@
-import 'package:bookme/core/presentation/theme/primary_color.dart';
 import 'package:bookme/core/presentation/theme/secondary_color.dart';
 import 'package:bookme/core/presentation/utitls/app_assets.dart';
 import 'package:bookme/core/presentation/widgets/app_loading_box.dart';

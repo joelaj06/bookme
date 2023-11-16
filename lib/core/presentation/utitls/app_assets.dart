@@ -12,6 +12,7 @@ abstract class AppImageAssets{
   static const String noImage = '$_imageSource/no_mage.png';
   static const String touch = '$_imageSource/touch.png';
   static const String timeOut = '$_imageSource/time-out.png';
+  static const String serviceSketches = '$_imageSource/service-sketches.png';
 
 
 

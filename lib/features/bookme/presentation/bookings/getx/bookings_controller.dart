@@ -5,10 +5,15 @@ import 'package:bookme/core/presentation/widgets/app_snacks.dart';
 import 'package:bookme/core/usecase/usecase.dart';
 import 'package:bookme/features/authentication/data/models/response/user/user_model.dart';
 import 'package:bookme/features/bookme/data/models/request/booking/booking_request.dart';
+import 'package:bookme/features/bookme/data/models/request/chat/chat_request.dart';
 import 'package:bookme/features/bookme/data/models/response/booking/booking_model.dart';
+import 'package:bookme/features/bookme/data/models/response/chat/chat_model.dart';
+import 'package:bookme/features/bookme/data/models/response/chat/initiate_chat_model.dart';
 import 'package:bookme/features/bookme/domain/usecases/booking/fetch_bookings.dart';
 import 'package:bookme/features/bookme/domain/usecases/booking/update_booking.dart';
+import 'package:bookme/features/bookme/domain/usecases/chat/initiate_chat.dart';
 import 'package:bookme/features/bookme/presentation/bookings/args/booking_arguments.dart';
+import 'package:bookme/features/bookme/presentation/chat/arguments/chat_argument.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -22,10 +27,12 @@ class BookingsController extends GetxController {
   BookingsController({
     required this.fetchBookings,
     required this.updateBooking,
+    required this.initiateNewChat,
   });
 
   final FetchBookings fetchBookings;
   final UpdateBooking updateBooking;
+  final InitiateNewChat initiateNewChat;
 
   // reactive variables
   RxInt pageIndex = 0.obs;
@@ -57,7 +64,6 @@ class BookingsController extends GetxController {
   RxString location = ''.obs;
   Rx<User> user = User.empty().obs;
   Rx<Failure> error = Failure.empty().obs;
-
 
   late String bookingId;
 
@@ -98,7 +104,6 @@ class BookingsController extends GetxController {
       (Booking booking) {
         isLoading(false);
         Get.back<dynamic>(result: booking);
-
       },
     );
   }
@@ -136,6 +141,21 @@ class BookingsController extends GetxController {
     Get.toNamed<dynamic>(AppRoutes.login);
   }
 
+  void navigateToChatMessageScreen(User user) async {
+    final Either<Failure, InitiateChat> failureOrChat =
+        await initiateNewChat(ChatRequest(user: user.id));
+    failureOrChat.fold(
+      (Failure failure) {
+        AppSnacks.showError('Chat', 'Failed, please try again');
+      },
+      (InitiateChat initChat) {
+        final Chat chat = Chat(id: initChat.chatRoomId, user: user);
+        Get.toNamed<dynamic>(AppRoutes.messages,
+        arguments: ChatArgument(chat));
+      },
+    );
+  }
+
   void onBookingCanceled(BuildContext context) {
     AppDialog().showConfirmationDialog(
       context,
@@ -168,9 +188,9 @@ class BookingsController extends GetxController {
   }
 
   void onDateDateValueChanged(List<DateTime?>? values) {
-    if(values!.length > 1){
-     startDate(values[0].toString().split(' ')[0]);
-     endDate(values[1].toString().split(' ')[0]);
+    if (values!.length > 1) {
+      startDate(values[0].toString().split(' ')[0]);
+      endDate(values[1].toString().split(' ')[0]);
     }
   }
 

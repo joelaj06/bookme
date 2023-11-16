@@ -113,7 +113,7 @@ class Pages {
     ),  GetPage<AppRoutes>(
       name: AppRoutes.messages,
       page: () => const MessageScreen(),
-      binding: MessageBindings(),
+      bindings:<Bindings>[ ChatBindings(),MessageBindings()],
     ),
   ];
 }

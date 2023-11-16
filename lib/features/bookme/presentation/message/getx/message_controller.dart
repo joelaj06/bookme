@@ -1,4 +1,6 @@
+import 'package:bookme/core/presentation/routes/app_routes.dart';
 import 'package:bookme/core/usecase/usecase.dart';
+import 'package:bookme/core/utitls/app_socket_client.dart';
 import 'package:bookme/features/authentication/data/datasource/auth_local_data_source.dart';
 import 'package:bookme/features/authentication/data/models/response/login/login_response.dart';
 import 'package:bookme/features/bookme/data/models/request/message/message_request.dart';
@@ -44,13 +46,16 @@ class MessageController extends GetxController {
   final Rx<TextEditingController> messageTextEditingController =
       TextEditingController().obs;
   final ScrollController scrollController = ScrollController();
+  final AppSocketClient _socketClient = AppSocketClient();
   late IO.Socket socketIO;
 
   final ChatController chatController = Get.find();
 
   @override
   void onInit() {
+    initializeSocket();
     getUser();
+    chatController.connectToSocket();
     connectSocket();
     super.onInit();
   }
@@ -58,11 +63,26 @@ class MessageController extends GetxController {
   @override
   void onClose() {
     pagingController.dispose();
+    if(Get.previousRoute == AppRoutes.bookingDetails){
+      _socketClient.disconnect();
+      chatController.socketIO.disconnect();
+
+    }
     super.onClose();
   }
 
+  void initializeSocket(){
+    if(Get.previousRoute == AppRoutes.bookingDetails){
+      socketIO = _socketClient.init(
+          onSocketConnected: (IO.Socket socket) {},
+          onSocketDisconnected: (IO.Socket socket) {});
+    }
+  }
+
   void connectSocket() {
-    socketIO = chatController.socketIO;
+    if(Get.previousRoute == AppRoutes.chats){
+      socketIO = chatController.socketIO;
+    }
     socketIO.on('receive-message', (dynamic data) {
       final Map<String, dynamic> json = data as Map<String, dynamic>;
       final MessageContent messageContent =

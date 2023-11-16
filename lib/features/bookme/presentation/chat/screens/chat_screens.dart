@@ -1,14 +1,9 @@
-import 'package:bookme/core/presentation/utitls/app_padding.dart';
+import 'package:bookme/core/presentation/utitls/app_assets.dart';
 import 'package:bookme/features/bookme/presentation/chat/getx/chat_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
-import '../../../../../core/errors/failure.dart';
-import '../../../../../core/presentation/theme/primary_color.dart';
 import '../../../../../core/presentation/utitls/app_spacing.dart';
-import '../../../../../core/presentation/widgets/exception_indicators/empty_list_indicator.dart';
-import '../../../../../core/presentation/widgets/exception_indicators/error_indicator.dart';
 import '../../../../../core/utitls/base_64.dart';
 import '../../../../../core/utitls/date_formatter.dart';
 import '../../../../authentication/data/models/response/user/user_model.dart';
@@ -35,31 +30,6 @@ class ChatScreen extends GetView<ChatController> {
             return _buildChatCard(context, controller.chats[index],index);
           }),
     );
-    /*return PagedListView<int, Chat>.separated(
-      pagingController: controller.pagingController,
-      builderDelegate: PagedChildBuilderDelegate<Chat>(
-        itemBuilder: (BuildContext context, Chat chat, int index) {
-          return _buildChatCard(context, chat);
-        },
-        firstPageErrorIndicatorBuilder: (BuildContext context) =>
-            ErrorIndicator(
-          error: controller.pagingController.value.error as Failure,
-          onTryAgain: () => controller.pagingController.refresh(),
-        ),
-        noItemsFoundIndicatorBuilder: (BuildContext context) =>
-            const EmptyListIndicator(),
-        newPageProgressIndicatorBuilder: (BuildContext context) => const Center(
-          child: CircularProgressIndicator.adaptive(),
-        ),
-        firstPageProgressIndicatorBuilder: (BuildContext context) =>
-            const Center(
-          child: CircularProgressIndicator.adaptive(),
-        ),
-      ),
-      //padding: AppPaddings.lA,
-      separatorBuilder: (BuildContext context, int index) =>
-          const SizedBox.shrink(),
-    );*/
   }
 
   Widget _buildChatCard(BuildContext context, Chat chat, int index) {
@@ -85,7 +55,7 @@ class ChatScreen extends GetView<ChatController> {
                         borderRadius: BorderRadius.circular(50),
                         child: CircleAvatar(
                           child: image.isEmpty
-                              ? Image.asset('assets/images/user2.jpg')
+                              ? Image.asset(AppImageAssets.blankProfilePicture)
                               : Image.memory(
                                   fit: BoxFit.cover,
                                   Base64Convertor().base64toImage(

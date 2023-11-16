@@ -3,15 +3,23 @@ import 'package:bookme/features/bookme/presentation/bookings/getx/bookings_contr
 import 'package:get/get.dart';
 
 import '../../../domain/usecases/booking/fetch_bookings.dart';
+import '../../../domain/usecases/chat/initiate_chat.dart';
 
-class BookingBindings extends Bindings{
+class BookingBindings extends Bindings {
   @override
   void dependencies() {
-    Get.put<BookingsController>(BookingsController(fetchBookings: FetchBookings(
-      bookmeRepository: Get.find(),
-    ), updateBooking: UpdateBooking(
-      bookmeRepository: Get.find(),
-    )));
+    Get.put<BookingsController>(
+      BookingsController(
+        fetchBookings: FetchBookings(
+          bookmeRepository: Get.find(),
+        ),
+        updateBooking: UpdateBooking(
+          bookmeRepository: Get.find(),
+        ),
+        initiateNewChat: InitiateNewChat(
+          bookmeRepository: Get.find(),
+        ),
+      ),
+    );
   }
-
 }

@@ -43,9 +43,26 @@ class _BaseScreenState extends State<BaseScreen> {
         color: Colors.transparent,
         height: 60,
         width: width / navIconList.length,
-        child: Icon(
-          icon,
-          color: index == _selectedIndexItem ? PrimaryColor.color : Colors.grey,
+        child: Column(
+          children: <Widget>[
+            Icon(
+              icon,
+              color: index == _selectedIndexItem
+                  ? PrimaryColor.color
+                  : Colors.grey,
+            ),
+            FittedBox(
+              fit: BoxFit.fill,
+              child: Text(
+                navIconText[index],
+                style: TextStyle(
+                  color: index == _selectedIndexItem
+                      ? PrimaryColor.color
+                      : Colors.grey,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

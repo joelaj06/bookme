@@ -197,7 +197,7 @@ class ServiceAgentScreen extends GetView<ServiceAgentController> {
             ClipRRect(
               borderRadius: BorderRadius.circular(50),
               child: CircleAvatar(
-                child: Image.asset('assets/images/user2.jpg'),
+                child: Image.asset(AppImageAssets.blankProfilePicture),
               ),
             ),
             const AppSpacing(

@@ -51,16 +51,12 @@ class ChatController extends GetxController {
     connectToSocket();
     getUserChats(1);
     retrieveNotificationPersistedData();
-    /* pagingController.addPageRequestListener((int pageKey) {
-      getUserChats(pageKey);
-    });*/
     super.onInit();
   }
 
   @override
   void onClose() {
     _socketClient.disconnect();
-    // clearUnreadNotifications();
     super.onClose();
   }
 
@@ -141,7 +137,6 @@ class ChatController extends GetxController {
       ),
     );
 
-    print(unreadNotifications);
     persistUnreadMessageNotification();
   }
 
@@ -165,8 +160,6 @@ class ChatController extends GetxController {
       }
       getUnreadNotifications();
     }
-    print("================================");
-    print(notifications);
     Get.toNamed<dynamic>(AppRoutes.messages, arguments: ChatArgument(chat));
   }
 
@@ -178,19 +171,9 @@ class ChatController extends GetxController {
         //  pagingController.error = failure;
       },
       (ListPage<Chat> newPage) {
-        final int previouslyFetchedItemsCount =
-            pagingController.itemList?.length ?? 0;
-
-        // final bool isLastPage = newPage.isLastPage(previouslyFetchedItemsCount);
         final List<Chat> newItems = newPage.itemList;
         chats(newItems);
-        print(chats[0].lastMessage);
-        /*  if (isLastPage) {
-         // pagingController.appendLastPage(newItems);
-        } else {
-          final int nextPageKey = pageKey + 1;
-       //   pagingController.appendPage(newItems, nextPageKey);
-        }*/
+
       },
     );
   }
@@ -210,7 +193,7 @@ class ChatController extends GetxController {
   User getRecipient(Chat chat) {
     final List<User> users = <User>[];
     users.add(chat.user);
-    users.add(chat.initiator!);
+    users.add(chat.initiator ?? User.empty());
     final User recipient = users.firstWhere((User el) => el.id != user.value.id,
         orElse: () => User.empty());
     return recipient;

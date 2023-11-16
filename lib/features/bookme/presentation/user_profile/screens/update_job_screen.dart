@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:bookme/core/presentation/widgets/animated_column.dart';
 import 'package:bookme/core/presentation/widgets/app_loading_box.dart';
 import 'package:bookme/features/bookme/data/models/response/category/category_model.dart';
@@ -24,6 +22,7 @@ class UpdateJobScreen extends GetView<UserProfileController> {
 
   @override
   Widget build(BuildContext context) {
+    controller.getUserService();
     return Scaffold(
       appBar: AppBar(
         title: const Text('Job'),
@@ -38,176 +37,192 @@ class UpdateJobScreen extends GetView<UserProfileController> {
           fontSize: 18,
         ),
       ),
-      body: FutureBuilder<void>(
-          future: controller.getUserService(),
-          builder: (BuildContext context, _) {
-            return Obx(() => AppLoadingBox(
-                loading: controller.isLoading.value,
-                child: Obx(
-                  () => SingleChildScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    child: _buildJobPage(
-                      context,
-                      controller.service.value,
-                    ),
-                  ),
+      body: GestureDetector(
+        onTap: () {
+          FocusScope.of(context).requestFocus(FocusNode());
+        },
+        child: Obx(
+          () => AppLoadingBox(
+            loading: controller.isLoading.value,
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Obx(
+                () => _buildJobPage(
+                  context,
+                  controller.service.value,
                 ),
               ),
-            );
-          }),
+            ),
+          ),
+        ),
+      ),
     );
   }
 
   Widget _buildJobPage(BuildContext context, Service service) {
-    return Padding(
-      padding: AppPaddings.mA,
-      child: AppAnimatedColumn(
-        children: <Widget>[
-          AppTextInputField(
-            labelText: 'Job Tittle',
-            initialValue: service.title,
-            onChanged: controller.onServiceTitleInputChanged,
-          ),
-          const AppSpacing(
-            v: 10,
-          ),
-          AppTextInputField(
-            labelText: 'Job Description',
-            initialValue: service.description,
-            maxLines: 3,
-            onChanged: controller.onServiceDescriptionInputChanged,
-          ),
-          Row(
-            children: <Widget>[
-              const Text(
-                'Apply Discount',
-                style: TextStyle(
-                  fontWeight: FontWeight.w500,
+    return Obx(
+      () => Padding(
+        padding: AppPaddings.mA,
+        child: AppAnimatedColumn(
+          children: <Widget>[
+            AppTextInputField(
+              controller:
+                  TextEditingController(text: controller.service.value.title),
+              labelText: 'Job Tittle',
+              //initialValue: controller.service.value.title,
+              onChanged: controller.onServiceTitleInputChanged,
+            ),
+            const AppSpacing(
+              v: 10,
+            ),
+            AppTextInputField(
+              labelText: 'Job Description',
+              controller: TextEditingController(
+                  text: controller.service.value.description),
+              maxLines: 3,
+              onChanged: controller.onServiceDescriptionInputChanged,
+            ),
+            Row(
+              children: <Widget>[
+                const Text(
+                  'Apply Discount',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
-              ),
-              const AppSpacing(
-                h: 10,
-              ),
-              Obx(
-                () => Checkbox(
-                  value: controller.applyDiscount.value,
-                  onChanged: controller.onApplyDiscountInputChanged,
-                  fillColor: MaterialStateProperty.resolveWith(
-                    (Set<MaterialState> states) {
-                      if (states.contains(MaterialState.disabled)) {
-                        return Colors.transparent;
-                      }
-                      return PrimaryColor.color;
-                    },
+                const AppSpacing(
+                  h: 10,
+                ),
+                Obx(
+                  () => Checkbox(
+                    value: controller.applyDiscount.value,
+                    onChanged: controller.onApplyDiscountInputChanged,
+                    fillColor: MaterialStateProperty.resolveWith(
+                      (Set<MaterialState> states) {
+                        if (states.contains(MaterialState.disabled)) {
+                          return Colors.transparent;
+                        }
+                        return PrimaryColor.color;
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            Obx(
+              () => AppTextInputField(
+                labelText: 'Discount',
+                controller: TextEditingController(
+                    text: controller.discountValue.value.toStringAsFixed(2)),
+                enabled: controller.applyDiscount.value,
+                readOnly: !controller.applyDiscount.value,
+                onChanged: controller.onDiscountValueInputChanged,
+                textInputType: TextInputType.number,
+                inputFormatters: <TextInputFormatter>[
+                  // FilteringTextInputFormatter.digitsOnly,
+                  FilteringTextInputFormatter.allow(
+                    RegExp(r'^\d+\.?\d{0,2}'),
+                  ),
+                ],
+                suffixIcon: ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    bottomRight: Radius.circular(15),
+                    topRight: Radius.circular(15),
+                  ),
+                  child: Container(
+                    width: 80,
+                    color: HintColor.color.shade50,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        PopupMenuButton<String>(
+                          onSelected: (String value) {
+                            controller.discountType(value);
+                          },
+                          itemBuilder: (BuildContext context) =>
+                              controller.discountValues
+                                  .map<PopupMenuEntry<String>>(
+                                    (dynamic value) => PopupMenuItem<String>(
+                                      value: value.toString(),
+                                      child: Text(value.toString()),
+                                    ),
+                                  )
+                                  .toList(),
+                          child: Padding(
+                            padding: const EdgeInsets.all(
+                              15.0,
+                            ),
+                            child: Text(
+                              controller.discountType.value,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ],
-          ),
-          Obx(
-            () => AppTextInputField(
-              labelText: 'Discount',
-              initialValue:
-                  controller.discountValue.value.toStringAsFixed(2),
-              enabled: controller.applyDiscount.value,
-              readOnly: !controller.applyDiscount.value,
-              onChanged: controller.onDiscountValueInputChanged,
-              textInputType: Platform.isAndroid
-                  ? TextInputType.number
-                  : const TextInputType.numberWithOptions(decimal: true),
+            ),
+            const AppSpacing(
+              v: 10,
+            ),
+            Obx(() => AppTextInputField(
+                controller: controller.discountTitleTextEditingController.value,
+                labelText: 'Discount Tittle',
+                //onChanged: controller.onDiscountTitleInputChanged,
+                enabled: controller.applyDiscount.value,
+                readOnly: !controller.applyDiscount.value,
+              ),
+            ),
+
+            //TODO discount end date
+            AppTextInputField(
+              labelText: 'Least Price',
+              onChanged: controller.onLeastPriceInputChanged,
+              controller: TextEditingController(
+                text:
+                    controller.service.value.price?.toStringAsFixed(2) ?? '0.0',
+              ),
+              textInputType: TextInputType.text,
               inputFormatters: <TextInputFormatter>[
-                FilteringTextInputFormatter.digitsOnly,
+                //  FilteringTextInputFormatter.,
                 FilteringTextInputFormatter.allow(
                   RegExp(r'^\d+\.?\d{0,2}'),
                 ),
               ],
-              suffixIcon: ClipRRect(
-                borderRadius: const BorderRadius.only(
-                  bottomRight: Radius.circular(15),
-                  topRight: Radius.circular(15),
-                ),
-                child: Container(
-                  width: 80,
-                  color: HintColor.color.shade50,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      PopupMenuButton<String>(
-                        onSelected: (String value) {
-                          controller.discountType(value);
-                        },
-                        itemBuilder: (BuildContext context) =>
-                            controller.discountValues
-                                .map<PopupMenuEntry<String>>(
-                                  (dynamic value) => PopupMenuItem<String>(
-                                    value: value.toString(),
-                                    child: Text(value.toString()),
-                                  ),
-                                )
-                                .toList(),
-                        child: Padding(
-                          padding: const EdgeInsets.all(
-                            15.0,
-                          ),
-                          child: Text(
-                            controller.discountType.value,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+            ),
+            const AppSpacing(
+              v: 10,
+            ),
+            _buildImageUploadContainer(),
+            const AppSpacing(
+              v: 10,
+            ),
+            const Text(
+              'Select category',
+              style: TextStyle(
+                fontWeight: FontWeight.w500,
               ),
             ),
-          ),
-          const AppSpacing(
-            v: 10,
-          ),
-          //TODO discount end date
-          AppTextInputField(
-            labelText: 'Least Price',
-            onChanged: controller.onLeastPriceInputChanged,
-            initialValue: service.price?.toStringAsFixed(2) ?? '0.0',
-            textInputType: Platform.isAndroid
-                ? TextInputType.number
-                : const TextInputType.numberWithOptions(decimal: true),
-            inputFormatters: <TextInputFormatter>[
-              FilteringTextInputFormatter.digitsOnly,
-              FilteringTextInputFormatter.allow(
-                RegExp(r'^\d+\.?\d{0,2}'),
-              ),
-            ],
-          ),
-          const AppSpacing(
-            v: 10,
-          ),
-          _buildImageUploadContainer(),
-          const AppSpacing(
-            v: 10,
-          ),
-          const Text(
-            'Select category',
-            style: TextStyle(
-              fontWeight: FontWeight.w500,
+            const AppSpacing(
+              v: 10,
             ),
-          ),
-          const AppSpacing(
-            v: 10,
-          ),
-          SizedBox(
-            height: 500,
-            child: _buildCategoryList(),
-          )
-        ],
+            SizedBox(
+              height: 500,
+              child: _buildCategoryList(),
+            )
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildCategoryList() {
-    return Obx(() {
+    return Obx(
+      () {
         bool load = false;
         if (controller.selectedCategories.isEmpty) {
           load = true;
@@ -236,7 +251,6 @@ class UpdateJobScreen extends GetView<UserProfileController> {
                     }),
                     value: isSelected,
                     onChanged: (bool? value) {
-                      print('added to list');
                       if (isSelected) {
                         controller.selectedCategories.remove(category.id);
                       } else {
