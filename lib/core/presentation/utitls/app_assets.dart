@@ -13,6 +13,9 @@ abstract class AppImageAssets{
   static const String touch = '$_imageSource/touch.png';
   static const String timeOut = '$_imageSource/time-out.png';
   static const String serviceSketches = '$_imageSource/service-sketches.png';
+  static const String plumber = '$_imageSource/plumber.png';
+  static const String client = '$_imageSource/client.png';
+  static const String labourBg = '$_imageSource/labour-bg.png';
 
 
 

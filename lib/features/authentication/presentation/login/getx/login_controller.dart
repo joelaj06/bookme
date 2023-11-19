@@ -47,6 +47,12 @@ class LoginController extends GetxController{
     );
   }
 
+  void navigateToSignUpScreen() async{
+   final dynamic result = await Get.toNamed<dynamic>(AppRoutes.signup);
+   if(result != null){
+     AppSnacks.showSuccess('Success', 'User account created successfully');
+   }
+  }
 
   void togglePassword(){
     showPassword(!showPassword.value);

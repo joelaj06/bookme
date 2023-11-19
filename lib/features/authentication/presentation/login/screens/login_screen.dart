@@ -34,7 +34,9 @@ class LoginScreen extends GetView<LoginController> {
             children: <Widget>[
               const Text("Don't have an account?"),
               TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  controller.navigateToSignUpScreen();
+                },
                 child: const Text('Register'),
               )
             ],

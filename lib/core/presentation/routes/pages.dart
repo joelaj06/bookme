@@ -1,6 +1,7 @@
 import 'package:bookme/core/presentation/routes/app_routes.dart';
 import 'package:bookme/features/authentication/presentation/login/getx/login_bindings.dart';
 import 'package:bookme/features/authentication/presentation/login/screens/login_screen.dart';
+import 'package:bookme/features/authentication/presentation/signup/screens/singup_screen.dart';
 import 'package:bookme/features/bookme/presentation/chat/getx/chat_bindings.dart';
 import 'package:bookme/features/bookme/presentation/chat/screens/chat_screens.dart';
 import 'package:bookme/features/bookme/presentation/favorites/getx/favorites_bindings.dart';
@@ -16,6 +17,7 @@ import 'package:bookme/features/bookme/presentation/user_profile/screens/update_
 import 'package:bookme/features/bookme/presentation/user_profile/screens/user_profile_screen.dart';
 import 'package:get/get.dart';
 
+import '../../../features/authentication/presentation/signup/getx/signup_bindings.dart';
 import '../../../features/bookme/presentation/favorites/screens/favorite_screen.dart';
 import '../../../features/bookme/presentation/presentation.dart';
 import '../../../features/bookme/presentation/user_profile/screens/update_user_screen.dart';
@@ -37,6 +39,10 @@ class Pages {
         name: AppRoutes.login,
         page: () => const LoginScreen(),
         binding: LoginBindings()),
+    GetPage<AppRoutes>(
+        name: AppRoutes.signup,
+        page: () => const SignUpScreen(),
+        binding: SignUpBindings()),
     GetPage<AppRoutes>(
         name: AppRoutes.home,
         page: () => const HomeScreen(),
