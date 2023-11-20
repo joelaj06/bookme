@@ -82,6 +82,7 @@ class UserProfileController extends GetxController {
   @override
   void dispose() {
     pageController.dispose();
+    discountTitleTextEditingController.value.dispose();
     super.dispose();
   }
 

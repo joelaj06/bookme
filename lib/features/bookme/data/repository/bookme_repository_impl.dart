@@ -149,4 +149,11 @@ class BookmeRepositoryImpl extends Repository implements BookmeRepository {
       ),
     );
   }
+
+  @override
+  Future<Either<Failure, Service>> addService(
+      {required ServiceRequest serviceRequest}) {
+    return makeRequest(
+        bookmeRemoteDatasource.addService(serviceRequest: serviceRequest));
+  }
 }

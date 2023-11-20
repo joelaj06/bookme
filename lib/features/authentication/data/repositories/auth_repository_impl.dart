@@ -94,4 +94,9 @@ class AuthRepositoryImpl extends Repository implements AuthRepository {
       },
     );
   }
+
+  @override
+  Future<Either<Failure, User>> addUser({required UserRequest userRequest}) {
+    return makeRequest(authRemoteDataSource.addUser(userRequest: userRequest));
+  }
 }

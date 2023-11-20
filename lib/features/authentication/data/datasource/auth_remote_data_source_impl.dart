@@ -41,4 +41,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
    return MessageResponse.fromJson(json);
   }
 
+  @override
+  Future<User> addUser({required UserRequest userRequest}) async{
+    final Map<String,dynamic> json = await _client.post(AuthEndpoints.signup, body: userRequest.toJson());
+    return User.fromJson(json);
+  }
+
 }

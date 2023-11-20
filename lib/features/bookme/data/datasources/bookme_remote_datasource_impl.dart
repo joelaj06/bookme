@@ -149,8 +149,9 @@ class BookmeRemoteDatasourceImpl implements BookmeRemoteDatasource {
   Future<Service> updateService(
       {required String serviceId,
       required ServiceRequest serviceRequest}) async {
-    final Map<String, dynamic> json = await _client
-        .put(BookmeEndpoints.service(serviceId), body: serviceRequest.toJson());
+    final Map<String, dynamic> json = await _client.put(
+        BookmeEndpoints.serviceById(serviceId),
+        body: serviceRequest.toJson());
     return Service.fromJson(json);
   }
 
@@ -237,5 +238,12 @@ class BookmeRemoteDatasourceImpl implements BookmeRemoteDatasource {
     final Map<String, dynamic> json = await _client
         .post(BookmeEndpoints.message(chatId), body: messageRequest.toJson());
     return Message.fromJson(json);
+  }
+
+  @override
+  Future<Service> addService({required ServiceRequest serviceRequest}) async {
+    final Map<String, dynamic> json = await _client
+        .post(BookmeEndpoints.service, body: serviceRequest.toJson());
+    return Service.fromJson(json);
   }
 }

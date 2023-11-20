@@ -70,4 +70,7 @@ abstract class BookmeRepository {
     required String recipient,
     required MessageContent message,
   });
+
+  Future<Either<Failure, Service>> addService(
+      {required ServiceRequest serviceRequest});
 }

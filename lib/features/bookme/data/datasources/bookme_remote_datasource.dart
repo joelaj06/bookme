@@ -51,7 +51,8 @@ abstract class BookmeRemoteDatasource {
 
   Future<List<Favorite>> fetchFavorites({required String userId});
 
-  Future<Favorite> addFavorite({required AddFavoriteRequest addFavoriteRequest});
+  Future<Favorite> addFavorite(
+      {required AddFavoriteRequest addFavoriteRequest});
 
   Future<Favorite> deleteFavorite({required String favoriteId});
 
@@ -59,7 +60,10 @@ abstract class BookmeRemoteDatasource {
 
   Future<InitiateChat> initiateChat({required ChatRequest chatRequest});
 
-  Future<ListPage<Message>> fetchMessages({required String chatId });
+  Future<ListPage<Message>> fetchMessages({required String chatId});
 
-  Future<Message> sendMessage({required String chatId,required MessageRequest messageRequest});
+  Future<Message> sendMessage(
+      {required String chatId, required MessageRequest messageRequest});
+
+  Future<Service> addService({required ServiceRequest serviceRequest});
 }

@@ -1,3 +1,4 @@
+import 'package:bookme/features/authentication/data/models/request/user/user_request.dart';
 import 'package:bookme/features/authentication/data/models/response/generic/message_response.dart';
 import 'package:dartz/dartz.dart';
 
@@ -27,5 +28,6 @@ abstract class AuthRepository {
 });
 
   Future<Either<Failure,MessageResponse>> logout();
+  Future<Either<Failure,User>> addUser({required UserRequest userRequest});
 
 }

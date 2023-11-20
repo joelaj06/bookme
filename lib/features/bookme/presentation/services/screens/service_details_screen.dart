@@ -97,102 +97,102 @@ class ServiceDetailsScreen extends GetView<ServicesController> {
   Padding _buildServiceDetails(ServiceArgument? args, BuildContext context) {
     final String image = args?.service.user?.image ?? '';
     return Padding(
-              padding: AppPaddings.mA,
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Flexible(
-                          child: Text(
-                            args?.service.title ?? '',
-                            style: context.textTheme.bodyLarge?.copyWith(
-                              color: SecondaryColor.color,
-                              fontSize: 30,
-                            ),
-                          ),
-                        ),
-                      ],
+      padding: AppPaddings.mA,
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Flexible(
+                  child: Text(
+                    args?.service.title ?? '',
+                    style: context.textTheme.bodyLarge?.copyWith(
+                      color: SecondaryColor.color,
+                      fontSize: 30,
                     ),
-                    IconText(
-                      text: args?.service.location ?? '',
-                      textColor: PrimaryColor.color,
-                      iconColor: PrimaryColor.color,
-                    ),
-                    const AppSpacing(v: 10,),
-                    _buildProfileSection(image, args, context),
-                    const AppSpacing(
-                      v: 20,
-                    ),
-                    Text(
-                      'About Service',
-                      style: context.textTheme.bodyLarge?.copyWith(
-                        fontSize: 20,
-                      ),
-                    ),
-                    const AppSpacing(
-                      v: 10,
-                    ),
-                    Text(
-                      args?.service.description ?? '',
-                    )
-                  ],
+                  ),
                 ),
+              ],
+            ),
+            IconText(
+              text: args?.service.location ?? '',
+              textColor: PrimaryColor.color,
+              iconColor: PrimaryColor.color,
+            ),
+            const AppSpacing(
+              v: 10,
+            ),
+            _buildProfileSection(image, args, context),
+            const AppSpacing(
+              v: 20,
+            ),
+            Text(
+              'About Service',
+              style: context.textTheme.bodyLarge?.copyWith(
+                fontSize: 20,
               ),
-            );
+            ),
+            const AppSpacing(
+              v: 10,
+            ),
+            Text(
+              args?.service.description ?? '',
+            )
+          ],
+        ),
+      ),
+    );
   }
 
-  Row _buildProfileSection(String image, ServiceArgument? args, BuildContext context) {
+  Row _buildProfileSection(
+      String image, ServiceArgument? args, BuildContext context) {
     return Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Row(
-                        children: <Widget>[
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(50),
-                            child: CircleAvatar(
-                              radius: 25,
-                              child: image.isEmpty
-                                  ? Image.asset(
-                                      AppImageAssets.blankProfilePicture)
-                                  : Image.memory(
-                                      fit: BoxFit.cover,
-                                      Base64Convertor().base64toImage(
-                                        image,
-                                      ),
-                                    ),
-                            ),
-                          ),
-                          const AppSpacing(
-                            h: 10,
-                          ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              Text(
-                                '${args?.service.user?.firstName ?? ''} ${args?.service.user?.lastName ?? ''}',
-                                style:
-                                    context.textTheme.bodyLarge?.copyWith(
-                                  fontSize: 20,
-                                ),
-                              ),
-                              Text(args?.service.user?.jobTitle ?? ''),
-                            ],
-                          ),
-                        ],
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: <Widget>[
+        Row(
+          children: <Widget>[
+            ClipRRect(
+              borderRadius: BorderRadius.circular(50),
+              child: CircleAvatar(
+                radius: 25,
+                child: image.isEmpty
+                    ? Image.asset(AppImageAssets.blankProfilePicture)
+                    : Image.memory(
+                        fit: BoxFit.cover,
+                        Base64Convertor().base64toImage(
+                          image,
+                        ),
                       ),
-                      TextButton(
-                        onPressed: () {
-                          controller
-                              .navigateToServiceAgentScreen(args!.service);
-                        },
-                        child: const Text('See More'),
-                      ),
-                    ],
-                  );
+              ),
+            ),
+            const AppSpacing(
+              h: 10,
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  '${args?.service.user?.firstName ?? ''} ${args?.service.user?.lastName ?? ''}',
+                  style: context.textTheme.bodyLarge?.copyWith(
+                    fontSize: 20,
+                  ),
+                ),
+                Text(args?.service.user?.jobTitle ?? ''),
+              ],
+            ),
+          ],
+        ),
+        TextButton(
+          onPressed: () {
+            controller.navigateToServiceAgentScreen(args!.service);
+          },
+          child: const Text('See More'),
+        ),
+      ],
+    );
   }
 
   SizedBox _buildHorizontalImageList(List<String?> images) {

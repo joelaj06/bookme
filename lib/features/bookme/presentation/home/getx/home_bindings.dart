@@ -4,16 +4,23 @@ import 'package:bookme/features/bookme/domain/usecases/service/fetch_promoted_se
 import 'package:get/get.dart';
 
 import 'home_controller.dart';
-class HomeBindings extends Bindings{
+
+class HomeBindings extends Bindings {
   @override
   void dependencies() {
-    Get.put<HomeController>(HomeController(
+    Get.lazyPut<HomeController>(
+      () => HomeController(
         fetchCategories: FetchCategories(
           bookmeRepository: Get.find(),
-        ), fetchPopularServices: FetchPopularServices(
-      bookmeRepository: Get.find(),
-    ), fetchPromotedServices: FetchPromotedServices(bookmeRepository: Get.find())),
+        ),
+        fetchPopularServices: FetchPopularServices(
+          bookmeRepository: Get.find(),
+        ),
+        fetchPromotedServices: FetchPromotedServices(
+          bookmeRepository: Get.find(),
+        ),
+      ),
+      fenix: true
     );
   }
-
 }

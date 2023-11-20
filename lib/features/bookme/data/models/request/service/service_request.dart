@@ -16,6 +16,7 @@ class ServiceRequest with _$ServiceRequest {
     String? location,
     required List<String>? categories,
     List<String>? images,
+    String? user,
     required String? description,
     required String? title,
     Discount? discount,
