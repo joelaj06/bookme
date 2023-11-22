@@ -53,6 +53,7 @@ class SignUpController extends GetxController {
   RxList<Category> categories = <Category>[].obs;
   RxDouble leastPrice = (0.0).obs;
   RxString serviceCoverImage = ''.obs;
+  RxString location = ''.obs;
 
   ImagePicker picker = ImagePicker();
   final HomeController homeController = Get.find();
@@ -72,8 +73,8 @@ class SignUpController extends GetxController {
         description: serviceDescription.value,
         title: serviceTitle.value,
         price: leastPrice.value,
-        location: 'Accra',
-        user: '655b415d9cc71b6294a5a47a',
+        location: location.value,
+        user: user.value.id,
         images: base64Images,
         coverImage: serviceCoverImage.value);
     final Either<Failure, Service> failureOrService =
@@ -210,6 +211,10 @@ class SignUpController extends GetxController {
         navigatePages(1);
       },
     );
+  }
+
+  void onServiceLocationInputChanged(String? value){
+    location(value);
   }
 
   void onLeastPriceInputChanged(String? value) {

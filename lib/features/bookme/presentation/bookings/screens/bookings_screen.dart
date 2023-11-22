@@ -8,9 +8,11 @@ import 'package:bookme/core/presentation/widgets/app_loading_box.dart';
 import 'package:bookme/core/presentation/widgets/exception_indicators/auth_navigation.dart';
 import 'package:bookme/core/presentation/widgets/exception_indicators/empty_list_indicator.dart';
 import 'package:bookme/core/presentation/widgets/exception_indicators/error_indicator.dart';
+import 'package:bookme/core/utitls/date_formatter.dart';
 import 'package:bookme/features/bookme/presentation/bookings/getx/bookings_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:iconly/iconly.dart';
 import 'package:ionicons/ionicons.dart';
 
 import '../../../../../core/utitls/base_64.dart';
@@ -61,9 +63,9 @@ class BookingsScreen extends GetView<BookingsController> {
           controller: controller.pageController,
           onPageChanged: controller.onPageChanged,
           children: <Widget>[
-            _buildJobHistoryContainer(
+            _buildUpcomingBookingsContainer(
                 userId, context, 'pending', 'Fri 30th June, 2023'),
-            _buildJobHistoryContainer(
+            _buildBookingHistoryContainer(
                 userId, context, 'completed', 'Sun 28th May, 2023')
           ],
         ),
@@ -71,7 +73,7 @@ class BookingsScreen extends GetView<BookingsController> {
     );
   }
 
-  Widget _buildJobHistoryContainer(
+  Widget _buildUpcomingBookingsContainer(
     String userId,
     BuildContext context,
     String status,
@@ -88,23 +90,60 @@ class BookingsScreen extends GetView<BookingsController> {
         ),
         failure: controller.error.value,
         itemBuilder: (BuildContext context, int index) {
-          final bool isPending = controller.bookings[index].status == 'pending';
-          return _buildPendingJobCard(
-            index,
-            controller.bookings[index],
-            width,
-            context,
-            isPending,
-          );
+          final BookingStatus status =
+              convertToBookingStatus(controller.bookings[index].status!);
+          if (controller.bookings[index].status == BookingStatus.pending.name ||
+              controller.bookings[index].status =='requested') {
+            return _buildBookingsCard(
+                index, controller.bookings[index], width, context, status);
+          }
+          return const SizedBox.shrink();
         },
         emptyListIndicatorBuilder: const EmptyListIndicator(),
       ),
     );
   }
 
-  Padding _buildPendingJobCard(int index, Booking booking, double width,
-      BuildContext context, bool isPending) {
-    final String image = booking.agent.image ?? '';
+  Widget _buildBookingHistoryContainer(
+    String userId,
+    BuildContext context,
+    String status,
+    String date,
+  ) {
+    final double width = MediaQuery.of(context).size.width;
+    return Obx(
+      () => AppCustomListView<Booking>(
+        items: controller.bookings,
+        onRefresh: () => controller.getBookings(userId),
+        errorIndicatorBuilder: ErrorIndicator(
+          error: controller.error.value,
+          onTryAgain: () => controller.getBookings(userId),
+        ),
+        failure: controller.error.value,
+        itemBuilder: (BuildContext context, int index) {
+          final BookingStatus status =
+              convertToBookingStatus(controller.bookings[index].status!);
+
+          if (status == BookingStatus.completed ||
+              status == BookingStatus.canceled) {
+            return _buildBookingsCard(
+              index,
+              controller.bookings[index],
+              width,
+              context,
+              convertToBookingStatus(controller.bookings[index].status!),
+            );
+          }
+          return const SizedBox.shrink();
+        },
+        emptyListIndicatorBuilder: const EmptyListIndicator(),
+      ),
+    );
+  }
+
+  Padding _buildBookingsCard(int index, Booking booking, double width,
+      BuildContext context, BookingStatus status) {
+    final String image = booking.agent?.image ?? '';
     return Padding(
       padding: AppPaddings.mA,
       child: GestureDetector(
@@ -154,15 +193,15 @@ class BookingsScreen extends GetView<BookingsController> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Text(
-                        '${booking.agent.firstName} ${booking.agent.lastName}',
+                        '${booking.agent?.firstName ?? ''} ${booking.agent?.lastName ?? ''}',
                         style: context.textTheme.bodyMedium?.copyWith(
                             fontSize: 15, fontWeight: FontWeight.w500),
                       ),
-                      Text(booking.service.title),
+                      Text(booking.service!.title),
                       Expanded(
                         child: SizedBox(
                           child: Text(
-                            'Ghc ${booking.preliminaryCost}',
+                            'Ghc ${booking.preliminaryCost ?? '0.0'}',
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(color: PrimaryColor.color),
                           ),
@@ -172,15 +211,23 @@ class BookingsScreen extends GetView<BookingsController> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
                           Text(
-                            booking.endDate ?? '',
+                            DataFormatter.dateToString(booking.endDate ?? ''),
                           ),
                           Icon(
-                            isPending
+                            status == BookingStatus.pending
                                 ? Icons.pending_actions_outlined
-                                : Ionicons.checkmark_circle,
-                            color: isPending
+                                : status == BookingStatus.requested
+                                    ? IconlyBroken.more_circle
+                                    : status == BookingStatus.canceled
+                                        ? Icons.cancel
+                                        : Ionicons.checkmark_circle,
+                            color: status == BookingStatus.pending
                                 ? const Color(0xffbb8833)
-                                : Colors.green,
+                                : status == BookingStatus.requested
+                                    ? Colors.blue
+                                    : status == BookingStatus.canceled
+                                        ? Colors.red
+                                        : Colors.green,
                           )
                         ],
                       ),

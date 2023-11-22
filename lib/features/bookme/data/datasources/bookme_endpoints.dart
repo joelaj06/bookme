@@ -34,9 +34,11 @@ class BookmeEndpoints {
 
   static const String service = 'services';
 
+  static const String booking = 'bookings';
+
   static String serviceById(String serviceId) => 'services/$serviceId';
 
-  static String booking(String bookingId) => 'bookings/$bookingId';
+  static String bookingWithId(String bookingId) => 'bookings/$bookingId';
   static const String favorites = 'favorites';
 
   static String favorite(String serviceId) => 'favorites/$serviceId';

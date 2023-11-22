@@ -160,7 +160,7 @@ class BookmeRemoteDatasourceImpl implements BookmeRemoteDatasource {
       {required String bookingId,
       required BookingRequest bookingRequest}) async {
     final Map<String, dynamic> json = await _client
-        .put(BookmeEndpoints.booking(bookingId), body: bookingRequest.toJson());
+        .put(BookmeEndpoints.bookingWithId(bookingId), body: bookingRequest.toJson());
     return Booking.fromJson(json);
   }
 
@@ -245,5 +245,12 @@ class BookmeRemoteDatasourceImpl implements BookmeRemoteDatasource {
     final Map<String, dynamic> json = await _client
         .post(BookmeEndpoints.service, body: serviceRequest.toJson());
     return Service.fromJson(json);
+  }
+
+  @override
+  Future<Booking> addBooking({required BookingRequest bookingRequest}) async{
+    final Map<String, dynamic>  json = await _client.post(BookmeEndpoints.booking, body: bookingRequest.toJson());
+    return Booking.fromJson(json);
+
   }
 }

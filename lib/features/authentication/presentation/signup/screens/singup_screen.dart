@@ -93,6 +93,13 @@ class SignUpScreen extends GetView<SignUpController> {
                 v: 10,
               ),
               AppTextInputField(
+                labelText: 'Location',
+                onChanged: controller.onServiceLocationInputChanged,
+              ),
+              const AppSpacing(
+                v: 10,
+              ),
+              AppTextInputField(
                 labelText: 'Least Price',
                 onChanged: controller.onLeastPriceInputChanged,
                 textInputType:
@@ -421,6 +428,7 @@ class SignUpScreen extends GetView<SignUpController> {
                           )
                         : const SizedBox.shrink(),
                   ),
+
                   Obx(
                     () => AppTextInputField(
                       maxLines: 1,
@@ -456,6 +464,9 @@ class SignUpScreen extends GetView<SignUpController> {
                         ),
                       ),
                     ),
+                  ),
+                  const AppSpacing(
+                    v: 10,
                   ),
                   Obx(
                     () => AppTextInputField(

@@ -73,4 +73,6 @@ abstract class BookmeRepository {
 
   Future<Either<Failure, Service>> addService(
       {required ServiceRequest serviceRequest});
+
+  Future<Either<Failure,Booking>> addBooking({required BookingRequest bookingRequest});
 }

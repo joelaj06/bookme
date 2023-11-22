@@ -108,7 +108,7 @@ class TasksScreen extends GetView<TasksController> {
 
   Padding _buildTaskCard(int index, double width, BuildContext context,
       Booking booking, bool isPending, bool isCanceled) {
-    final String image = booking.service.coverImage ?? '';
+    final String image = booking.service?.coverImage ?? '';
     final String note = booking.notes ?? '';
     return Padding(
       padding: AppPaddings.mA,
@@ -159,12 +159,12 @@ class TasksScreen extends GetView<TasksController> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Text(
-                        '${booking.user.firstName} ${booking.user.lastName}',
+                        '${booking.user!.firstName} ${booking.user?.lastName}',
                         style: context.textTheme.bodyMedium?.copyWith(
                             fontSize: 15, fontWeight: FontWeight.w500),
                       ),
                       Text(
-                        note.isEmpty ? booking.service.title : note,
+                        note.isEmpty ? booking.service!.title : note,
                       ),
                       SizedBox(
                         child: Text(

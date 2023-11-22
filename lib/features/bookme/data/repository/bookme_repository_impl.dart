@@ -156,4 +156,9 @@ class BookmeRepositoryImpl extends Repository implements BookmeRepository {
     return makeRequest(
         bookmeRemoteDatasource.addService(serviceRequest: serviceRequest));
   }
+
+  @override
+  Future<Either<Failure, Booking>> addBooking({required BookingRequest bookingRequest}) {
+    return makeRequest(bookmeRemoteDatasource.addBooking(bookingRequest: bookingRequest));
+  }
 }

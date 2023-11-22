@@ -13,9 +13,9 @@ part 'booking_model.g.dart';
 class Booking with _$Booking {
   const factory Booking({
     @JsonKey(name: '_id') required String id,
-    required User user,
-    required User agent,
-    required Service service,
+    required User? user,
+    required User? agent,
+    required Service? service,
     @JsonKey(name: 'start_date')String? startDate,
     @JsonKey(name: 'end_date')String? endDate,
     String? location,

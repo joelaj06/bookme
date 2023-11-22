@@ -9,10 +9,12 @@ import 'package:bookme/core/presentation/widgets/app_loading_box.dart';
 import 'package:bookme/core/presentation/widgets/location_icon.dart';
 import 'package:bookme/features/bookme/presentation/services/arguments/service_arguments.dart';
 import 'package:bookme/features/bookme/presentation/services/getx/services_controller.dart';
+import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ionicons/ionicons.dart';
 
+import '../../../../../core/presentation/widgets/app_text_input_field.dart';
 import '../../../../../core/utitls/base_64.dart';
 import '../../../data/models/response/service/service_model.dart';
 
@@ -33,10 +35,10 @@ class ServiceDetailsScreen extends GetView<ServicesController> {
       }
     }
 
-    print(images);
+
     return Scaffold(
       extendBodyBehindAppBar: true, // Extend the body behind the AppBar
-      bottomNavigationBar: _buildBottomNavigationItems(args?.service),
+      bottomNavigationBar: _buildBottomNavigationItems(context,args?.service),
       appBar: AppBar(
         leading: Padding(
           padding: const EdgeInsets.only(left: 8.0),
@@ -239,7 +241,7 @@ class ServiceDetailsScreen extends GetView<ServicesController> {
     );
   }
 
-  Widget _buildBottomNavigationItems(Service? service) {
+  Widget _buildBottomNavigationItems(BuildContext context,Service? service) {
     return Container(
       height: 80,
       padding: AppPaddings.mA,
@@ -253,7 +255,7 @@ class ServiceDetailsScreen extends GetView<ServicesController> {
             backgroundColor: HintColor.color.shade300.withOpacity(0.5),
             child: IconButton(
               onPressed: () {
-                controller.checkAuth(service!.id);
+                controller.addToFavorites(service!.id);
               },
               icon: const Icon(
                 Ionicons.heart,
@@ -267,12 +269,83 @@ class ServiceDetailsScreen extends GetView<ServicesController> {
           Flexible(
             child: AppButton(
               onPressed: () {
-                controller.navigateToChatsScreen();
+               //controller.bookAgent(service!);
+                showModalBottomSheet<dynamic>(
+                  isScrollControlled: true,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(13)),
+                  context: context,
+                  builder: (BuildContext context) => SizedBox(
+                    height: MediaQuery.of(context).size.height *0.8,
+                    child: Padding(
+                      padding: AppPaddings.mA,
+                      child: _buildBookingModal(context,service!),
+                    ),
+                  ),
+                );
               },
               text: 'Book Now',
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildBookingModal(BuildContext context,Service service){
+    return Scaffold(
+      bottomNavigationBar:  SizedBox(
+        height: 60,
+        child: Obx(
+              () => AppButton(
+            enabled: !controller.isLoading.value,
+            onPressed: () {
+              controller.bookAgent(service,context);
+             // Navigator.pop(context);
+            },
+            text: 'Done',
+            fontSize: 18,
+          ),
+        ),
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: <Widget>[
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(15),
+                boxShadow: const <BoxShadow>[
+                  BoxShadow(
+                    offset: Offset(3, 3),
+                    spreadRadius: -8,
+                    blurRadius: 10,
+                    color: Color.fromRGBO(137, 137, 137, 1),
+                  )
+                ],
+              ),
+              child: Obx(
+                    () => CalendarDatePicker2(
+                  config: CalendarDatePicker2Config(
+                    calendarType: CalendarDatePicker2Type.range,
+                  ),
+                  value: controller.dialogCalendarPickerValue,
+                  onValueChanged: controller.onDateDateValueChanged,
+                ),
+              ),
+            ),
+            const AppSpacing(v: 20,),
+            AppTextInputField(
+              labelText: 'Location',
+              onChanged: controller.onLocationInputChanged,
+            ),
+            const AppSpacing(v: 20,),
+            AppTextInputField(
+              labelText: 'Notes',
+              maxLines: 3,
+              onChanged: controller.onNotesInputChanged,
+            ),
+          ],
+        ),
       ),
     );
   }

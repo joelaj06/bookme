@@ -66,4 +66,6 @@ abstract class BookmeRemoteDatasource {
       {required String chatId, required MessageRequest messageRequest});
 
   Future<Service> addService({required ServiceRequest serviceRequest});
+
+  Future<Booking> addBooking({required BookingRequest bookingRequest});
 }

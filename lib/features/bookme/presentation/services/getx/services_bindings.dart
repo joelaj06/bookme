@@ -1,3 +1,4 @@
+import 'package:bookme/features/bookme/domain/usecases/booking/add_booking.dart';
 import 'package:bookme/features/bookme/domain/usecases/favorite/add_favorite.dart';
 import 'package:bookme/features/bookme/domain/usecases/service/fetch_services.dart';
 import 'package:bookme/features/bookme/domain/usecases/service/fetch_services_by_category.dart';
@@ -14,6 +15,8 @@ class ServicesBindings extends Bindings{
      bookmeRepository: Get.find(),
    ), addFavorite: AddFavorite(
      bookmeRepository: Get.find(),
+   ), addBooking: AddBooking(
+     bookmeRepository: Get.find()
    ),
    ),);
   }

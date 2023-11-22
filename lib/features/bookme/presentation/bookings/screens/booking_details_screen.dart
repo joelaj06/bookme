@@ -34,8 +34,8 @@ class BookingDetailsScreen extends GetView<BookingsController> {
           DateTime.parse(args.booking.endDate ?? DateTime.now().toString()));
       controller.dialogCalendarPickerValue(dates);
 
-      final String startTime = args.booking.startDate.toString().split('T')[1];
-      final String endTime = args.booking.endDate.toString().split('T')[1];
+      final String startTime = args.booking.startDate.toString();
+      final String endTime = args.booking.endDate.toString();
       controller.startTimeTextEditingController.value.text = (startTime);
       controller.endTimeTextEditingController.value.text = (endTime);
       controller.startTime(startTime);
@@ -102,48 +102,6 @@ class BookingDetailsScreen extends GetView<BookingsController> {
                   const AppSpacing(
                     v: 10,
                   ),
-                  /*SizedBox(
-                    width: MediaQuery.of(context).size.width,
-                    child: Row(
-                      children: <Widget>[
-                        Expanded(
-                          child: Obx(
-                            () => AppTextInputField(
-                              controller: controller
-                                  .startTimeTextEditingController.value,
-                              labelText: 'Begin',
-                              readOnly: true,
-                              suffixIcon: IconButton(
-                                onPressed: () {
-                                  //  controller.onTimeSelected(context, true);
-                                },
-                                icon: const Icon(Icons.schedule),
-                              ),
-                            ),
-                          ),
-                        ),
-                        const AppSpacing(
-                          h: 10,
-                        ),
-                        Expanded(
-                          child: Obx(
-                            () => AppTextInputField(
-                              controller:
-                                  controller.endTimeTextEditingController.value,
-                              labelText: 'End',
-                              readOnly: true,
-                              suffixIcon: IconButton(
-                                onPressed: () {
-                                  //  controller.onTimeSelected(context, false);
-                                },
-                                icon: const Icon(Icons.schedule),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),*/
                   AppTextInputField(
                     labelText: 'Location',
                     initialValue: args?.booking.location,
@@ -173,7 +131,7 @@ class BookingDetailsScreen extends GetView<BookingsController> {
                         fit: BoxFit.fill,
                         child: Text(
                           DataFormatter.getLocalCurrencyFormatter(context)
-                              .format(args?.booking.preliminaryCost),
+                              .format(args?.booking.preliminaryCost ?? 0.0),
                           style: context.textTheme.bodyLarge?.copyWith(
                             fontSize: 16,
                             color: PrimaryColor.color,
@@ -186,19 +144,7 @@ class BookingDetailsScreen extends GetView<BookingsController> {
                   const AppSpacing(
                     v: 10,
                   ),
-                  Row(
-                    children: <Widget>[
-                      const Text('Job Description:'),
-                      const AppSpacing(
-                        h: 10,
-                      ),
-                      Flexible(
-                        child: Text(
-                          args?.booking.notes ?? '',
-                        ),
-                      )
-                    ],
-                  )
+                   Text('Job Description: ${args?.booking.notes ?? ''}')
                 ],
               ),
             ),

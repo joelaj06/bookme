@@ -108,6 +108,7 @@ class BookingsController extends GetxController {
     );
   }
 
+
   Future<User?> getUser() async {
     final LoginResponse? response = _authLocalDataSource.authResponse ??
         await _authLocalDataSource.getAuthResponse();
@@ -214,8 +215,17 @@ class BookingsController extends GetxController {
   }
 }
 
+ // Convert string to enum
+BookingStatus convertToBookingStatus(String status){
+return BookingStatus.values
+    .firstWhere((BookingStatus e) => e.name == status,
+orElse: () => BookingStatus.pending);
+
+}
+
 enum BookingStatus {
   completed,
   pending,
   canceled,
+  requested,
 }
