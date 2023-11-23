@@ -41,7 +41,7 @@ abstract class BookmeRepository {
   Future<Either<Failure, List<Booking>>> fetchBookings(
       {String? agentId, required String? userId});
 
-  Future<Either<Failure, Service>> fetchServiceByUser();
+  Future<Either<Failure, Service>> fetchServiceByUser({required String? agentId});
 
   Future<Either<Failure, Service>> updateService(
       {required String serviceId, required ServiceRequest serviceRequest});

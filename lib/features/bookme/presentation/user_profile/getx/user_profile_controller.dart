@@ -166,7 +166,7 @@ class UserProfileController extends GetxController {
   Future<void> getUserService() async {
     //  isLoading(true);
     final Either<Failure, Service> failureOrService =
-        await fetchServiceByUser(NoParams());
+        await fetchServiceByUser(const PageParams(page: 0, size: 0));
     failureOrService.fold(
       (Failure failure) {
         isLoading(false);

@@ -1,8 +1,10 @@
+import 'package:bookme/core/presentation/routes/app_routes.dart';
 import 'package:bookme/core/presentation/theme/hint_color.dart';
 import 'package:bookme/core/presentation/theme/primary_color.dart';
 import 'package:bookme/core/presentation/utitls/app_assets.dart';
 import 'package:bookme/core/presentation/utitls/app_padding.dart';
 import 'package:bookme/core/presentation/utitls/app_spacing.dart';
+import 'package:bookme/core/presentation/widgets/app_button.dart';
 import 'package:bookme/core/presentation/widgets/app_ratings_icon.dart';
 import 'package:bookme/features/bookme/data/models/response/review/review_model.dart';
 import 'package:bookme/features/bookme/presentation/service_agent/getx/service_agent_controller.dart';
@@ -10,7 +12,6 @@ import 'package:flutter/material.dart';
 import 'package:full_screen_image/full_screen_image.dart';
 import 'package:get/get.dart';
 
-import '../../../../../core/utitls/base_64.dart';
 import '../../services/arguments/service_arguments.dart';
 
 class ServiceAgentProfileScreen extends GetView<ServiceAgentProfileController> {
@@ -26,6 +27,10 @@ class ServiceAgentProfileScreen extends GetView<ServiceAgentProfileController> {
         args.service.user?.id ?? args.service.userData!.id,
         null,
       );
+
+      if(Get.previousRoute == AppRoutes.base){
+        controller.getServiceByAgent(args.service.user!.id);
+      }
     }
 
     return Scaffold(
@@ -33,6 +38,16 @@ class ServiceAgentProfileScreen extends GetView<ServiceAgentProfileController> {
       appBar: AppBar(
         backgroundColor: PrimaryColor.primaryAccent.withOpacity(0.2),
       ),
+      bottomNavigationBar: Get.previousRoute == AppRoutes.base ?
+      SizedBox(
+        height: 60,
+        child: AppButton(
+          onPressed: () {
+            controller.navigateToServiceDetailsScreen();
+          },
+          text: 'Book Agent',
+        ),
+      ): const SizedBox.shrink(),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         child: Column(
@@ -61,7 +76,6 @@ class ServiceAgentProfileScreen extends GetView<ServiceAgentProfileController> {
   }
 
   Container _buildProfile(BuildContext context) {
-    final String image = controller.agent.value.image ?? '';
     return Container(
             width: MediaQuery.of(context).size.width,
             color: PrimaryColor.primaryAccent.withOpacity(0.2),
@@ -71,7 +85,7 @@ class ServiceAgentProfileScreen extends GetView<ServiceAgentProfileController> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  SizedBox(
+                /*  SizedBox(
                     height: 100,
                     width: 100,
                     child: ClipRRect(
@@ -85,7 +99,7 @@ class ServiceAgentProfileScreen extends GetView<ServiceAgentProfileController> {
                         ),
                       ),
                     ),
-                  ),
+                  ),*/
                   Obx(
                     () => Text(
                       '${controller.agent.value.firstName} ${controller.agent.value.lastName}',

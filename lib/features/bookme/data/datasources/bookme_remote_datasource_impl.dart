@@ -140,9 +140,13 @@ class BookmeRemoteDatasourceImpl implements BookmeRemoteDatasource {
   }
 
   @override
-  Future<Service> fetchUserService() async {
-    final Map<String, dynamic> json =
-        await _client.get(BookmeEndpoints.userService);
+  Future<Service> fetchUserService({required String? agentId}) async {
+    final Map<String, dynamic> json;
+    if (agentId == null || agentId.isEmpty) {
+      json = await _client.get(BookmeEndpoints.userService);
+    } else {
+      json = await _client.get(BookmeEndpoints.userServiceById(agentId));
+    }
     return Service.fromJson(json);
   }
 
@@ -261,9 +265,10 @@ class BookmeRemoteDatasourceImpl implements BookmeRemoteDatasource {
       {required int page, required int size, required String? query}) async {
     final Map<String, dynamic> json;
     if (query == null || query.isEmpty) {
-      json = await _client.get(BookmeEndpoints.agents(page,size));
+      json = await _client.get(BookmeEndpoints.agents(page, size));
     } else {
-      json = await _client.get(BookmeEndpoints.agentsWithQuery(query,page,size));
+      json =
+          await _client.get(BookmeEndpoints.agentsWithQuery(query, page, size));
     }
     final List<dynamic> items = json['items'] as List<dynamic>;
     final List<User> users = List<User>.from(

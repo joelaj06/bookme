@@ -42,7 +42,7 @@ abstract class BookmeRemoteDatasource {
   Future<List<Booking>> fetchBookings(
       {String? agentId, required String? userId});
 
-  Future<Service> fetchUserService();
+  Future<Service> fetchUserService({required String? agentId});
 
   Future<Service> updateService(
       {required String serviceId, required ServiceRequest serviceRequest});

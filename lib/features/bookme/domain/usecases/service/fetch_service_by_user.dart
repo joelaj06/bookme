@@ -4,13 +4,13 @@ import 'package:bookme/features/bookme/data/models/response/service/service_mode
 import 'package:bookme/features/bookme/data/repository/bookme_repository.dart';
 import 'package:dartz/dartz.dart';
 
-class FetchServiceByUser implements UseCase<Service, NoParams>{
+class FetchServiceByUser implements UseCase<Service, PageParams>{
   FetchServiceByUser({required this.bookmeRepository});
 
   final BookmeRepository bookmeRepository;
 
   @override
-  Future<Either<Failure, Service>> call(NoParams params) {
-    return bookmeRepository.fetchServiceByUser();
+  Future<Either<Failure, Service>> call(PageParams params) {
+    return bookmeRepository.fetchServiceByUser(agentId: params.agentId);
   }
 }

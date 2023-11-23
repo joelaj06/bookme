@@ -32,6 +32,7 @@ class BookmeEndpoints {
 
   static const String userService = 'services/user';
 
+  static String userServiceById(String agentId) => 'services/user?agentId=$agentId';
   static const String service = 'services';
 
   static const String booking = 'bookings';

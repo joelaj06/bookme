@@ -1,3 +1,4 @@
+import 'package:bookme/core/presentation/routes/app_routes.dart';
 import 'package:bookme/core/presentation/theme/hint_color.dart';
 import 'package:bookme/core/presentation/theme/primary_color.dart';
 import 'package:bookme/core/presentation/theme/secondary_color.dart';
@@ -35,10 +36,9 @@ class ServiceDetailsScreen extends GetView<ServicesController> {
       }
     }
 
-
     return Scaffold(
       extendBodyBehindAppBar: true, // Extend the body behind the AppBar
-      bottomNavigationBar: _buildBottomNavigationItems(context,args?.service),
+      bottomNavigationBar: _buildBottomNavigationItems(context, args?.service),
       appBar: AppBar(
         leading: Padding(
           padding: const EdgeInsets.only(left: 8.0),
@@ -187,12 +187,15 @@ class ServiceDetailsScreen extends GetView<ServicesController> {
             ),
           ],
         ),
-        TextButton(
-          onPressed: () {
-            controller.navigateToServiceAgentScreen(args!.service);
-          },
-          child: const Text('See More'),
-        ),
+        if (Get.previousRoute == AppRoutes.serviceAgent)
+          const SizedBox.shrink()
+        else
+          TextButton(
+            onPressed: () {
+              controller.navigateToServiceAgentScreen(args!.service);
+            },
+            child: const Text('See More'),
+          ),
       ],
     );
   }
@@ -241,7 +244,7 @@ class ServiceDetailsScreen extends GetView<ServicesController> {
     );
   }
 
-  Widget _buildBottomNavigationItems(BuildContext context,Service? service) {
+  Widget _buildBottomNavigationItems(BuildContext context, Service? service) {
     return Container(
       height: 80,
       padding: AppPaddings.mA,
@@ -269,16 +272,17 @@ class ServiceDetailsScreen extends GetView<ServicesController> {
           Flexible(
             child: AppButton(
               onPressed: () {
-               //controller.bookAgent(service!);
+                //controller.bookAgent(service!);
                 showModalBottomSheet<dynamic>(
                   isScrollControlled: true,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(13)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(13)),
                   context: context,
                   builder: (BuildContext context) => SizedBox(
-                    height: MediaQuery.of(context).size.height *0.8,
+                    height: MediaQuery.of(context).size.height * 0.8,
                     child: Padding(
                       padding: AppPaddings.mA,
-                      child: _buildBookingModal(context,service!),
+                      child: _buildBookingModal(context, service!),
                     ),
                   ),
                 );
@@ -291,16 +295,16 @@ class ServiceDetailsScreen extends GetView<ServicesController> {
     );
   }
 
-  Widget _buildBookingModal(BuildContext context,Service service){
+  Widget _buildBookingModal(BuildContext context, Service service) {
     return Scaffold(
-      bottomNavigationBar:  SizedBox(
+      bottomNavigationBar: SizedBox(
         height: 60,
         child: Obx(
-              () => AppButton(
+          () => AppButton(
             enabled: !controller.isLoading.value,
             onPressed: () {
-              controller.bookAgent(service,context);
-             // Navigator.pop(context);
+              controller.bookAgent(service, context);
+              // Navigator.pop(context);
             },
             text: 'Done',
             fontSize: 18,
@@ -324,7 +328,7 @@ class ServiceDetailsScreen extends GetView<ServicesController> {
                 ],
               ),
               child: Obx(
-                    () => CalendarDatePicker2(
+                () => CalendarDatePicker2(
                   config: CalendarDatePicker2Config(
                     calendarType: CalendarDatePicker2Type.range,
                   ),
@@ -333,12 +337,16 @@ class ServiceDetailsScreen extends GetView<ServicesController> {
                 ),
               ),
             ),
-            const AppSpacing(v: 20,),
+            const AppSpacing(
+              v: 20,
+            ),
             AppTextInputField(
               labelText: 'Location',
               onChanged: controller.onLocationInputChanged,
             ),
-            const AppSpacing(v: 20,),
+            const AppSpacing(
+              v: 20,
+            ),
             AppTextInputField(
               labelText: 'Notes',
               maxLines: 3,

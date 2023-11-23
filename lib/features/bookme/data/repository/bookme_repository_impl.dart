@@ -79,8 +79,8 @@ class BookmeRepositoryImpl extends Repository implements BookmeRepository {
   }
 
   @override
-  Future<Either<Failure, Service>> fetchServiceByUser() {
-    return makeRequest(bookmeRemoteDatasource.fetchUserService());
+  Future<Either<Failure, Service>> fetchServiceByUser({required String? agentId}) {
+    return makeRequest(bookmeRemoteDatasource.fetchUserService(agentId: agentId));
   }
 
   @override
