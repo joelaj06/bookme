@@ -13,8 +13,8 @@ import 'package:get/get.dart';
 import '../../../../../core/utitls/base_64.dart';
 import '../../services/arguments/service_arguments.dart';
 
-class ServiceAgentScreen extends GetView<ServiceAgentController> {
-  const ServiceAgentScreen({Key? key}) : super(key: key);
+class ServiceAgentProfileScreen extends GetView<ServiceAgentProfileController> {
+  const ServiceAgentProfileScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

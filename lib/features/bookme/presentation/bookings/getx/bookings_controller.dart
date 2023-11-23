@@ -84,8 +84,8 @@ class BookingsController extends GetxController {
       _authLocalDataSource.isAuthenticated();
 
   void updateTheBooking(BookingStatus status) async {
-    final String startingDate = '${startDate.value}T$startTime';
-    final String endingDate = '${endDate.value}T$endTime';
+    final String startingDate = startDate.value;
+    final String endingDate = endDate.value;
     final BookingRequest bookingRequest = BookingRequest(
       id: bookingId,
       endDate: endingDate,

@@ -2,6 +2,8 @@ import 'package:bookme/core/presentation/routes/app_routes.dart';
 import 'package:bookme/features/authentication/presentation/login/getx/login_bindings.dart';
 import 'package:bookme/features/authentication/presentation/login/screens/login_screen.dart';
 import 'package:bookme/features/authentication/presentation/signup/screens/singup_screen.dart';
+import 'package:bookme/features/bookme/presentation/agents/getx/agents_bindings.dart';
+import 'package:bookme/features/bookme/presentation/agents/screens/agents_screen.dart';
 import 'package:bookme/features/bookme/presentation/chat/getx/chat_bindings.dart';
 import 'package:bookme/features/bookme/presentation/chat/screens/chat_screens.dart';
 import 'package:bookme/features/bookme/presentation/favorites/getx/favorites_bindings.dart';
@@ -30,7 +32,7 @@ class Pages {
       page: () => const BaseScreen(),
       bindings: <Bindings>[
         HomeBindings(),
-        ServicesBindings(),
+        AgentsBindings(),
         BookingBindings(),
         UserProfileBindings(),
       ]
@@ -79,8 +81,8 @@ class Pages {
     ),
     GetPage<AppRoutes>(
       name: AppRoutes.serviceAgent,
-      page: () => const ServiceAgentScreen(),
-      binding: ServiceAgentBindings(),
+      page: () => const ServiceAgentProfileScreen(),
+      binding: ServiceAgentProfileBindings(),
 
     ),
     GetPage<AppRoutes>(
@@ -120,6 +122,11 @@ class Pages {
       name: AppRoutes.messages,
       page: () => const MessageScreen(),
       bindings:<Bindings>[ ChatBindings(),MessageBindings()],
+    ),
+    GetPage<AppRoutes>(
+      name: AppRoutes.agents,
+      page: () => const AgentsScreen(),
+      binding: AgentsBindings(),
     ),
   ];
 }

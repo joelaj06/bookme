@@ -8,8 +8,8 @@ import '../../../../authentication/data/models/response/user/user_model.dart';
 import '../../../data/models/response/review/agent_rating_model.dart';
 import '../../../domain/usecases/review/fetch_agent_review.dart';
 
-class ServiceAgentController extends GetxController{
-  ServiceAgentController({required this.fetchAgentReview,});
+class ServiceAgentProfileController extends GetxController{
+  ServiceAgentProfileController({required this.fetchAgentReview,});
 
   FetchAgentReview fetchAgentReview;
 

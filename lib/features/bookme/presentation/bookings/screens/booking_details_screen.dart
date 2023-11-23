@@ -34,12 +34,8 @@ class BookingDetailsScreen extends GetView<BookingsController> {
           DateTime.parse(args.booking.endDate ?? DateTime.now().toString()));
       controller.dialogCalendarPickerValue(dates);
 
-      final String startTime = args.booking.startDate.toString();
-      final String endTime = args.booking.endDate.toString();
-      controller.startTimeTextEditingController.value.text = (startTime);
-      controller.endTimeTextEditingController.value.text = (endTime);
-      controller.startTime(startTime);
-      controller.endTime(endTime);
+      controller.startDate(args.booking.startDate.toString());
+      controller.endDate(args.booking.endDate.toString());
     }
     return Scaffold(
       appBar: AppBar(

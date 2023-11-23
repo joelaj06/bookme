@@ -11,6 +11,7 @@ import 'package:bookme/features/bookme/data/models/response/review/agent_rating_
 import 'package:bookme/features/bookme/data/models/response/review/review_model.dart';
 import 'package:bookme/features/bookme/data/models/response/service/service_model.dart';
 
+import '../../../authentication/data/models/response/user/user_model.dart';
 import '../models/request/service/service_request.dart';
 import '../models/response/booking/booking_model.dart';
 import '../models/response/chat/initiate_chat_model.dart';
@@ -68,4 +69,10 @@ abstract class BookmeRemoteDatasource {
   Future<Service> addService({required ServiceRequest serviceRequest});
 
   Future<Booking> addBooking({required BookingRequest bookingRequest});
+
+  Future<ListPage<User>> fetchAgents({
+    required int page,
+    required int size,
+    required String? query,
+});
 }

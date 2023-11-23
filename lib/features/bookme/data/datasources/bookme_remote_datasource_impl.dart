@@ -1,4 +1,5 @@
 import 'package:bookme/core/utitls/app_http_client.dart';
+import 'package:bookme/features/authentication/data/models/response/user/user_model.dart';
 import 'package:bookme/features/bookme/data/datasources/bookme_endpoints.dart';
 import 'package:bookme/features/bookme/data/datasources/bookme_remote_datasource.dart';
 import 'package:bookme/features/bookme/data/models/request/booking/booking_request.dart';
@@ -159,8 +160,9 @@ class BookmeRemoteDatasourceImpl implements BookmeRemoteDatasource {
   Future<Booking> updateBooking(
       {required String bookingId,
       required BookingRequest bookingRequest}) async {
-    final Map<String, dynamic> json = await _client
-        .put(BookmeEndpoints.bookingWithId(bookingId), body: bookingRequest.toJson());
+    final Map<String, dynamic> json = await _client.put(
+        BookmeEndpoints.bookingWithId(bookingId),
+        body: bookingRequest.toJson());
     return Booking.fromJson(json);
   }
 
@@ -248,9 +250,30 @@ class BookmeRemoteDatasourceImpl implements BookmeRemoteDatasource {
   }
 
   @override
-  Future<Booking> addBooking({required BookingRequest bookingRequest}) async{
-    final Map<String, dynamic>  json = await _client.post(BookmeEndpoints.booking, body: bookingRequest.toJson());
+  Future<Booking> addBooking({required BookingRequest bookingRequest}) async {
+    final Map<String, dynamic> json = await _client
+        .post(BookmeEndpoints.booking, body: bookingRequest.toJson());
     return Booking.fromJson(json);
+  }
 
+  @override
+  Future<ListPage<User>> fetchAgents(
+      {required int page, required int size, required String? query}) async {
+    final Map<String, dynamic> json;
+    if (query == null || query.isEmpty) {
+      json = await _client.get(BookmeEndpoints.agents(page,size));
+    } else {
+      json = await _client.get(BookmeEndpoints.agentsWithQuery(query,page,size));
+    }
+    final List<dynamic> items = json['items'] as List<dynamic>;
+    final List<User> users = List<User>.from(
+      items.map<User>(
+        (dynamic json) => User.fromJson(json as Map<String, dynamic>),
+      ),
+    );
+    return ListPage<User>(
+      grandTotalCount: int.parse(json['total_count'] as String),
+      itemList: users,
+    );
   }
 }

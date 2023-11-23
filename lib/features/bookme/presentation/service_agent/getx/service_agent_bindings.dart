@@ -2,10 +2,10 @@ import 'package:bookme/features/bookme/domain/usecases/review/fetch_agent_review
 import 'package:bookme/features/bookme/presentation/service_agent/getx/service_agent_controller.dart';
 import 'package:get/get.dart';
 
-class ServiceAgentBindings extends Bindings{
+class ServiceAgentProfileBindings extends Bindings{
   @override
   void dependencies() {
-    Get.put<ServiceAgentController>(ServiceAgentController(
+    Get.put<ServiceAgentProfileController>(ServiceAgentProfileController(
         fetchAgentReview: FetchAgentReview(
           bookmeRepository: Get.find(),
         )),);

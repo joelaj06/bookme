@@ -1,5 +1,6 @@
 import 'package:bookme/core/errors/failure.dart';
 import 'package:bookme/core/utitls/repository.dart';
+import 'package:bookme/features/authentication/data/models/response/user/user_model.dart';
 import 'package:bookme/features/bookme/data/datasources/bookme_remote_datasource.dart';
 import 'package:bookme/features/bookme/data/models/request/booking/booking_request.dart';
 import 'package:bookme/features/bookme/data/models/request/chat/chat_request.dart';
@@ -158,7 +159,19 @@ class BookmeRepositoryImpl extends Repository implements BookmeRepository {
   }
 
   @override
-  Future<Either<Failure, Booking>> addBooking({required BookingRequest bookingRequest}) {
-    return makeRequest(bookmeRemoteDatasource.addBooking(bookingRequest: bookingRequest));
+  Future<Either<Failure, Booking>> addBooking(
+      {required BookingRequest bookingRequest}) {
+    return makeRequest(
+        bookmeRemoteDatasource.addBooking(bookingRequest: bookingRequest));
+  }
+
+  @override
+  Future<Either<Failure, ListPage<User>>> fetchAgents(
+      {required int page,  required String? query,required int size,}) {
+    return makeRequest(bookmeRemoteDatasource.fetchAgents(
+      page: page,
+      size: size,
+      query: query,
+    ));
   }
 }

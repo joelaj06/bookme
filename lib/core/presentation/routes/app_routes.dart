@@ -20,4 +20,5 @@ class AppRoutes{
   static const String updateUser = '/updateUser';
   static const String user = '/user';
   static const String messages = '/messages';
+  static const String agents = '/agents';
 }

@@ -3,7 +3,7 @@ import 'package:iconly/iconly.dart';
 
 final List<IconData> navIconList = <IconData>[
   IconlyLight.home,
-  IconlyLight.document,
+  IconlyLight.user_1,
   IconlyLight.ticket,
   IconlyLight.profile,
 ];
@@ -11,7 +11,7 @@ final List<IconData> navIconList = <IconData>[
 
 final List<IconData> navIconSolidList = <IconData>[
   IconlyBold.home,
-  IconlyBold.document,
+  IconlyBold.user_3,
   IconlyBold.ticket,
   IconlyBold.profile,
 ];
@@ -20,7 +20,7 @@ final List<IconData> navIconSolidList = <IconData>[
 
 final List<String> navIconText = <String>[
   'Home',
-  'Services',
+  'Agents',
   'Bookings',
   'Profile'
 ];

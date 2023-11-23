@@ -50,4 +50,7 @@ class BookmeEndpoints {
   static String message(String chatId) => 'chats/$chatId/message';
 
   static String messages(String chatId) =>'chats/$chatId/messages';
+
+  static String agents(int page, int size) => 'users/agents?page=$page&size=$size';
+  static  String agentsWithQuery(String query,int page, int size) => 'users/agents?page=$page&size=$size&query=$query';
 }

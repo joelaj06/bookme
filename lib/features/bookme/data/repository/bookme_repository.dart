@@ -14,6 +14,7 @@ import 'package:bookme/features/bookme/data/models/response/review/agent_rating_
 import 'package:bookme/features/bookme/data/models/response/service/service_model.dart';
 import 'package:dartz/dartz.dart';
 
+import '../../../authentication/data/models/response/user/user_model.dart';
 import '../models/response/chat/chat_model.dart';
 import '../models/response/review/review_model.dart';
 
@@ -74,5 +75,12 @@ abstract class BookmeRepository {
   Future<Either<Failure, Service>> addService(
       {required ServiceRequest serviceRequest});
 
-  Future<Either<Failure,Booking>> addBooking({required BookingRequest bookingRequest});
+  Future<Either<Failure, Booking>> addBooking(
+      {required BookingRequest bookingRequest});
+
+  Future<Either<Failure,ListPage<User>>> fetchAgents({
+    required int page,
+    required int size,
+    required String? query,
+});
 }
