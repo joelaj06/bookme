@@ -41,7 +41,11 @@ class BookingDetailsScreen extends GetView<BookingsController> {
       appBar: AppBar(
         title: const Text('Booking Details'),
       ),
-      bottomNavigationBar: _buildBottomNavigationItems(context),
+      bottomNavigationBar:
+          (args?.booking.status == BookingStatus.canceled.name ||
+                  args?.booking.status == BookingStatus.completed.name)
+              ? const SizedBox.shrink()
+              : _buildBottomNavigationItems(context),
       body: Obx(
         () => AppLoadingBox(
           loading: controller.isLoading.value,
@@ -110,7 +114,8 @@ class BookingDetailsScreen extends GetView<BookingsController> {
                   if (Get.previousRoute == AppRoutes.tasks)
                     _buildUserInfo(args?.booking.user ?? User.empty(), context)
                   else
-                    _buildUserInfo(args?.booking.agent ?? User.empty(), context),
+                    _buildUserInfo(
+                        args?.booking.agent ?? User.empty(), context),
                   const AppSpacing(
                     v: 10,
                   ),
@@ -140,7 +145,7 @@ class BookingDetailsScreen extends GetView<BookingsController> {
                   const AppSpacing(
                     v: 10,
                   ),
-                   Text('Job Description: ${args?.booking.notes ?? ''}')
+                  Text('Job Description: ${args?.booking.notes ?? ''}')
                 ],
               ),
             ),
@@ -193,7 +198,6 @@ class BookingDetailsScreen extends GetView<BookingsController> {
       ],
     );
   }
-
 
   Widget _buildBottomNavigationItems(BuildContext context) {
     return Container(

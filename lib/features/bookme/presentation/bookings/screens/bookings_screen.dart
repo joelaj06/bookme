@@ -10,12 +10,12 @@ import 'package:bookme/core/presentation/widgets/exception_indicators/empty_list
 import 'package:bookme/core/presentation/widgets/exception_indicators/error_indicator.dart';
 import 'package:bookme/core/utitls/date_formatter.dart';
 import 'package:bookme/features/bookme/presentation/bookings/getx/bookings_controller.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconly/iconly.dart';
 import 'package:ionicons/ionicons.dart';
 
-import '../../../../../core/utitls/base_64.dart';
 import '../../../../authentication/data/models/response/user/user_model.dart';
 import '../../../data/models/response/booking/booking_model.dart';
 
@@ -46,7 +46,9 @@ class BookingsScreen extends GetView<BookingsController> {
                 future: controller.getUser(),
                 builder: (BuildContext context, AsyncSnapshot<User?> snapshot) {
                   final User user = snapshot.data ?? User.empty();
+                  if(user.id.isNotEmpty){
                   controller.getBookings(user.id);
+                }
                   return _buildPageView(context, user.id);
                 }),
           ),
@@ -93,7 +95,7 @@ class BookingsScreen extends GetView<BookingsController> {
           final BookingStatus status =
               convertToBookingStatus(controller.bookings[index].status!);
           if (controller.bookings[index].status == BookingStatus.pending.name ||
-              controller.bookings[index].status =='requested') {
+              controller.bookings[index].status == 'requested') {
             return _buildBookingsCard(
                 index, controller.bookings[index], width, context, status);
           }
@@ -177,11 +179,13 @@ class BookingsScreen extends GetView<BookingsController> {
                     tag: 'service$index',
                     child: image.isEmpty
                         ? Image.asset(AppImageAssets.blankProfilePicture)
-                        : Image.memory(
-                            fit: BoxFit.cover,
-                            Base64Convertor().base64toImage(
-                              image,
-                            ),
+                        : CachedNetworkImage(
+                            imageUrl: image,
+                            placeholder: (BuildContext context, String url) =>
+                                Image.asset(AppImageAssets.blankProfilePicture),
+                            errorWidget: (BuildContext context, String url,
+                                    dynamic error) =>
+                                const Icon(Icons.error),
                           ),
                   ),
                 ),
@@ -197,7 +201,7 @@ class BookingsScreen extends GetView<BookingsController> {
                         style: context.textTheme.bodyMedium?.copyWith(
                             fontSize: 15, fontWeight: FontWeight.w500),
                       ),
-                      Text(booking.service!.title),
+                      Text(booking.service!.title ?? ''),
                       Expanded(
                         child: SizedBox(
                           child: Text(

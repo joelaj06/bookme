@@ -4,6 +4,7 @@ import 'package:bookme/core/presentation/widgets/app_loading_box.dart';
 import 'package:bookme/features/bookme/data/models/response/review/agent_rating_model.dart';
 import 'package:bookme/features/bookme/data/models/response/review/review_model.dart';
 import 'package:bookme/features/bookme/presentation/reviews/getx/user_review_controller.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -13,7 +14,6 @@ import '../../../../../core/presentation/widgets/app_custom_listview.dart';
 import '../../../../../core/presentation/widgets/app_ratings_icon.dart';
 import '../../../../../core/presentation/widgets/exception_indicators/empty_list_indicator.dart';
 import '../../../../../core/presentation/widgets/exception_indicators/error_indicator.dart';
-import '../../../../../core/utitls/base_64.dart';
 
 class UserReviewScreen extends GetView<UserReviewController> {
   const UserReviewScreen({super.key});
@@ -79,31 +79,6 @@ class UserReviewScreen extends GetView<UserReviewController> {
             emptyListIndicatorBuilder: const EmptyListIndicator(),
           ),
         )
-        /* RefreshIndicator(
-        onRefresh: () {
-          return controller.checkAgent();
-        },
-        child: ListView.builder(
-            physics: const BouncingScrollPhysics(
-              parent: AlwaysScrollableScrollPhysics(),
-            ),
-            shrinkWrap: true,
-            itemCount: controller.reviews.length,
-            itemBuilder: (BuildContext context, int index) {
-              return Column(
-                children: <Widget>[
-                  Padding(
-                    padding: AppPaddings.mA,
-                    child: _buildUserReviewCard(
-                        context, controller.reviews[index]),
-                  ),
-                  const Divider(
-                    height: 1,
-                  ),
-                ],
-              );
-            }),
-      ),*/
         );
   }
 
@@ -119,11 +94,13 @@ class UserReviewScreen extends GetView<UserReviewController> {
               child: CircleAvatar(
                 child: image.isEmpty
                     ? Image.asset(AppImageAssets.blankProfilePicture)
-                    : Image.memory(
-                        fit: BoxFit.cover,
-                        Base64Convertor().base64toImage(
-                          image,
-                        ),
+                    : CachedNetworkImage(
+                        imageUrl: image,
+                        placeholder: (BuildContext context, String url) =>
+                            Image.asset(AppImageAssets.blankProfilePicture),
+                        errorWidget:
+                            (BuildContext context, String url, dynamic error) =>
+                                const Icon(Icons.error),
                       ),
               ),
             ),

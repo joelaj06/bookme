@@ -171,9 +171,18 @@ class SignUpController extends GetxController {
     base64Images.removeAt(index);
   }
 
+
+
   Future<String?> showImagePicker() async {
     final XFile? imageFile =
         await picker.pickImage(source: ImageSource.gallery);
+    final double size = await Base64Convertor.checkImageSize(imageFile);
+    if (size > 5) {
+      AppSnacks.showInfo('Large File Size', 'Image should not exceed 5MB',
+        duration: const Duration(milliseconds: 3000),
+      );
+      return null;
+    }
     if (imageFile != null) {
       final String base64StringImage =
           Base64Convertor().imageToBase64(imageFile.path);

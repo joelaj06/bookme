@@ -5,6 +5,7 @@ import 'package:bookme/core/utitls/date_formatter.dart';
 import 'package:bookme/core/utitls/string_utils.dart';
 import 'package:bookme/features/bookme/data/models/response/discount/discount_model.dart';
 import 'package:bookme/features/bookme/presentation/promotions/getx/promotions_controller.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
@@ -14,7 +15,6 @@ import '../../../../../core/errors/failure.dart';
 import '../../../../../core/presentation/utitls/app_spacing.dart';
 import '../../../../../core/presentation/widgets/exception_indicators/empty_list_indicator.dart';
 import '../../../../../core/presentation/widgets/exception_indicators/error_indicator.dart';
-import '../../../../../core/utitls/base_64.dart';
 import '../../../data/models/response/service/service_model.dart';
 
 class PromotionsScreen extends GetView<PromotionsController> {
@@ -56,8 +56,8 @@ class PromotionsScreen extends GetView<PromotionsController> {
               height: 120,
               width: width,
               padding: AppPaddings.mA,
-              decoration:  BoxDecoration(
-              color: Colors.red,
+              decoration: BoxDecoration(
+                color: Colors.red,
                 borderRadius: BorderRadius.circular(20),
                 gradient: LinearGradient(
                   begin: Alignment.centerLeft,
@@ -70,8 +70,7 @@ class PromotionsScreen extends GetView<PromotionsController> {
                 ),
               ),
               child: Stack(
-                children:  <Widget>[
-
+                children: <Widget>[
                   Positioned(
                     top: 0,
                     left: 0,
@@ -79,28 +78,35 @@ class PromotionsScreen extends GetView<PromotionsController> {
                     bottom: 0,
                     child: const Align(
                       alignment: Alignment.centerLeft,
-                      child: Text('Enjoy Cool Discounts From Your Favorite Service Providers',
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: Colors.white,
-                      ),),
+                      child: Text(
+                        'Enjoy Cool Discounts From Your Favorite Service Providers',
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
                   ),
                   Positioned(
                     bottom: -60,
-                    left: width * 0.25, // Adjust this value to position the image
-                   // width: width * 0.5,
-                    child: Image.asset(AppImageAssets.newYear,
+                    left: width * 0.25,
+                    // Adjust this value to position the image
+                    // width: width * 0.5,
+                    child: Image.asset(
+                      AppImageAssets.newYear,
                       scale: 5,
-                    fit: BoxFit.cover,),
+                      fit: BoxFit.cover,
+                    ),
                   ),
                   Positioned(
                     right: 0,
                     bottom: 0,
                     top: 0,
-                    width: width*0.3,
-                    child: Image.asset(AppImageAssets.megaphone,
-                    scale: 5,),
+                    width: width * 0.3,
+                    child: Image.asset(
+                      AppImageAssets.megaphone,
+                      scale: 5,
+                    ),
                   ),
                 ],
               ),
@@ -108,7 +114,8 @@ class PromotionsScreen extends GetView<PromotionsController> {
             const AppSpacing(
               v: 10,
             ),
-            Expanded(child: _buildPromotionListTile(context),
+            Expanded(
+              child: _buildPromotionListTile(context),
             ),
           ],
         ),
@@ -116,12 +123,12 @@ class PromotionsScreen extends GetView<PromotionsController> {
     );
   }
 
-  Widget _buildPromotionListTile(BuildContext context){
-   // final double width = MediaQuery.of(context).size.width;
+  Widget _buildPromotionListTile(BuildContext context) {
+    // final double width = MediaQuery.of(context).size.width;
     return RefreshIndicator(
       onRefresh: () => Future<void>.sync(
-            () {
-             controller.promotedServicesPagingController.refresh();
+        () {
+          controller.promotedServicesPagingController.refresh();
         },
       ),
       child: PagedListView<int, Service>.separated(
@@ -133,35 +140,38 @@ class PromotionsScreen extends GetView<PromotionsController> {
               onDismissed: (DismissDirection direction) {
                 //  controller.deleteTheService(context, index);
               },
-              child: _buildPromotionServiceCard(context,index,service),
+              child: _buildPromotionServiceCard(context, index, service),
             );
           },
           firstPageErrorIndicatorBuilder: (BuildContext context) =>
               ErrorIndicator(
-                error: controller.promotedServicesPagingController.value.error as Failure,
-                onTryAgain: () => controller.promotedServicesPagingController.refresh(),
-              ),
+            error: controller.promotedServicesPagingController.value.error
+                as Failure,
+            onTryAgain: () =>
+                controller.promotedServicesPagingController.refresh(),
+          ),
           noItemsFoundIndicatorBuilder: (BuildContext context) =>
-          const EmptyListIndicator(),
+              const EmptyListIndicator(),
           newPageProgressIndicatorBuilder: (BuildContext context) =>
-          const Center(
+              const Center(
             child: CircularProgressIndicator.adaptive(),
           ),
           firstPageProgressIndicatorBuilder: (BuildContext context) =>
-          const Center(
+              const Center(
             child: CircularProgressIndicator.adaptive(),
           ),
         ),
         //padding: AppPaddings.lA,
         separatorBuilder: (BuildContext context, int index) =>
-        const SizedBox.shrink(),
+            const SizedBox.shrink(),
       ),
     );
   }
 
-  GestureDetector _buildPromotionServiceCard(BuildContext context,int index, Service service) {
-   final String title = service.discount!.title ?? service.title;
-   final String image = service.coverImage ?? '';
+  GestureDetector _buildPromotionServiceCard(
+      BuildContext context, int index, Service service) {
+    final String title = service.discount!.title ?? service.title ?? '';
+    final String image = service.coverImage ?? '';
     return GestureDetector(
       onTap: () => controller.navigateToServiceDetailsScreen(service),
       child: Padding(
@@ -190,14 +200,18 @@ class PromotionsScreen extends GetView<PromotionsController> {
                   children: <Widget>[
                     ClipRRect(
                       borderRadius: BorderRadius.circular(15),
-                      child: image.isEmpty ?
-                      Image.asset(AppImageAssets.noServiceImage)
-                          :Image.memory(
-                        fit: BoxFit.cover,
-                        Base64Convertor().base64toImage(
-                          image,
-                        ),
-                      ),
+                      child: image.isEmpty
+                          ? Image.asset(AppImageAssets.noServiceImage)
+                          : CachedNetworkImage(
+                              fit: BoxFit.cover,
+                              imageUrl: image,
+                              placeholder: (BuildContext context, String url) =>
+                                  Image.asset(
+                                      AppImageAssets.blankProfilePicture),
+                              errorWidget: (BuildContext context, String url,
+                                      dynamic error) =>
+                                  const Icon(Icons.error),
+                            ),
                     ),
                     const AppSpacing(
                       h: 10,
@@ -212,10 +226,11 @@ class PromotionsScreen extends GetView<PromotionsController> {
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                         Text(service.title.toTitleCase()),
+                        Text(service.title!.toTitleCase()),
                         const Expanded(child: Text('Valid up to')),
                         Text(
-                          DataFormatter.dateToString(service.discount!.endDate ?? ''),
+                          DataFormatter.dateToString(
+                              service.discount!.endDate ?? ''),
                           style: context.textTheme.bodyMedium?.copyWith(
                             //fontSize: 15,
                             fontWeight: FontWeight.w500,
@@ -226,7 +241,7 @@ class PromotionsScreen extends GetView<PromotionsController> {
                     ),
                   ],
                 ),
-                _buildDiscountBanner(context,service.discount!)
+                _buildDiscountBanner(context, service.discount!)
               ],
             ),
           ),
@@ -241,7 +256,7 @@ class PromotionsScreen extends GetView<PromotionsController> {
       width: 60,
       height: 60,
       padding: AppPaddings.mA,
-      decoration:  BoxDecoration(
+      decoration: BoxDecoration(
         color: Colors.red.shade700,
         borderRadius: const BorderRadius.only(
           bottomLeft: Radius.circular(15),
@@ -276,11 +291,11 @@ class PromotionsScreen extends GetView<PromotionsController> {
             child: Text(
               'OFF',
               style: context.textTheme.bodyMedium?.copyWith(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  color: PrimaryColor.color.shade400,
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: PrimaryColor.color.shade400,
+              ),
             ),
-          ),
           ),
         ],
       ),

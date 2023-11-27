@@ -1,6 +1,7 @@
 import 'package:bookme/core/presentation/utitls/app_assets.dart';
 import 'package:bookme/features/bookme/data/models/response/favorite/favorite_model.dart';
 import 'package:bookme/features/bookme/presentation/favorites/getx/favorites_controller.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -14,7 +15,6 @@ import '../../../../../core/presentation/widgets/app_loading_box.dart';
 import '../../../../../core/presentation/widgets/exception_indicators/empty_list_indicator.dart';
 import '../../../../../core/presentation/widgets/exception_indicators/error_indicator.dart';
 import '../../../../../core/presentation/widgets/location_icon.dart';
-import '../../../../../core/utitls/base_64.dart';
 import '../../../data/models/response/service/service_model.dart';
 
 class FavoriteScreen extends GetView<FavoritesController> {
@@ -26,13 +26,12 @@ class FavoriteScreen extends GetView<FavoritesController> {
       appBar: AppBar(
         title: const Text('Favorites'),
       ),
-      body:  AppLoadingBox(
-          loading: controller.isLoading.value,
-          child: _buildServiceListTile(
-            context,
-          ),
+      body: AppLoadingBox(
+        loading: controller.isLoading.value,
+        child: _buildServiceListTile(
+          context,
         ),
-
+      ),
     );
   }
 
@@ -107,11 +106,13 @@ class FavoriteScreen extends GetView<FavoritesController> {
                     tag: 'service${service.id}',
                     child: image.isEmpty
                         ? Image.asset(AppImageAssets.noImage)
-                        : Image.memory(
-                            fit: BoxFit.cover,
-                            Base64Convertor().base64toImage(
-                              image,
-                            ),
+                        : CachedNetworkImage(
+                            imageUrl: image,
+                            placeholder: (BuildContext context, String url) =>
+                                Image.asset(AppImageAssets.noServiceImage),
+                            errorWidget: (BuildContext context, String url,
+                                    dynamic error) =>
+                                const Icon(Icons.error),
                           ),
                   ),
                 ),
@@ -123,14 +124,14 @@ class FavoriteScreen extends GetView<FavoritesController> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Text(
-                        service.title,
+                        service.title ?? '',
                         style: context.textTheme.bodyMedium?.copyWith(
                             fontSize: 15, fontWeight: FontWeight.w500),
                       ),
                       IconText(text: service.location ?? ''),
                       SizedBox(
                         child: Text(
-                          service.description,
+                          service.description ?? '',
                           overflow: TextOverflow.ellipsis,
                           maxLines: 2,
                           style: TextStyle(

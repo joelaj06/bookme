@@ -147,6 +147,8 @@ class BookmeRemoteDatasourceImpl implements BookmeRemoteDatasource {
     } else {
       json = await _client.get(BookmeEndpoints.userServiceById(agentId));
     }
+    print('printing json.....');
+    print(json);
     return Service.fromJson(json);
   }
 

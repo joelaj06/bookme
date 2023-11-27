@@ -10,13 +10,13 @@ import 'package:bookme/core/presentation/widgets/app_loading_box.dart';
 import 'package:bookme/core/presentation/widgets/location_icon.dart';
 import 'package:bookme/features/bookme/presentation/services/arguments/service_arguments.dart';
 import 'package:bookme/features/bookme/presentation/services/getx/services_controller.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ionicons/ionicons.dart';
 
 import '../../../../../core/presentation/widgets/app_text_input_field.dart';
-import '../../../../../core/utitls/base_64.dart';
 import '../../../data/models/response/service/service_model.dart';
 
 class ServiceDetailsScreen extends GetView<ServicesController> {
@@ -31,7 +31,7 @@ class ServiceDetailsScreen extends GetView<ServicesController> {
 
     List<String?> images = <String>[];
     if (args != null) {
-      if (args.service.images != null && args.service.images!.isNotEmpty) {
+      if (args.service.images != null && coverImage.isNotEmpty) {
         images = <String?>[coverImage, ...args.service.images ?? <String>[]];
       }
     }
@@ -73,15 +73,22 @@ class ServiceDetailsScreen extends GetView<ServicesController> {
                   child: Hero(
                     tag: 'service${args?.service.id}',
                     child: Obx(() {
-                      final String image =
-                          images[controller.imageIndex.value] ?? '';
+                       RxString image = ''.obs;
+                      if(images.isNotEmpty){
+                        image(
+                            images[controller.imageIndex.value] ?? '');
+                    }
                       return image.isEmpty
                           ? Image.asset(AppImageAssets.serviceSketches)
-                          : Image.memory(
-                              fit: BoxFit.cover,
-                              Base64Convertor().base64toImage(
-                                images[controller.imageIndex.value]!,
-                              ),
+                          : CachedNetworkImage(
+                             fit: BoxFit.cover,
+                              imageUrl: image.value,
+                              placeholder: (BuildContext context, String url) =>
+                                  Image.asset(
+                                      AppImageAssets.serviceSketches),
+                              errorWidget: (BuildContext context, String url,
+                                      dynamic error) =>
+                                  const Icon(Icons.error),
                             );
                     }),
                   ),
@@ -162,11 +169,13 @@ class ServiceDetailsScreen extends GetView<ServicesController> {
                 radius: 25,
                 child: image.isEmpty
                     ? Image.asset(AppImageAssets.blankProfilePicture)
-                    : Image.memory(
-                        fit: BoxFit.cover,
-                        Base64Convertor().base64toImage(
-                          image,
-                        ),
+                    : CachedNetworkImage(
+                        imageUrl: image,
+                        placeholder: (BuildContext context, String url) =>
+                            Image.asset(AppImageAssets.blankProfilePicture),
+                        errorWidget:
+                            (BuildContext context, String url, dynamic error) =>
+                                const Icon(Icons.error),
                       ),
               ),
             ),
@@ -226,15 +235,20 @@ class ServiceDetailsScreen extends GetView<ServicesController> {
                               width: 120,
                               color: HintColor.color.shade50,
                               child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(15),
-                                  child: image.isEmpty
-                                      ? Image.asset(AppImageAssets.noImage)
-                                      : Image.memory(
-                                          fit: BoxFit.cover,
-                                          Base64Convertor().base64toImage(
-                                            images[index]!,
-                                          ),
-                                        )),
+                                borderRadius: BorderRadius.circular(15),
+                                child: image.isEmpty
+                                    ? Image.asset(AppImageAssets.noImage)
+                                    : CachedNetworkImage(
+                                        imageUrl: image,
+                                        placeholder: (BuildContext context,
+                                                String url) =>
+                                            Image.asset(AppImageAssets
+                                                .blankProfilePicture),
+                                        errorWidget: (BuildContext context,
+                                                String url, dynamic error) =>
+                                            const Icon(Icons.error),
+                                      ),
+                              ),
                             ),
                           ),
                         ),
@@ -258,7 +272,7 @@ class ServiceDetailsScreen extends GetView<ServicesController> {
             backgroundColor: HintColor.color.shade300.withOpacity(0.5),
             child: IconButton(
               onPressed: () {
-                controller.addToFavorites(service!.id);
+                controller.addToFavorites(service!.id!);
               },
               icon: const Icon(
                 Ionicons.heart,

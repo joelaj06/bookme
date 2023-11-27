@@ -13,15 +13,15 @@ part 'service_model.g.dart';
 class Service with _$Service {
   const factory Service({
     @JsonKey(name: 'is_special_offer') bool? isSpecialOffer,
-    @JsonKey(name: '_id') required String id,
+    @JsonKey(name: '_id') required String? id,
     @JsonKey(name: 'cover_image') String? coverImage,
     String? location,
     User? user,
     @JsonKey(name: 'user_data') User? userData,
     required List<Category>? categories,
     List<String>? images,
-    required String description,
-    required String title,
+    required String? description,
+    required String? title,
     Discount? discount,
     double? price,
     String? createdAt,

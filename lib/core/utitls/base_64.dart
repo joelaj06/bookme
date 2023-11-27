@@ -3,12 +3,23 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 
 class Base64Convertor {
   static bool isFolderCreated = false;
   static Directory? directory;
+
+  static Future<double> checkImageSize(XFile? imageFile) async{
+    final int? bytes = (await imageFile?.readAsBytes())?.lengthInBytes;
+    if (bytes != null) {
+      final double imageInKb = bytes / 1024;
+      final double imageInMB = imageInKb / 1024;
+      return imageInMB;
+    }
+    return 0;
+  }
 
   static Future<void> checkDocumentFolder() async {
     try {

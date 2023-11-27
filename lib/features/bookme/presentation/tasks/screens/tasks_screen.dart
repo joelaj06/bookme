@@ -2,18 +2,19 @@ import 'package:bookme/core/presentation/widgets/app_loading_box.dart';
 import 'package:bookme/core/utitls/date_formatter.dart';
 import 'package:bookme/features/bookme/data/models/response/booking/booking_model.dart';
 import 'package:bookme/features/bookme/presentation/tasks/getx/tasks_controller.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ionicons/ionicons.dart';
 
 import '../../../../../core/presentation/theme/hint_color.dart';
 import '../../../../../core/presentation/theme/primary_color.dart';
+import '../../../../../core/presentation/utitls/app_assets.dart';
 import '../../../../../core/presentation/utitls/app_padding.dart';
 import '../../../../../core/presentation/utitls/app_spacing.dart';
 import '../../../../../core/presentation/widgets/app_custom_listview.dart';
 import '../../../../../core/presentation/widgets/exception_indicators/empty_list_indicator.dart';
 import '../../../../../core/presentation/widgets/exception_indicators/error_indicator.dart';
-import '../../../../../core/utitls/base_64.dart';
 
 class TasksScreen extends GetView<TasksController> {
   const TasksScreen({Key? key}) : super(key: key);
@@ -143,11 +144,13 @@ class TasksScreen extends GetView<TasksController> {
                     tag: 'service$index',
                     child: image.isEmpty
                         ? Image.asset('assets/images/no_image.png')
-                        : Image.memory(
-                            fit: BoxFit.cover,
-                            Base64Convertor().base64toImage(
-                              image,
-                            ),
+                        : CachedNetworkImage(
+                            imageUrl: image,
+                            placeholder: (BuildContext context, String url) =>
+                                Image.asset(AppImageAssets.blankProfilePicture),
+                            errorWidget: (BuildContext context, String url,
+                                    dynamic error) =>
+                                const Icon(Icons.error),
                           ),
                   ),
                 ),
@@ -164,12 +167,13 @@ class TasksScreen extends GetView<TasksController> {
                             fontSize: 15, fontWeight: FontWeight.w500),
                       ),
                       Text(
-                        note.isEmpty ? booking.service!.title : note,
+                        note.isEmpty ? booking.service!.title ?? '' : note,
+                        overflow: TextOverflow.ellipsis,
                       ),
                       SizedBox(
                         child: Text(
                           DataFormatter.getLocalCurrencyFormatter(context)
-                              .format(booking.preliminaryCost),
+                              .format(booking.preliminaryCost ?? 0.0),
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(color: PrimaryColor.color),
                         ),

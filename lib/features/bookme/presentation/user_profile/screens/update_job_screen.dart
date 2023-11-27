@@ -2,6 +2,7 @@ import 'package:bookme/core/presentation/widgets/animated_column.dart';
 import 'package:bookme/core/presentation/widgets/app_loading_box.dart';
 import 'package:bookme/features/bookme/data/models/response/category/category_model.dart';
 import 'package:bookme/features/bookme/presentation/user_profile/getx/user_profile_controller.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:full_screen_image/full_screen_image.dart';
@@ -10,6 +11,7 @@ import 'package:ionicons/ionicons.dart';
 
 import '../../../../../core/presentation/theme/hint_color.dart';
 import '../../../../../core/presentation/theme/primary_color.dart';
+import '../../../../../core/presentation/utitls/app_assets.dart';
 import '../../../../../core/presentation/utitls/app_padding.dart';
 import '../../../../../core/presentation/utitls/app_spacing.dart';
 import '../../../../../core/presentation/widgets/app_button.dart';
@@ -169,7 +171,8 @@ class UpdateJobScreen extends GetView<UserProfileController> {
             const AppSpacing(
               v: 10,
             ),
-            Obx(() => AppTextInputField(
+            Obx(
+              () => AppTextInputField(
                 controller: controller.discountTitleTextEditingController.value,
                 labelText: 'Discount Tittle',
                 //onChanged: controller.onDiscountTitleInputChanged,
@@ -333,12 +336,24 @@ class UpdateJobScreen extends GetView<UserProfileController> {
                           tag: 'image$index',
                           child: ClipRRect(
                               borderRadius: BorderRadius.circular(15),
-                              child: Image.memory(
-                                fit: BoxFit.contain,
-                                Base64Convertor().base64toImage(
-                                  image,
-                                ),
-                              )),
+                              child: image.contains('http')
+                                  ? CachedNetworkImage(
+                                      fit: BoxFit.contain,
+                                      imageUrl: image,
+                                      placeholder:
+                                          (BuildContext context, String url) =>
+                                              Image.asset(AppImageAssets
+                                                  .blankProfilePicture),
+                                      errorWidget: (BuildContext context,
+                                              String url, dynamic error) =>
+                                          const Icon(Icons.error),
+                                    )
+                                  : Image.memory(
+                                      fit: BoxFit.contain,
+                                      Base64Convertor().base64toImage(
+                                        image,
+                                      ),
+                                    )),
                         ),
                       ),
                     ),

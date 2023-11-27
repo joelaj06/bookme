@@ -85,21 +85,6 @@ class ServiceAgentProfileScreen extends GetView<ServiceAgentProfileController> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                /*  SizedBox(
-                    height: 100,
-                    width: 100,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(15),
-                      child: image.isEmpty ?
-                      Image.asset(AppImageAssets.blankProfilePicture)
-                          :Image.memory(
-                        fit: BoxFit.cover,
-                        Base64Convertor().base64toImage(
-                          image,
-                        ),
-                      ),
-                    ),
-                  ),*/
                   Obx(
                     () => Text(
                       '${controller.agent.value.firstName} ${controller.agent.value.lastName}',

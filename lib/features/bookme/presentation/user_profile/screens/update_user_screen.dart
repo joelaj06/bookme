@@ -2,6 +2,7 @@ import 'package:bookme/core/presentation/theme/primary_color.dart';
 import 'package:bookme/core/presentation/utitls/app_padding.dart';
 import 'package:bookme/core/presentation/widgets/animated_column.dart';
 import 'package:bookme/features/bookme/presentation/user_profile/getx/user_profile_controller.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconly/iconly.dart';
@@ -70,13 +71,26 @@ class UpdateUserScreen extends GetView<UserProfileController> {
                       radius: 70,
                       child: controller.userProfileImage.value.isEmpty
                           ? Image.asset(AppImageAssets.blankProfilePicture)
-                          : Image.memory(
-                              height: 200,
-                              fit: BoxFit.cover,
-                              Base64Convertor().base64toImage(
-                                controller.userProfileImage.value,
-                              ),
-                            ),
+                          : controller.userProfileImage.value.contains('http')
+                              ? CachedNetworkImage(
+                                  fit: BoxFit.cover,
+                                  height: 200,
+                                  imageUrl: controller.userProfileImage.value,
+                                  placeholder: (BuildContext context,
+                                          String url) =>
+                                      Image.asset(
+                                          AppImageAssets.blankProfilePicture),
+                                  errorWidget: (BuildContext context,
+                                          String url, dynamic error) =>
+                                      const Icon(Icons.error),
+                                )
+                              : Image.memory(
+                                  height: 200,
+                                  fit: BoxFit.cover,
+                                  Base64Convertor().base64toImage(
+                                    controller.userProfileImage.value,
+                                  ),
+                                ),
                     ),
                   ),
                 ),
@@ -159,13 +173,14 @@ class UpdateUserScreen extends GetView<UserProfileController> {
       children: <Widget>[
         const Align(
           alignment: Alignment.center,
-          child: Text('Choose an option',
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: 16
-          ),),
+          child: Text(
+            'Choose an option',
+            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+          ),
         ),
-        const AppSpacing(v: 10,),
+        const AppSpacing(
+          v: 10,
+        ),
         _buildModalListCard(
           onTap: () {
             controller.addImage();

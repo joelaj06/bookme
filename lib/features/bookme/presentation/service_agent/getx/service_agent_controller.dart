@@ -50,6 +50,8 @@ class ServiceAgentProfileController extends GetxController {
       },
       (Service serv) {
         service(serv);
+        print(service);
+        print(serv);
       },
     );
   }

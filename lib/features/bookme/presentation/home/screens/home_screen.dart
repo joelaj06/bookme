@@ -5,12 +5,12 @@ import 'package:bookme/core/presentation/utitls/app_spacing.dart';
 import 'package:bookme/core/presentation/widgets/app_rating_widget.dart';
 import 'package:bookme/core/presentation/widgets/location_icon.dart';
 import 'package:bookme/core/utitls/string_utils.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconly/iconly.dart';
 
 import '../../../../../core/presentation/utitls/app_assets.dart';
-import '../../../../../core/utitls/base_64.dart';
 import '../../../data/models/response/category/category_model.dart';
 import '../../../data/models/response/review/review_model.dart';
 import '../../../data/models/response/service/service_model.dart';
@@ -143,7 +143,7 @@ class HomeScreen extends GetView<HomeController> {
 
   GestureDetector _buildPromotionServiceCard(
       BuildContext context, int index, Service service) {
-    final String title = service.discount!.title ?? service.title;
+    final String title = service.discount!.title ?? service.title ?? '';
     final String discountType = service.discount!.type;
     final double value = service.discount!.value;
     final String image = service.coverImage ?? '';
@@ -177,11 +177,10 @@ class HomeScreen extends GetView<HomeController> {
                     borderRadius: BorderRadius.circular(15),
                     child: image.isEmpty ?
                     Image.asset(AppImageAssets.noServiceImage)
-                        :Image.memory(
-                      fit: BoxFit.cover,
-                      Base64Convertor().base64toImage(
-                        image,
-                      ),
+                        :CachedNetworkImage(
+                      imageUrl: image,
+                      placeholder: (BuildContext context, String url) => Image.asset(AppImageAssets.noServiceImage),
+                      errorWidget: (BuildContext context, String url, dynamic error) => const Icon(Icons.error),
                     ),
                   ),
                   const AppSpacing(
@@ -196,7 +195,7 @@ class HomeScreen extends GetView<HomeController> {
                           style: context.textTheme.bodyMedium?.copyWith(
                               fontSize: 15, fontWeight: FontWeight.w500),
                         ),
-                        Text(service.title.toTitleCase()),
+                        Text(service.title!.toTitleCase()),
                         Expanded(
                           child: Align(
                             alignment: Alignment.bottomRight,
@@ -294,11 +293,10 @@ class HomeScreen extends GetView<HomeController> {
                     tag: 'service$index',
                     child: image.isEmpty ?
                     Image.asset(AppImageAssets.noServiceImage)
-                        :Image.memory(
-                      fit: BoxFit.cover,
-                      Base64Convertor().base64toImage(
-                        image,
-                      ),
+                        :CachedNetworkImage(
+                      imageUrl: image,
+                      placeholder: (BuildContext context, String url) => Image.asset(AppImageAssets.noServiceImage),
+                      errorWidget: (BuildContext context, String url, dynamic error) => const Icon(Icons.error),
                     ),
                   ),
                 ),
@@ -309,7 +307,7 @@ class HomeScreen extends GetView<HomeController> {
                     children: <Widget>[
                       Expanded(
                         child: Text(
-                          review.serviceData!.title.toTitleCase(),
+                          review.serviceData!.title!.toTitleCase(),
                           style: context.textTheme.bodyMedium?.copyWith(
                               fontSize: 15, fontWeight: FontWeight.w500),
                         ),
@@ -327,7 +325,7 @@ class HomeScreen extends GetView<HomeController> {
                 ),
                 Expanded(
                   child: Text(
-                    review.serviceData!.description.toTitleCase(),
+                    review.serviceData!.description!.toTitleCase(),
                     overflow: TextOverflow.fade,
                     maxLines: 3,
                     style: TextStyle(color: HintColor.color.shade400),

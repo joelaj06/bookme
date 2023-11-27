@@ -1,4 +1,3 @@
-
 import 'package:bookme/core/presentation/routes/app_routes.dart';
 import 'package:bookme/core/presentation/widgets/app_snacks.dart';
 import 'package:bookme/core/usecase/usecase.dart';
@@ -191,8 +190,9 @@ class UserProfileController extends GetxController {
   void updateTheUser() async {
     final UserRequest userRequest = UserRequest(
       id: user.value.id,
-      image: userProfileImage.value.isEmpty ? currentProfileImage.value :
-      userProfileImage.value,
+      image: userProfileImage.value.isEmpty
+          ? currentProfileImage.value
+          : userProfileImage.value,
       firstName: firstName.value.isEmpty ? null : firstName.value,
       lastName: lastName.value.isEmpty ? null : lastName.value,
       email: email.value.isEmpty ? null : email.value,
@@ -244,12 +244,12 @@ class UserProfileController extends GetxController {
     Get.toNamed<dynamic>(AppRoutes.tasks);
   }
 
-  void loadProfileImage(){
+  void loadProfileImage() {
     currentProfileImage(user.value.image);
     userProfileImage(user.value.image);
   }
 
-  void removeProfileImage(){
+  void removeProfileImage() {
     userProfileImage('');
   }
 
@@ -274,9 +274,17 @@ class UserProfileController extends GetxController {
     base64Images.removeAt(index);
   }
 
+
   void showImagePicker() async {
     final XFile? imageFile =
         await picker.pickImage(source: ImageSource.gallery);
+       final double size = await Base64Convertor.checkImageSize(imageFile);
+      if (size > 5) {
+        AppSnacks.showInfo('Large File Sized', 'Image should not exceed 5MB',
+          duration: const Duration(milliseconds: 3000),
+        );
+        return;
+      }
     if (imageFile != null) {
       final String base64StringImage =
           Base64Convertor().imageToBase64(imageFile.path);

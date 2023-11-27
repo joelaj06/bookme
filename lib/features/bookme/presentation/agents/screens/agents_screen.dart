@@ -1,6 +1,7 @@
 import 'package:bookme/core/presentation/utitls/app_padding.dart';
 import 'package:bookme/core/presentation/utitls/app_spacing.dart';
 import 'package:bookme/features/bookme/presentation/agents/getx/agents_controller.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconly/iconly.dart';
@@ -11,7 +12,6 @@ import '../../../../../core/presentation/utitls/app_assets.dart';
 import '../../../../../core/presentation/widgets/app_loading_box.dart';
 import '../../../../../core/presentation/widgets/exception_indicators/empty_list_indicator.dart';
 import '../../../../../core/presentation/widgets/exception_indicators/error_indicator.dart';
-import '../../../../../core/utitls/base_64.dart';
 import '../../../../authentication/data/models/response/user/user_model.dart';
 class AgentsScreen extends GetView<AgentsController> {
   const AgentsScreen({super.key});
@@ -142,12 +142,13 @@ class AgentsScreen extends GetView<AgentsController> {
                       borderRadius: BorderRadius.circular(15),
                       child: image.isEmpty
                           ? Image.asset(AppImageAssets.blankProfilePicture,)
-                          : Image.memory(
-                        fit: BoxFit.cover,
-                        Base64Convertor().base64toImage(
-                          image,
+                          :SizedBox(
+                        child: CachedNetworkImage(
+                          imageUrl: image,
+                          placeholder: (BuildContext context, String url) => Image.asset(AppImageAssets.blankProfilePicture),
+                          errorWidget: (BuildContext context, String url, dynamic error) => const Icon(Icons.error),
                         ),
-                      ),
+                      )
                     ),
                   ),
                   const AppSpacing(h: 10,),

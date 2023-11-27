@@ -7,6 +7,7 @@ import 'package:bookme/core/presentation/utitls/app_spacing.dart';
 import 'package:bookme/core/presentation/widgets/location_icon.dart';
 import 'package:bookme/features/bookme/data/models/response/category/category_model.dart';
 import 'package:bookme/features/bookme/presentation/services/getx/services_controller.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -16,7 +17,6 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import '../../../../../core/presentation/theme/primary_color.dart';
 import '../../../../../core/presentation/widgets/exception_indicators/empty_list_indicator.dart';
 import '../../../../../core/presentation/widgets/exception_indicators/error_indicator.dart';
-import '../../../../../core/utitls/base_64.dart';
 import '../../../data/models/response/service/service_model.dart';
 
 class ServicesScreen extends GetView<ServicesController> {
@@ -134,11 +134,10 @@ class ServicesScreen extends GetView<ServicesController> {
                     tag: 'service${service.id}',
                       child: image.isEmpty ?
                           Image.asset(AppImageAssets.noServiceImage)
-                      :Image.memory(
-                        fit: BoxFit.cover,
-                        Base64Convertor().base64toImage(
-                          image,
-                        ),
+                      :CachedNetworkImage(
+                        imageUrl: image,
+                        placeholder: (BuildContext context, String url) => Image.asset(AppImageAssets.noServiceImage),
+                        errorWidget: (BuildContext context, String url, dynamic error) => const Icon(Icons.error),
                       ),
                   ),
                 ),
@@ -148,14 +147,14 @@ class ServicesScreen extends GetView<ServicesController> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Text(
-                        service.title,
+                        service.title ?? '',
                         style: context.textTheme.bodyMedium?.copyWith(
                             fontSize: 15, fontWeight: FontWeight.w500),
                       ),
                       IconText(text: service.location ?? ''),
                       SizedBox(
                         child: Text(
-                          service.description,
+                          service.description ?? '',
                           overflow: TextOverflow.ellipsis,
                           maxLines: 2,
                           style: TextStyle(
