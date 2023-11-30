@@ -6,6 +6,7 @@ import 'package:bookme/features/bookme/data/models/request/booking/booking_reque
 import 'package:bookme/features/bookme/data/models/request/chat/chat_request.dart';
 import 'package:bookme/features/bookme/data/models/request/favorite/add_favorite_request.dart';
 import 'package:bookme/features/bookme/data/models/request/message/message_request.dart';
+import 'package:bookme/features/bookme/data/models/request/notification/notification.dart';
 import 'package:bookme/features/bookme/data/models/request/service/service_request.dart';
 import 'package:bookme/features/bookme/data/models/response/booking/booking_model.dart';
 import 'package:bookme/features/bookme/data/models/response/category/category_model.dart';
@@ -139,13 +140,15 @@ class BookmeRepositoryImpl extends Repository implements BookmeRepository {
   Future<Either<Failure, Message>> sendMessage(
       {required String chatId,
       required String recipient,
-      required MessageContent message}) {
+      required MessageContent message,
+      required FCMNotification? notification,}) {
     return makeRequest(
       bookmeRemoteDatasource.sendMessage(
         chatId: chatId,
         messageRequest: MessageRequest(
           recipient: recipient,
           message: message,
+          notification: notification,
         ),
       ),
     );

@@ -2,6 +2,7 @@ import 'package:bookme/core/errors/failure.dart';
 import 'package:bookme/features/bookme/data/models/request/booking/booking_request.dart';
 import 'package:bookme/features/bookme/data/models/request/chat/chat_request.dart';
 import 'package:bookme/features/bookme/data/models/request/favorite/add_favorite_request.dart';
+import 'package:bookme/features/bookme/data/models/request/notification/notification.dart';
 import 'package:bookme/features/bookme/data/models/request/service/service_request.dart';
 import 'package:bookme/features/bookme/data/models/response/booking/booking_model.dart';
 import 'package:bookme/features/bookme/data/models/response/category/category_model.dart';
@@ -70,6 +71,7 @@ abstract class BookmeRepository {
     required String chatId,
     required String recipient,
     required MessageContent message,
+    required FCMNotification? notification,
   });
 
   Future<Either<Failure, Service>> addService(

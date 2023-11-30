@@ -2,10 +2,12 @@ import 'package:bookme/core/errors/failure.dart';
 import 'package:bookme/core/presentation/routes/app_routes.dart';
 import 'package:bookme/core/presentation/widgets/app_snacks.dart';
 import 'package:bookme/core/usecase/usecase.dart';
+import 'package:bookme/core/utitls/shared_preferences_wrapper.dart';
 import 'package:bookme/features/authentication/data/datasource/auth_local_data_source.dart';
 import 'package:bookme/features/authentication/data/models/response/login/login_response.dart';
 import 'package:bookme/features/bookme/data/models/request/booking/booking_request.dart';
 import 'package:bookme/features/bookme/data/models/request/favorite/add_favorite_request.dart';
+import 'package:bookme/features/bookme/data/models/request/notification/notification.dart';
 import 'package:bookme/features/bookme/data/models/response/favorite/favorite_model.dart';
 import 'package:bookme/features/bookme/data/models/response/listpage/listpage.dart';
 import 'package:bookme/features/bookme/data/models/response/service/service_model.dart';
@@ -56,10 +58,10 @@ class ServicesController extends GetxController {
     DateTime.now().add(const Duration(days: 1)),
   ].obs;
 
-
   // Home controller
   final HomeController homeController = Get.find();
   final AuthLocalDataSource _authLocalDataSource = Get.find();
+  final SharedPreferencesWrapper _sharedPreferencesWrapper = Get.find();
 
   // Paging controller
   final PagingController<int, Service> pagingController =
@@ -80,37 +82,43 @@ class ServicesController extends GetxController {
   }
 
   //check auth before booking agent
-  void bookAgent(Service service, BuildContext context) async{
-    checkAuth((User user) => createBooking(service, user.id,context));
+  void bookAgent(Service service, BuildContext context) async {
+    checkAuth((User user) => createBooking(service, user.id, context));
   }
 
   void createBooking(Service service, String user, BuildContext context) async {
     isLoading(true);
+
+    const FCMNotification notification = FCMNotification(
+      route: AppRoutes.tasks,
+    );
     final BookingRequest bookingRequest = BookingRequest(
         id: null,
         service: service.id,
         user: user,
         userId: user,
-        agentId:  service.user?.id,
+        agentId: service.user?.id,
         agent: service.user?.id,
         status: BookingStatus.requested.name,
         startDate: startDate.value,
         endDate: endDate.value,
         location: location.value,
-        notes: notes.value);
+        notes: notes.value,
+        notification: notification,
+    );
     final Either<Failure, Booking> failureOrBooking =
         await addBooking(bookingRequest);
     failureOrBooking.fold(
       (Failure failure) {
         isLoading(false);
-        AppSnacks.showError('Failed', 'Sorry could not book agent. Please try again');
+        AppSnacks.showError(
+            'Failed', 'Sorry could not book agent. Please try again');
       },
       (Booking booking) {
         isLoading(false);
         Navigator.pop(context);
         AppSnacks.showSuccess('Success', 'Agent booked successfully');
         Get.toNamed<dynamic>(AppRoutes.bookings);
-
       },
     );
   }
@@ -193,7 +201,7 @@ class ServicesController extends GetxController {
     );
   }
 
-  void onLocationInputChanged(String? value){
+  void onLocationInputChanged(String? value) {
     location(value);
   }
 

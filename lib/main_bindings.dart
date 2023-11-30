@@ -22,6 +22,7 @@ class MainBindings extends Bindings {
       AuthLocalDataSourceImpl(Get.find()),
     );
 
+
     Get.put<AppHTTPClient>(
       AppHTTPClient(Get.find()),
     );

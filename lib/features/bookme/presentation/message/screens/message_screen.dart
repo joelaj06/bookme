@@ -3,13 +3,13 @@ import 'package:bookme/core/presentation/utitls/app_assets.dart';
 import 'package:bookme/core/utitls/date_formatter.dart';
 import 'package:bookme/features/bookme/presentation/chat/arguments/chat_argument.dart';
 import 'package:bookme/features/bookme/presentation/message/getx/message_controller.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 import '../../../../../core/presentation/theme/primary_color.dart';
 import '../../../../../core/presentation/utitls/app_spacing.dart';
-import '../../../../../core/utitls/base_64.dart';
 import '../../../../authentication/data/models/response/user/user_model.dart';
 import '../../../data/models/response/chat/chat_model.dart';
 import '../../../data/models/response/message/message_model.dart';
@@ -57,8 +57,7 @@ class MessageScreen extends GetView<MessageController> {
           itemBuilder: (BuildContext context, int index) {
             return _buildMessageCard(controller.messages[index], context);
           },
-        )
-        ,
+        ),
       ),
     );
   }
@@ -230,11 +229,13 @@ class MessageScreen extends GetView<MessageController> {
           child: CircleAvatar(
             child: image.isEmpty
                 ? Image.asset(AppImageAssets.blankProfilePicture)
-                : Image.memory(
-                    fit: BoxFit.cover,
-                    Base64Convertor().base64toImage(
-                      image,
-                    ),
+                : CachedNetworkImage(
+                    imageUrl: image,
+                    placeholder: (BuildContext context, String url) =>
+                        Image.asset(AppImageAssets.blankProfilePicture),
+                    errorWidget:
+                        (BuildContext context, String url, dynamic error) =>
+                            const Icon(Icons.error),
                   ),
           ),
         ),
@@ -249,7 +250,8 @@ class MessageScreen extends GetView<MessageController> {
               style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
             ),
             Obx(() {
-              final RxBool isOnline = controller.checkUserStatus(controller.chatController.activeUsers, user);
+              final RxBool isOnline = controller.checkUserStatus(
+                  controller.chatController.activeUsers, user);
               return Text(
                 isOnline.value ? 'Online' : 'Offline',
                 overflow: TextOverflow.ellipsis,

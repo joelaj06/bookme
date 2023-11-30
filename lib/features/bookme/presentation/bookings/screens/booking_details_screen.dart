@@ -37,6 +37,7 @@ class BookingDetailsScreen extends GetView<BookingsController> {
       controller.startDate(args.booking.startDate.toString());
       controller.endDate(args.booking.endDate.toString());
     }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Booking Details'),

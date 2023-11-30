@@ -1,4 +1,5 @@
 import 'package:bookme/core/presentation/routes/app_routes.dart';
+import 'package:bookme/core/utitls/shared_preferences_wrapper.dart';
 import 'package:bookme/features/authentication/data/domain/usecase/login_user.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter/cupertino.dart';
@@ -6,6 +7,7 @@ import 'package:get/get.dart';
 
 import '../../../../../core/errors/failure.dart';
 import '../../../../../core/presentation/widgets/app_snacks.dart';
+import '../../../../../core/utitls/shared_prefs_keys.dart';
 import '../../../data/models/request/login/login_request.dart';
 import '../../../data/models/response/user/user_model.dart';
 
@@ -21,16 +23,20 @@ class LoginController extends GetxController{
   RxString password = ''.obs;
 
 
+  final SharedPreferencesWrapper _sharedPreferencesWrapper = Get.find();
 
 
   void login(BuildContext context) async {
     // ignore: unawaited_futures
     isLoading(true);
+    final String token =
+    await _sharedPreferencesWrapper.getString(SharedPrefsKeys.fcmToken);
 
     final Either<Failure, User> failureOrUser = await loginUser(
       LoginRequest(
         email: email.value,
         password: password.value,
+        deviceToken: token
       ),
     );
     // ignore: unawaited_futures

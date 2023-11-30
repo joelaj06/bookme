@@ -4,6 +4,7 @@ import 'package:bookme/core/utitls/app_socket_client.dart';
 import 'package:bookme/features/authentication/data/datasource/auth_local_data_source.dart';
 import 'package:bookme/features/authentication/data/models/response/login/login_response.dart';
 import 'package:bookme/features/bookme/data/models/request/message/message_request.dart';
+import 'package:bookme/features/bookme/data/models/request/notification/notification.dart';
 import 'package:bookme/features/bookme/data/models/response/listpage/listpage.dart';
 import 'package:bookme/features/bookme/data/models/response/message/message_content_model.dart';
 import 'package:bookme/features/bookme/data/models/response/message/message_model.dart';
@@ -156,12 +157,14 @@ class MessageController extends GetxController {
 
   Future<void> sendMessage() async {
     isLoading(true);
+    const FCMNotification notification = FCMNotification(route: AppRoutes.chats);
     final MessageContent messageContent = MessageContent(text: message.value);
     final MessageRequest messageRequest = MessageRequest(
       recipient: recipient,
       senderId: user.value.id,
       message: messageContent,
       chatId: chatId,
+      notification: notification,
     );
     emitMessageToRecipient(messageRequest);
     final Message tempMessage = Message(

@@ -1,5 +1,6 @@
 // ignore_for_file: invalid_annotation_target
 
+import 'package:bookme/features/bookme/data/models/request/notification/notification.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 
@@ -21,6 +22,7 @@ class BookingRequest with _$BookingRequest {
     String? status,
     @JsonKey(name: 'agent_id')String? agentId,
     @JsonKey(name: 'user_id') String? userId,
+    @JsonKey(name: 'fcm_notification') FCMNotification? notification,
   }) = _BookingRequest;
 
   const BookingRequest._();

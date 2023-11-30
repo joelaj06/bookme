@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "606386924997",
+    "project_id": "bookme-c907d",
+    "storage_bucket": "bookme-c907d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:606386924997:android:d1497dc016381ead2dafac",
+        "android_client_info": {
+          "package_name": "com.apps.bookme"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD21ts86XD5Q6M5cAd4BAee7vOYUJIVeeI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

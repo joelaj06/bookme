@@ -1,5 +1,6 @@
 // ignore_for_file: invalid_annotation_target
 
+import 'package:bookme/features/bookme/data/models/request/notification/notification.dart';
 import 'package:bookme/features/bookme/data/models/response/message/message_content_model.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -15,6 +16,7 @@ class MessageRequest with _$MessageRequest {
     required MessageContent message,
     bool? isRead,
     String? date,
+    @JsonKey(name: 'fcm_notification') FCMNotification? notification,
   }) = _MessageRequest;
 
   const MessageRequest._();

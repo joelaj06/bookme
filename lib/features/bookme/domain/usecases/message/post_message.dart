@@ -16,6 +16,7 @@ class PostMessage implements UseCase<Message, MessageRequest> {
       chatId: request.chatId!,
       recipient: request.recipient,
       message: request.message,
+      notification : request.notification
     );
   }
 }
